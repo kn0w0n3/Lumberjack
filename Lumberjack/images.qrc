@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/homeBtnImg.png</file>
+        <file>images/toolsBtn.png</file>
+        <file>images/GmenuClose.png</file>
+        <file>images/GopenMenuDots.png</file>
+        <file>images/helpBtn.png</file>
+        <file>images/J_homeBtnImg.jpg</file>
+    </qresource>
+</RCC>
