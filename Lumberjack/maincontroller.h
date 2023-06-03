@@ -5,6 +5,11 @@
 #include <QProcess>
 #include <QStringList>
 #include <QDebug>
+#include <QFile>
+#include <QTextStream>
+//#include <QByteArray>
+#include <QDomDocument>
+#include <QXmlStreamReader>
 
 class MainController:  public QWidget{
     Q_OBJECT
@@ -20,9 +25,12 @@ public slots:
     void processStdOutLogInfo();
     void processErrorLogInfo();
     void sendLogInfoToQml();
+    void convertEvtxToXml();
+    void getSecDatafromXml();
 
 private:
     QProcess getWinLogs;
+    QProcess parseLogs;
 
     QByteArray b_StdOutLogInfo;
     QByteArray b_StdErrLogInfo;

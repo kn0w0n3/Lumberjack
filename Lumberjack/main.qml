@@ -1,5 +1,6 @@
 import QtQuick
-import QtQuick.Controls
+//import QtQuick.Controls
+import QtQuick.Controls 2.15
 
 Window {
     width: 1280
@@ -15,6 +16,16 @@ Window {
         height: 720
         visible: true
         color: "#000000"
+
+        Image {
+            id: mainWinBgImg
+            x: 0
+            y: 0
+            width: 1280
+            height: 720
+            source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/bg.png"
+            fillMode: Image.PreserveAspectFit
+        }
 
         Rectangle {
             id: summaryRect
@@ -262,14 +273,25 @@ Window {
         }
         Text {
             id: logViewerTitleText
-            x: 1117
-            y: 673
-            width: 155
-            height: 39
+            x: 1162
+            y: 680
+            width: 110
+            height: 32
             color: "#ffffff"
             text: qsTr("Lumberjack")
-            font.pixelSize: 29
+            font.pixelSize: 21
         }
+
+        Image {
+            id: image
+            x: 8
+            y: 662
+            width: 50
+            height: 50
+            source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/GmenuClose.png"
+            fillMode: Image.PreserveAspectFit
+        }
+
     }
 
     Rectangle {
@@ -348,8 +370,26 @@ Window {
         width: 60
         height: 50
         //source: "images/toolsBtn.png"
-       source: "images/toolsBtn.png"
+        source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/toolsBtn.png"
         fillMode: Image.PreserveAspectFit
+
+        MouseArea {
+            id: mouseAreaToolsBtn
+            x: 0
+            y: 0
+            width: 60
+            height: 50
+            hoverEnabled: true
+            onEntered: {
+                toolsBtn.width = 63
+                toolsBtn.height = 53
+            }
+            onExited: {
+                toolsBtn.width = 60
+                toolsBtn.height = 50
+            }
+        }
+
     }
 
     Image {
@@ -359,10 +399,27 @@ Window {
         width: 60
         height: 50
         visible: true
-        source: "images/homeBtnImg.png"
+        source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/homeBtnImg.png"
         clip: false
         //source: "qrc:/images/homeBtnImg.png"
         z: 0
         fillMode: Image.PreserveAspectFit
+
+        MouseArea {
+            id: mouseAreaHomeBtn
+            x: 0
+            y: 0
+            width: 60
+            height: 50
+            hoverEnabled: true
+            onEntered: {
+                homeBtn.width = 63
+                homeBtn.height = 53
+            }
+            onExited: {
+                homeBtn.width = 60
+                homeBtn.height = 50
+            }
+        }
     }
 }
