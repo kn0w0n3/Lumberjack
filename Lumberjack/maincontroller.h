@@ -11,6 +11,12 @@
 #include <QDomDocument>
 #include <QXmlStreamReader>
 
+#include <QJsonDocument>
+#include <QJsonParseError>
+#include <QJsonObject>
+#include <QJsonValue>
+#include <QJsonArray>
+
 class MainController:  public QWidget{
     Q_OBJECT
 
@@ -20,25 +26,72 @@ public:
 signals:
 
 public slots:
-    void getLogInfo();
-    void processLogInfo();
-    void processStdOutLogInfo();
-    void processErrorLogInfo();
+    void getSystemLogs();
+    void getApplicationLogs();
+    void getSecurityLogs();
+
+    void processStdOutSecLogInfo();
+    void processErrorSecLogInfo();
+    void processStdOutAppLogInfo();
+    void processErrorAppLogInfo();
+    void processStdOutSysLogInfo();
+    void processErrorSysLogInfo();
+
     void sendLogInfoToQml();
-    void convertEvtxToXml();
+
+    void convertSecEvtxToXml();
+    void convertSecEvtxToJson();
+    void convertAppEvtxToXml();
+    void convertAppEvtxToJson();
+    void convertSysEvtxToXml();
+    void convertSysEvtxToJson();
+
     void getSecDatafromXml();
+    void getSecDataFromJson();
 
 private:
     QProcess getWinLogs;
+
+    QProcess getSystemLogsProcess;
+    QProcess getApplicationLogsProcess;
+    QProcess getSecurityLogsProcess;
+
     QProcess parseLogs;
+    QProcess convertSecEvtxToXmlProcess;
+    QProcess convertSecEvtxToJsonProcess;
+    QProcess convertAppEvtxToXmlProcess;
+    QProcess convertAppEvtxToJsonProcess;
+    QProcess convertSysEvtxToXmlProcess;
+    QProcess convertSysEvtxToJsonProcess;
 
-    QByteArray b_StdOutLogInfo;
-    QByteArray b_StdErrLogInfo;
+    //Byte arrays for std out info
+    QByteArray b_StdOutSecLogInfo;
+    QByteArray b_StdErrSecLogInfo;
 
-    QString s_StdOutLogInfo;
-    QString s_StdErrLogInfo;
+    QByteArray b_StdOutAppLogInfo;
+    QByteArray b_StdErrAppLogInfo;
+
+    QByteArray b_StdOutSysLogInfo;
+    QByteArray b_StdErrSysLogInfo;
+
+
+    //Strings for std out info
+    QString s_StdOutSecLogInfo;
+    QString s_StdErrSecLogInfo;
+
+    QString s_StdOutAppLogInfo;
+    QString s_StdErrAppLogInfo;
+
+    QString s_StdOutSysLogInfo;
+    QString s_StdErrSysLogInfo;
+
+
+
     QString LogInfoText;
 
+    QString evtxType = "";
+
+    QString jsonStringData;
 
 };
 
