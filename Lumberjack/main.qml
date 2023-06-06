@@ -8,6 +8,41 @@ Window {
     visible: true
     title: qsTr("Lumberjack")
 
+    //Main Controller Connections
+    Connections {
+        target: mainController
+
+       onSecurityEventCount2Qml:{
+           var receivedSecTxt = secEventCountX
+            secEventCountTxt.text = receivedSecTxt;
+             console.log("SecSignal Detected")
+
+        }
+      // function onSecurityEventCount2Qml() {
+                  // secEventCountTxt.text = secEventCountX
+                   //console.log("Signal javascript function Detected")
+                  // }
+
+       onAppEventCount2Qml:{
+           var receivedAppTxt = appEventCountX
+            appEventCountTxt.text = receivedAppTxt;
+             console.log("App Signal Detected")
+
+        }
+       onSysEventCount2Qml:{
+           var reveivedSysTxt = sysEventCountX
+            sysEventCountTxt.text = reveivedSysTxt;
+             console.log("Sys Signal Detected")
+
+        }
+        //function onSecurityEventCount2Qml(secEventCountX) {
+            //secEventCountTxt.text = 11;
+            //console.log("Signal Detected")
+           // }
+    }
+
+
+
     Rectangle {
         id: mainWin
         x: 0
@@ -16,6 +51,8 @@ Window {
         height: 720
         visible: true
         color: "#000000"
+
+
 
         Image {
             id: mainWinBgImg
@@ -29,21 +66,22 @@ Window {
 
         Rectangle {
             id: summaryRect
-            x: 239
+            x: 342
             y: 157
-            width: 802
-            height: 285
+            width: 597
+            height: 225
             color: "#000000"
             border.color: "#ffffff"
+
 
             Text {
                 id: errorLabel
                 x: 19
                 y: 63
-                width: 66
+                width: 131
                 height: 38
                 color: "#ffffff"
-                text: qsTr("Error:")
+                text: qsTr("Application:")
                 font.pixelSize: 25
             }
 
@@ -51,11 +89,11 @@ Window {
                 id: text2
                 x: 0
                 y: -33
-                width: 104
+                width: 90
                 height: 38
                 color: "#ffffff"
                 text: qsTr("Summary")
-                font.pixelSize: 25
+                font.pixelSize: 21
             }
 
             Text {
@@ -65,7 +103,7 @@ Window {
                 width: 96
                 height: 38
                 color: "#ffffff"
-                text: qsTr("Warning:")
+                text: qsTr("Security:")
                 font.pixelSize: 25
             }
 
@@ -76,18 +114,7 @@ Window {
                 width: 142
                 height: 38
                 color: "#ffffff"
-                text: qsTr("Information:")
-                font.pixelSize: 25
-            }
-
-            Text {
-                id: auditSuccesslabel
-                x: 18
-                y: 216
-                width: 162
-                height: 38
-                color: "#ffffff"
-                text: qsTr("Audit Success:")
+                text: qsTr("System:")
                 font.pixelSize: 25
             }
 
@@ -110,37 +137,13 @@ Window {
                 width: 110
                 height: 38
                 color: "#1827f4"
-                text: qsTr("Last Hour")
+                text: qsTr("Number of Events")
                 font.pixelSize: 25
                 font.underline: true
             }
 
             Text {
-                id: twentyfourHourlabedl
-                x: 534
-                y: 13
-                width: 103
-                height: 38
-                color: "#1827f4"
-                text: qsTr("24 Hours")
-                font.pixelSize: 25
-                font.underline: true
-            }
-
-            Text {
-                id: sevenDayLabel
-                x: 676
-                y: 13
-                width: 80
-                height: 38
-                color: "#1827f4"
-                text: qsTr("7 Days")
-                font.pixelSize: 25
-                font.underline: true
-            }
-
-            Text {
-                id: errorLabel1
+                id: appEventCountTxt
                 x: 382
                 y: 63
                 width: 110
@@ -151,29 +154,7 @@ Window {
             }
 
             Text {
-                id: errorLabel2
-                x: 534
-                y: 63
-                width: 103
-                height: 38
-                color: "#ffffff"
-                text: qsTr("0")
-                font.pixelSize: 25
-            }
-
-            Text {
-                id: errorLabel3
-                x: 676
-                y: 63
-                width: 118
-                height: 38
-                color: "#ffffff"
-                text: qsTr("0")
-                font.pixelSize: 25
-            }
-
-            Text {
-                id: errorLabel4
+                id: secEventCountTxt
                 x: 382
                 y: 112
                 width: 110
@@ -184,87 +165,10 @@ Window {
             }
 
             Text {
-                id: errorLabel5
+                id: sysEventCountTxt
                 x: 382
                 y: 164
                 width: 110
-                height: 38
-                color: "#ffffff"
-                text: qsTr("0")
-                font.pixelSize: 25
-            }
-
-            Text {
-                id: errorLabel6
-                x: 382
-                y: 216
-                width: 110
-                height: 38
-                color: "#ffffff"
-                text: qsTr("0")
-                font.pixelSize: 25
-            }
-
-            Text {
-                id: errorLabel7
-                x: 534
-                y: 112
-                width: 103
-                height: 38
-                color: "#ffffff"
-                text: qsTr("0")
-                font.pixelSize: 25
-            }
-
-            Text {
-                id: errorLabel8
-                x: 534
-                y: 164
-                width: 103
-                height: 38
-                color: "#ffffff"
-                text: qsTr("0")
-                font.pixelSize: 25
-            }
-
-            Text {
-                id: errorLabel9
-                x: 534
-                y: 216
-                width: 103
-                height: 38
-                color: "#ffffff"
-                text: qsTr("0")
-                font.pixelSize: 25
-            }
-
-            Text {
-                id: errorLabel10
-                x: 676
-                y: 112
-                width: 118
-                height: 38
-                color: "#ffffff"
-                text: qsTr("0")
-                font.pixelSize: 25
-            }
-
-            Text {
-                id: errorLabel11
-                x: 676
-                y: 164
-                width: 118
-                height: 38
-                color: "#ffffff"
-                text: qsTr("0")
-                font.pixelSize: 25
-            }
-
-            Text {
-                id: errorLabel12
-                x: 676
-                y: 216
-                width: 118
                 height: 38
                 color: "#ffffff"
                 text: qsTr("0")
@@ -422,4 +326,5 @@ Window {
             }
         }
     }
+
 }

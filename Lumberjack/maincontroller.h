@@ -16,6 +16,8 @@
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QJsonArray>
+#include <QStringList>
+#include <QObject>
 
 class MainController:  public QWidget{
     Q_OBJECT
@@ -24,6 +26,9 @@ public:
     MainController(QWidget *parent = nullptr);
 
 signals:
+    void securityEventCount2Qml(QString secEventCountX);
+    void appEventCount2Qml(QString appEventCountX);
+    void sysEventCount2Qml(QString sysEventCountX);
 
 public slots:
     void getSystemLogs();
@@ -48,6 +53,9 @@ public slots:
 
     void getSecDatafromXml();
     void getSecDataFromJson();
+
+    void getAppDataFromJson();
+    void getSysDataFromJson();
 
 private:
     QProcess getWinLogs;
@@ -92,6 +100,11 @@ private:
     QString evtxType = "";
 
     QString jsonStringData;
+    QStringList jsonObjects;
+
+    int numOfSecEvents = 0;
+    int numbOfAppEvents = 0;
+    int numbOfSysEvents = 0;
 
 };
 
