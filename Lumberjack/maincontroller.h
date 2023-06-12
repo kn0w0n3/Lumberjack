@@ -29,6 +29,7 @@ signals:
     void securityEventCount2Qml(QString secEventCountX);
     void appEventCount2Qml(QString appEventCountX);
     void sysEventCount2Qml(QString sysEventCountX);
+    void processingStatus2Qml(QString processingStatus);
 
 public slots:
     void getSystemLogs();

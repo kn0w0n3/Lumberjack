@@ -1,9 +1,9 @@
 #include "maincontroller.h"
 
 MainController::MainController(QWidget *parent) : QWidget(parent){
-    getSecurityLogs();
-    getApplicationLogs();
-    getSystemLogs();
+    //getSecurityLogs();
+    //getApplicationLogs();
+    //getSystemLogs();
     //getSecDatafromXml();
     //getSecDataFromJson();
     //convertSecEvtxToJson();
@@ -12,6 +12,7 @@ MainController::MainController(QWidget *parent) : QWidget(parent){
 //Save system logs to evtx file
 void MainController::getSystemLogs(){
     qDebug() << "In get system logs........";
+    emit processingStatus2Qml("Processing data, please wait...");
     QStringList args;
 
     args  << "$log = Get-WmiObject -Class Win32_NTEventlogFile | Where-Object LogfileName -EQ 'system';"
@@ -26,6 +27,7 @@ void MainController::getSystemLogs(){
 //Save application logs to evtx file
 void MainController::getApplicationLogs(){
     qDebug() << "In get Application logs........";
+    emit processingStatus2Qml("Processing data, please wait...");
     QStringList args;
 
     args  << "$log = Get-WmiObject -Class Win32_NTEventlogFile | Where-Object LogfileName -EQ 'application';"
@@ -40,6 +42,7 @@ void MainController::getApplicationLogs(){
 //Save secuity logs to evtx file
 void MainController::getSecurityLogs(){
     qDebug() << "In get Security logs........";
+    emit processingStatus2Qml("Processing data, please wait...");
     QStringList args;
 
     args  << "$log = Get-WmiObject -Class Win32_NTEventlogFile | Where-Object LogfileName -EQ 'security';" <<
@@ -70,7 +73,7 @@ void MainController::convertSecEvtxToXml(){
 //App wouldn't run because it was missing the above microsoft requirement
 void MainController::convertSecEvtxToJson(){
     qDebug() << "IN CONVERT SEC EVTX TO JSON........";
-
+    emit processingStatus2Qml("Processing data, please wait...");
     QStringList args;
     args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/EvtxeCmd/;"
          << "./EvtxECmd.exe -f C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/security/security.evtx --json C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/json/security/ --fj --jsonf security.json";
@@ -87,7 +90,7 @@ void MainController::convertAppEvtxToXml(){
 
 void MainController::convertAppEvtxToJson(){
     qDebug() << "IN CONVERT App EVTX TO JSON........";
-
+    emit processingStatus2Qml("Processing data, please wait...");
     QStringList args;
     args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/EvtxeCmd/;"
          << "./EvtxECmd.exe -f C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/application/application.evtx --json C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/json/application/ --jsonf application.json";
@@ -104,7 +107,7 @@ void MainController::convertSysEvtxToXml(){
 
 void MainController::convertSysEvtxToJson(){
     qDebug() << "IN CONVERT Sys EVTX TO JSON........";
-
+    emit processingStatus2Qml("Processing data, please wait...");
     QStringList args;
     args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/EvtxeCmd/;"
          << "./EvtxECmd.exe -f C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/system/system.evtx --json C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/json/system/ --jsonf system.json";
@@ -120,7 +123,6 @@ void MainController::getSecDatafromXml(){
 }
 
 void MainController::getSecDataFromJson(){
-
     qDebug() << "In get SEC data from JSON file.......";
 
     QFile file("C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/json/security/security.json");
@@ -161,11 +163,13 @@ void MainController::getSecDataFromJson(){
     qDebug() << "Trying to emit";
     emit securityEventCount2Qml(QString::number(numOfSecEvents));
     numOfSecEvents = 0;
+    emit processingStatus2Qml("Summary");
 }
 
 void MainController::getAppDataFromJson(){
     qDebug() << "In get App data from JSON file.......";
 
+    emit processingStatus2Qml("Processing data, please wait...");
     QFile file("C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/json/application/application.json");
     if(!file.open(QIODevice::ReadOnly)) {
 
@@ -198,7 +202,7 @@ void MainController::getAppDataFromJson(){
 
 void MainController::getSysDataFromJson(){
     qDebug() << "In get Sys data from JSON file.......";
-
+    emit processingStatus2Qml("Processing data, please wait...");
     QFile file("C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/json/system/system.json");
     if(!file.open(QIODevice::ReadOnly)) {
 
