@@ -1,6 +1,8 @@
 import QtQuick
 //import QtQuick.Controls
 import QtQuick.Controls 2.15
+import Qt5Compat.GraphicalEffects
+import QtQml.Models 2.12
 
 Window {
     width: 1280
@@ -99,28 +101,6 @@ Window {
                 fillMode: Image.PreserveAspectFit
             }
 
-            Text {
-                id: clockText
-                x: 1211
-                y: 28
-                width: 74
-                height: 20
-                color: "#ffffff"
-                text: qsTr("")
-                font.pixelSize: 16
-            }
-
-            Text {
-                id: curDateTxt
-                x: 1208
-                y: 8
-                width: 74
-                height: 20
-                color: "#ffffff"
-                text: qsTr("")
-                font.pixelSize: 16
-            }
-
             Image {
                 id: image2
                 x: 1157
@@ -134,22 +114,40 @@ Window {
 
             Text {
                 id: text1
-                x: 550
-                y: 8
-                width: 180
-                height: 48
+                x: 604
+                y: 3
+                width: 72
+                height: 30
                 color: "#ffffff"
-                text: qsTr("Main Menu")
-                font.pixelSize: 35
+                text: qsTr("Home")
+                font.pixelSize: 25
             }
 
             Button {
                 id: button
                 x: 343
                 y: 401
-                width: 63
-                height: 23
+                width: 100
+                height: 25
                 text: qsTr("Start")
+                hoverEnabled: false
+                background: Rectangle {
+                    color: "#161e20"
+                    radius: 50
+                }
+                layer.enabled: true
+                layer.effect: DropShadow {
+                    width: 100
+                    visible: true
+                    color: "#ffffff"
+                    radius: 8
+                    horizontalOffset: 2
+                    spread: 0
+                    verticalOffset: 2
+                    transparentBorder: true
+                    samples: 17
+                }
+                palette.buttonText: "#ffffff"
                 onClicked: {
                     mainController.getSecurityLogs();
                     mainController.getApplicationLogs();
@@ -159,11 +157,29 @@ Window {
 
             Button {
                 id: button1
-                x: 441
+                x: 492
                 y: 401
-                width: 63
-                height: 23
+                width: 100
+                height: 25
                 text: qsTr("Save")
+                hoverEnabled: false
+                background: Rectangle {
+                    color: "#161e20"
+                    radius: 50
+                }
+                layer.enabled: true
+                layer.effect: DropShadow {
+                    width: 100
+                    visible: true
+                    color: "#ffffff"
+                    radius: 8
+                    horizontalOffset: 2
+                    spread: 0
+                    verticalOffset: 2
+                    transparentBorder: true
+                    samples: 17
+                }
+                palette.buttonText: "#ffffff"
             }
         }
 
@@ -330,9 +346,137 @@ Window {
         }
 
         ComboBox {
-            id: comboBox
+            id: control
             x: 82
-            y: 37
+            y: 43
+            width: 116
+            height: 21
+            model: ["Filter", "Application", "System", "Security", "Custom"]
+
+            delegate: ItemDelegate {
+                width: control.width
+                contentItem: Text {
+                    text: control.textRole
+                          ? (Array.isArray(control.model) ? modelData[control.textRole] : model[control.textRole])
+                          : modelData
+                    color: "#000000" //Change the text color of the model data in the drop down box.
+                    font: control.font
+                    elide: Text.ElideRight
+                    verticalAlignment: Text.AlignVCenter
+                }
+                highlighted: control.highlightedIndex === index
+            }
+
+            indicator: Canvas {
+                id: canvas
+                x: control.width - width - control.rightPadding
+                y: control.topPadding + (control.availableHeight - height) / 2
+                width: 12
+                height: 8
+                contextType: "2d"
+
+                Connections {
+                    target: control
+                    function onPressedChanged() { canvas.requestPaint(); }
+                }
+
+                //This will change the color of the triangle indicator.
+                onPaint: {
+                    context.reset();
+                    context.moveTo(0, 0);
+                    context.lineTo(width, 0);
+                    context.lineTo(width / 2, height);
+                    context.closePath();
+                    context.fillStyle = control.pressed ? "#ffffff" : "#ffffff";
+                    context.fill();
+                }
+            }
+            //The second color is the main color. The first item is what color the changes to once clicked.
+            //This will change the text color of main text in the box.
+            contentItem: Text {
+                leftPadding: 0
+                rightPadding: control.indicator.width + control.spacing
+
+                text: control.displayText
+                font: control.font
+                color: control.pressed ? "#000000" : "#ffffff"
+                verticalAlignment: Text.AlignVCenter
+                elide: Text.ElideRight
+            }
+
+            //This will change the main box background color, border color,  and the border color when pressed.
+            //The second color is the main color. The first item is what color the changes to once clicked.
+            background: Rectangle {
+                implicitWidth: 120
+                implicitHeight: 40
+                color: "#000000"
+                border.color: control.pressed ? "#ffffff" : "#ffffff"
+                border.width: control.visualFocus ? 2 : 1
+                radius: 2
+            }
+
+            popup: Popup {
+                y: control.height - 1
+                width: control.width
+                implicitHeight: contentItem.implicitHeight
+                padding: 1
+
+                contentItem: ListView {
+                    clip: true
+                    implicitHeight: contentHeight
+                    model: control.popup.visible ? control.delegateModel : null
+                    currentIndex: control.highlightedIndex
+
+                    ScrollIndicator.vertical: ScrollIndicator { }
+                }
+
+                //This will change the color of the drop down Rectangle
+                background: Rectangle {
+                    border.color: "#ffffff"
+                    color: "#ffffff"
+                    radius: 5
+                }
+            }
+
+
+        }
+
+        Text {
+            id: text2
+            x: 607
+            y: 8
+            width: 108
+            height: 26
+            color: "#ffffff"
+            text: qsTr("Log Viewer")
+            font.pixelSize: 21
+        }
+
+        Button {
+            id: selectFileBtn
+            x: 82
+            y: 612
+            width: 100
+            height: 25
+            text: qsTr("Select File")
+            hoverEnabled: false
+            background: Rectangle {
+                color: "#161e20"
+                radius: 50
+            }
+            layer.enabled: true
+            layer.effect: DropShadow {
+                width: 100
+                visible: true
+                color: "#ffffff"
+                radius: 8
+                horizontalOffset: 2
+                spread: 0
+                verticalOffset: 2
+                transparentBorder: true
+                samples: 17
+            }
+            palette.buttonText: "#ffffff"
         }
     }
 
@@ -453,6 +597,28 @@ Window {
         }
     }
 
+    Text {
+        id: curDateTxt
+        x: 1200
+        y: 8
+        width: 74
+        height: 20
+        color: "#ffffff"
+        text: qsTr("")
+        font.pixelSize: 16
+    }
+
+    Text {
+        id: clockText
+        x: 1210
+        y: 28
+        width: 74
+        height: 20
+        color: "#ffffff"
+        text: qsTr("")
+        font.pixelSize: 16
+    }
+
     Image {
         id: homeBtn
         x: 5
@@ -543,6 +709,8 @@ Window {
             }
         }
     }
+
+
 
 
 
