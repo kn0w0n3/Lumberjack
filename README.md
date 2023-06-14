@@ -10,4 +10,8 @@ Based on Qt 6.4.3 (MSVC 2019, x86_64)
 Built on May 4 2023 01:13:52  
 From revision d2b3c31e04  
 Kit 6.5.1 MinGW 64-bit      
-https://www.qt.io/      
+https://www.qt.io/  
+
+# **Requirements:**   
+https://aka.ms/dotnet-core-applaunch?framework=Microsoft.NETCore.App&framework_version=6.0.0&arch=x64&rid=win10-x64  
+
