@@ -18,7 +18,6 @@
 #include <QJsonArray>
 #include <QStringList>
 #include <QObject>
-#include <QThread>
 
 class MainController:  public QWidget{
     Q_OBJECT

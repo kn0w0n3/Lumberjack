@@ -20,7 +20,7 @@ void MainController::getSystemLogs(){
 
     getSystemLogsProcess.connect(&getSystemLogsProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutSysLogInfo);
     getSystemLogsProcess.connect(&getSystemLogsProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorSysLogInfo);
-    connect(&getSystemLogsProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{convertSysEvtxToJson();});
+    connect(&getSystemLogsProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{convertSysEvtxToXml(); convertSysEvtxToJson();});
     getSystemLogsProcess.start("powershell", args);
 }
 
@@ -35,7 +35,7 @@ void MainController::getApplicationLogs(){
 
     getApplicationLogsProcess.connect(&getApplicationLogsProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutAppLogInfo);
     getApplicationLogsProcess.connect(&getApplicationLogsProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorAppLogInfo);
-    connect(&getApplicationLogsProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{convertAppEvtxToJson();});
+    connect(&getApplicationLogsProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{convertAppEvtxToXml(); convertAppEvtxToJson();});
     getApplicationLogsProcess.start("powershell", args);
 }
 
@@ -50,9 +50,8 @@ void MainController::getSecurityLogs(){
 
     getSecurityLogsProcess.connect(&getSecurityLogsProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutSecLogInfo);
     getSecurityLogsProcess.connect(&getSecurityLogsProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorSecLogInfo);
-    connect(&getSecurityLogsProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{convertSecEvtxToJson(); convertSecEvtxToXml();});
+    connect(&getSecurityLogsProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{convertSecEvtxToJson();});
     getSecurityLogsProcess.start("powershell", args);
-
 }
 
 
@@ -72,18 +71,17 @@ void MainController::convertSecEvtxToXml(){
 
 //https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-6.0.16-windows-x64-installer?cid=getdotnetcore
 //App wouldn't run because it was missing the above microsoft requirement
-//Evtx conversion to json won't work without: https://aka.ms/dotnet-core-applaunch?framework=Microsoft.NETCore.App&framework_version=6.0.0&arch=x64&rid=win10-x64
-void MainController::convertSecEvtxToJson(){   
+void MainController::convertSecEvtxToJson(){
     qDebug() << "IN CONVERT SEC EVTX TO JSON........";
     emit processingStatus2Qml("Processing data, please wait...");
     QStringList args;
     args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/EvtxeCmd/;"
-         << "./EvtxECmd.exe -f C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/security/security.evtx --json C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/json/security --jsonf security.json";
+         << "./EvtxECmd.exe -f C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/security/security.evtx --json C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/json/security/ --fj --jsonf security.json";
 
     convertSecEvtxToJsonProcess.connect(&convertSecEvtxToJsonProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutSecLogInfo);
     convertSecEvtxToJsonProcess.connect(&convertSecEvtxToJsonProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorSecLogInfo);
     connect(&convertSecEvtxToJsonProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{getSecDataFromJson();});
-    convertSecEvtxToJsonProcess.start("powershell", args);  
+    convertSecEvtxToJsonProcess.start("powershell", args);
 }
 
 void MainController::convertAppEvtxToXml(){
@@ -200,7 +198,6 @@ void MainController::getAppDataFromJson(){
     qDebug() << "Trying to emit";
     emit appEventCount2Qml(QString::number(numbOfAppEvents));
     numbOfAppEvents = 0;
-    emit processingStatus2Qml("Summary");
 }
 
 void MainController::getSysDataFromJson(){
@@ -232,7 +229,6 @@ void MainController::getSysDataFromJson(){
     qDebug() << "Trying to emit";
     emit sysEventCount2Qml(QString::number(numbOfSysEvents));
     numbOfAppEvents = 0;
-    emit processingStatus2Qml("Summary");
 }
 
 void MainController::processStdOutSecLogInfo(){

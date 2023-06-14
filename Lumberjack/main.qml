@@ -302,20 +302,10 @@ Window {
         id: convertEvtxWin
         x: 0
         y: 0
-        width: 1280
+        width: 1284
         height: 720
         visible: false
         color: "#000000"
-
-        Image {
-            id: convertEvtxWinBg
-            x: 0
-            y: 0
-            width: 1280
-            height: 720
-            source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/bg.png"
-            fillMode: Image.PreserveAspectFit
-        }
 
         Image {
             id: image
@@ -339,8 +329,8 @@ Window {
 
             Button {
                 id: button4
-                x: 203
-                y: 467
+                x: 153
+                y: 139
                 width: 75
                 height: 25
                 text: qsTr("Select FIle")
@@ -366,8 +356,8 @@ Window {
 
             Rectangle {
                 id: rectangle2
-                x: 292
-                y: 469
+                x: 240
+                y: 138
                 width: 200
                 height: 25
                 color: "#000000"
@@ -376,8 +366,8 @@ Window {
 
             Button {
                 id: saveToBtn
-                x: 834
-                y: 467
+                x: 817
+                y: 137
                 width: 75
                 height: 25
                 text: qsTr("Save To")
@@ -403,37 +393,19 @@ Window {
 
             Rectangle {
                 id: rectangle3
-                x: 923
-                y: 469
+                x: 904
+                y: 138
                 width: 200
                 height: 25
                 color: "#000000"
                 border.color: "#ffffff"
             }
-
-            Rectangle {
-                id: rectangle4
-                x: 203
-                y: 72
-                width: 920
-                height: 359
-                color: "#000000"
-                border.color: "#ffffff"
-
-                ScrollView {
-                    id: scrollView1
-                    x: 8
-                    y: 8
-                    width: 904
-                    height: 343
-                }
-            }
         }
 
         ComboBox {
             id: control1
-            x: 584
-            y: 470
+            x: 575
+            y: 141
             width: 116
             height: 21
             popup: Popup {
@@ -506,7 +478,6 @@ Window {
             }
             model: ["Convert To", "JSON", "XML", "CSV"]
         }
-
     }
 
     Rectangle {
@@ -517,16 +488,6 @@ Window {
         height: 720
         visible: false
         color: "#000000"
-
-        Image {
-            id: logViewWinBg
-            x: 0
-            y: 0
-            width: 1280
-            height: 720
-            source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/bg.png"
-            fillMode: Image.PreserveAspectFit
-        }
 
         Rectangle {
             id: rectangle
@@ -687,7 +648,6 @@ Window {
             }
             palette.buttonText: "#ffffff"
         }
-
     }
 
     Rectangle {
@@ -698,16 +658,6 @@ Window {
         height: 720
         visible: false
         color: "#000000"
-
-        Image {
-            id: image3
-            x: 0
-            y: 0
-            width: 1282
-            height: 720
-            source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/bg.png"
-            fillMode: Image.PreserveAspectFit
-        }
 
         Text {
             id: text3
@@ -855,7 +805,6 @@ Window {
             }
             palette.buttonText: "#ffffff"
         }
-
     }
 
     Rectangle {
@@ -899,7 +848,6 @@ Window {
                 mainWin.visible = false
                 logViewerWin.visible = false
                 logViewerSettings.visible = true
-                convertEvtxWin.visible  = false
             }
         }
 
@@ -1006,7 +954,6 @@ Window {
     }
 
 
-
     Image {
         id: homeBtn
         x: 5
@@ -1039,7 +986,6 @@ Window {
                 mainWin.visible = true
                 logViewerWin.visible = false
                 logViewerSettings.visible = false
-                convertEvtxWin.visible  = false
             }
         }
     }
@@ -1071,7 +1017,6 @@ Window {
                 mainWin.visible = false
                 logViewerWin.visible = true
                 logViewerSettings.visible = false
-                convertEvtxWin.visible  = false
             }
         }
     }
@@ -1099,13 +1044,6 @@ Window {
                 evtxConvertBtn.width = 63
                 evtxConvertBtn.height = 53
             }
-            onClicked: {
-                mainWin.visible = false
-                logViewerWin.visible = false
-                logViewerSettings.visible = false
-                convertEvtxWin.visible  = true
-            }
         }
     }
-
 }
