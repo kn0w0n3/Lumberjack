@@ -5,12 +5,14 @@ MainController::MainController(QWidget *parent) : QWidget(parent){
     //getApplicationLogs();
     //getSystemLogs();
     //getSecDatafromXml();
-    getSecDataFromJson();
+    //getSecDataFromJson();
+    //convertSecEvtxToJson();
 }
 
 //Save system logs to evtx file
 void MainController::getSystemLogs(){
     qDebug() << "In get system logs........";
+    emit processingStatus2Qml("Processing data, please wait...");
     QStringList args;
 
     args  << "$log = Get-WmiObject -Class Win32_NTEventlogFile | Where-Object LogfileName -EQ 'system';"
@@ -18,13 +20,14 @@ void MainController::getSystemLogs(){
 
     getSystemLogsProcess.connect(&getSystemLogsProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutSysLogInfo);
     getSystemLogsProcess.connect(&getSystemLogsProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorSysLogInfo);
-    connect(&getSystemLogsProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{convertSysEvtxToXml(); convertSysEvtxToJson();});
+    connect(&getSystemLogsProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{convertSysEvtxToJson();});
     getSystemLogsProcess.start("powershell", args);
 }
 
 //Save application logs to evtx file
 void MainController::getApplicationLogs(){
     qDebug() << "In get Application logs........";
+    emit processingStatus2Qml("Processing data, please wait...");
     QStringList args;
 
     args  << "$log = Get-WmiObject -Class Win32_NTEventlogFile | Where-Object LogfileName -EQ 'application';"
@@ -32,13 +35,14 @@ void MainController::getApplicationLogs(){
 
     getApplicationLogsProcess.connect(&getApplicationLogsProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutAppLogInfo);
     getApplicationLogsProcess.connect(&getApplicationLogsProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorAppLogInfo);
-    connect(&getApplicationLogsProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{convertAppEvtxToXml(); convertAppEvtxToJson();});
+    connect(&getApplicationLogsProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{convertAppEvtxToJson();});
     getApplicationLogsProcess.start("powershell", args);
 }
 
 //Save secuity logs to evtx file
 void MainController::getSecurityLogs(){
     qDebug() << "In get Security logs........";
+    emit processingStatus2Qml("Processing data, please wait...");
     QStringList args;
 
     args  << "$log = Get-WmiObject -Class Win32_NTEventlogFile | Where-Object LogfileName -EQ 'security';" <<
@@ -46,8 +50,189 @@ void MainController::getSecurityLogs(){
 
     getSecurityLogsProcess.connect(&getSecurityLogsProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutSecLogInfo);
     getSecurityLogsProcess.connect(&getSecurityLogsProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorSecLogInfo);
-    connect(&getSecurityLogsProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{convertSecEvtxToXml(); convertSecEvtxToJson();});
+    connect(&getSecurityLogsProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{convertSecEvtxToJson(); convertSecEvtxToXml();});
     getSecurityLogsProcess.start("powershell", args);
+
+}
+
+
+
+void MainController::convertSecEvtxToXml(){
+    qDebug() << "IN CONVERT SEC EVTX TO XML........";
+
+    QStringList args;
+    args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/EvtxeCmd/;"
+         << "./EvtxECmd.exe -f C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/security/security.evtx --xml C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/xml/security/ --jsonf security.xml";
+
+    convertSecEvtxToXmlProcess.connect(&convertSecEvtxToXmlProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutSecLogInfo);
+    convertSecEvtxToXmlProcess.connect(&convertSecEvtxToXmlProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorSecLogInfo);
+    //connect(&convertSecEvtxToXmlProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{getSecDatafromXml();});
+    convertSecEvtxToXmlProcess.start("powershell", args);
+}
+
+//https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-6.0.16-windows-x64-installer?cid=getdotnetcore
+//App wouldn't run because it was missing the above microsoft requirement
+//Evtx conversion to json won't work without: https://aka.ms/dotnet-core-applaunch?framework=Microsoft.NETCore.App&framework_version=6.0.0&arch=x64&rid=win10-x64
+void MainController::convertSecEvtxToJson(){   
+    qDebug() << "IN CONVERT SEC EVTX TO JSON........";
+    emit processingStatus2Qml("Processing data, please wait...");
+    QStringList args;
+    args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/EvtxeCmd/;"
+         << "./EvtxECmd.exe -f C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/security/security.evtx --json C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/json/security --jsonf security.json";
+
+    convertSecEvtxToJsonProcess.connect(&convertSecEvtxToJsonProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutSecLogInfo);
+    convertSecEvtxToJsonProcess.connect(&convertSecEvtxToJsonProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorSecLogInfo);
+    connect(&convertSecEvtxToJsonProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{getSecDataFromJson();});
+    convertSecEvtxToJsonProcess.start("powershell", args);  
+}
+
+void MainController::convertAppEvtxToXml(){
+
+}
+
+void MainController::convertAppEvtxToJson(){
+    qDebug() << "IN CONVERT App EVTX TO JSON........";
+    emit processingStatus2Qml("Processing data, please wait...");
+    QStringList args;
+    args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/EvtxeCmd/;"
+         << "./EvtxECmd.exe -f C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/application/application.evtx --json C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/json/application/ --jsonf application.json";
+
+    convertAppEvtxToJsonProcess.connect(&convertAppEvtxToJsonProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutAppLogInfo);
+    convertAppEvtxToJsonProcess.connect(&convertAppEvtxToJsonProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorAppLogInfo);
+    connect(&convertAppEvtxToJsonProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{getAppDataFromJson();});
+    convertAppEvtxToJsonProcess.start("powershell", args);
+}
+
+void MainController::convertSysEvtxToXml(){
+
+}
+
+void MainController::convertSysEvtxToJson(){
+    qDebug() << "IN CONVERT Sys EVTX TO JSON........";
+    emit processingStatus2Qml("Processing data, please wait...");
+    QStringList args;
+    args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/EvtxeCmd/;"
+         << "./EvtxECmd.exe -f C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/system/system.evtx --json C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/json/system/ --jsonf system.json";
+
+    convertSysEvtxToJsonProcess.connect(&convertSysEvtxToJsonProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutSysLogInfo);
+    convertSysEvtxToJsonProcess.connect(&convertSysEvtxToJsonProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorSysLogInfo);
+    connect(&convertSysEvtxToJsonProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{getSysDataFromJson();});
+    convertSysEvtxToJsonProcess.start("powershell", args);
+}
+
+void MainController::getSecDatafromXml(){
+
+}
+
+void MainController::getSecDataFromJson(){
+    qDebug() << "In get SEC data from JSON file.......";
+
+    QFile file("C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/json/security/security.json");
+    if(!file.open(QIODevice::ReadOnly)) {
+
+    }
+
+    QTextStream in(&file);
+    while (!in.atEnd()){
+        jsonObjects << in.readLine();
+    }
+    file.close();
+
+    foreach(const QString &logEntry, jsonObjects){
+        numOfSecEvents++;
+        QString numToString = QString::number(numOfSecEvents);
+        //qDebug() << "The counter is: " + numToString;
+
+        QByteArray tArray = logEntry.trimmed().toLocal8Bit();
+        QJsonDocument json_doc = QJsonDocument::fromJson(tArray);
+        QJsonObject jsonObject = json_doc.object();
+        QJsonObject obdata = jsonObject.value("Event").toObject().value("System").toObject();
+        QString eventId = obdata["EventID"].toString();
+    }
+
+    //Working JSON!!!
+    /*
+    foreach(const QString &logEntry, jsonObjects){
+        QByteArray tArray = logEntry.trimmed().toLocal8Bit();
+        QJsonDocument json_doc = QJsonDocument::fromJson(tArray);
+        QJsonObject jsonObject = json_doc.object();
+        QJsonObject obdata = jsonObject.value("Event").toObject().value("System").toObject().value("Provider").toObject();
+        QString test = obdata["@Name"].toString();
+        qDebug() << "Event id is:" + test;
+    }
+    */
+
+    qDebug() << "Trying to emit";
+    emit securityEventCount2Qml(QString::number(numOfSecEvents));
+    numOfSecEvents = 0;
+    emit processingStatus2Qml("Summary");
+}
+
+void MainController::getAppDataFromJson(){
+    qDebug() << "In get App data from JSON file.......";
+
+    emit processingStatus2Qml("Processing data, please wait...");
+    QFile file("C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/json/application/application.json");
+    if(!file.open(QIODevice::ReadOnly)) {
+
+    }
+
+    QTextStream in(&file);
+    while (!in.atEnd()){
+        //QString line = in.readLine();
+        //qDebug() << "Data is: " + line;
+        jsonObjects << in.readLine();
+    }
+    file.close();
+
+    foreach(const QString &logEntry, jsonObjects){
+        numbOfAppEvents++;
+
+        //qDebug() << "The counter is: " + QString::number(numbOfAppEvents);
+
+        QByteArray tArray = logEntry.trimmed().toLocal8Bit();
+        QJsonDocument json_doc = QJsonDocument::fromJson(tArray);
+        QJsonObject jsonObject = json_doc.object();
+        QJsonObject obdata = jsonObject.value("Event").toObject().value("System").toObject();
+        QString eventId = obdata["EventID"].toString();
+    }
+
+    qDebug() << "Trying to emit";
+    emit appEventCount2Qml(QString::number(numbOfAppEvents));
+    numbOfAppEvents = 0;
+    emit processingStatus2Qml("Summary");
+}
+
+void MainController::getSysDataFromJson(){
+    qDebug() << "In get Sys data from JSON file.......";
+    emit processingStatus2Qml("Processing data, please wait...");
+    QFile file("C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/json/system/system.json");
+    if(!file.open(QIODevice::ReadOnly)) {
+
+    }
+
+    QTextStream in(&file);
+    while (!in.atEnd()){
+        jsonObjects << in.readLine();
+    }
+    file.close();
+
+    foreach(const QString &logEntry, jsonObjects){
+        numbOfSysEvents++;
+
+        //qDebug() << "The counter is: " + QString::number(numbOfSysEvents);
+
+        QByteArray tArray = logEntry.trimmed().toLocal8Bit();
+        QJsonDocument json_doc = QJsonDocument::fromJson(tArray);
+        QJsonObject jsonObject = json_doc.object();
+        QJsonObject obdata = jsonObject.value("Event").toObject().value("System").toObject();
+        QString eventId = obdata["EventID"].toString();
+    }
+
+    qDebug() << "Trying to emit";
+    emit sysEventCount2Qml(QString::number(numbOfSysEvents));
+    numbOfAppEvents = 0;
+    emit processingStatus2Qml("Summary");
 }
 
 void MainController::processStdOutSecLogInfo(){
@@ -89,164 +274,4 @@ void MainController::processErrorSysLogInfo(){
 
 void MainController::sendLogInfoToQml(){
     //qDebug() <<"Sending info to QML: " + s_StdOutLogInfo;
-}
-
-void MainController::convertSecEvtxToXml(){
-    qDebug() << "IN CONVERT SEC EVTX TO XML........";
-
-    QStringList args;
-    args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/;"
-         << "./evtx_dump-v0_8_1 C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/security/security.evtx | Out-File -FilePath C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/xml/security/security.xml";
-
-    convertSecEvtxToXmlProcess.connect(&convertSecEvtxToXmlProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutSecLogInfo);
-    convertSecEvtxToXmlProcess.connect(&convertSecEvtxToXmlProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorSecLogInfo);
-    //connect(&convertSecEvtxToXmlProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{getSecDatafromXml();});
-    convertSecEvtxToXmlProcess.start("powershell", args);
-}
-
-void MainController::convertSecEvtxToJson(){
-    qDebug() << "IN CONVERT SEC EVTX TO JSON........";
-
-    QStringList args;
-    args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/;"
-         << "./evtx_dump-v0_8_1 -o json C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/security/security.evtx | Out-File -FilePath C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/json/security/security.json";
-
-    convertSecEvtxToJsonProcess.connect(&convertSecEvtxToJsonProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutSecLogInfo);
-    convertSecEvtxToJsonProcess.connect(&convertSecEvtxToJsonProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorSecLogInfo);
-    connect(&convertSecEvtxToJsonProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{getSecDataFromJson();});
-    convertSecEvtxToJsonProcess.start("powershell", args);
-}
-
-void MainController::convertAppEvtxToXml(){
-    qDebug() << "IN CONVERT App EVTX TO XML........";
-
-    QStringList args;
-    args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/;"
-         << "./evtx_dump-v0_8_1 C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/application/application.evtx | Out-File -FilePath C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/xml/application/application.xml";
-
-    convertAppEvtxToXmlProcess.connect(&convertAppEvtxToXmlProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutAppLogInfo);
-    convertAppEvtxToXmlProcess.connect(&convertAppEvtxToXmlProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorAppLogInfo);
-    //connect(&convertAppEvtxToXmlProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{getSecDatafromXml();});
-    convertAppEvtxToXmlProcess.start("powershell", args);
-
-}
-
-void MainController::convertAppEvtxToJson(){
-    qDebug() << "IN CONVERT App EVTX TO JSON........";
-
-    QStringList args;
-    args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/;"
-         << "./evtx_dump-v0_8_1 -o json C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/application/application.evtx | Out-File -FilePath C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/json/application/application.json";
-
-    convertAppEvtxToJsonProcess.connect(&convertAppEvtxToJsonProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutAppLogInfo);
-    convertAppEvtxToJsonProcess.connect(&convertAppEvtxToJsonProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorAppLogInfo);
-    //connect(&convertAppEvtxToJsonProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{getSecDatafromXml();});
-    convertAppEvtxToJsonProcess.start("powershell", args);
-}
-
-void MainController::convertSysEvtxToXml(){
-    qDebug() << "IN CONVERT Sys EVTX TO XML........";
-
-    QStringList args;
-    args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/;"
-         << "./evtx_dump-v0_8_1 C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/system/system.evtx | Out-File -FilePath C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/xml/system/system.xml";
-
-    convertSysEvtxToXmlProcess.connect(&convertSysEvtxToXmlProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutSysLogInfo);
-    convertSysEvtxToXmlProcess.connect(&convertSysEvtxToXmlProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorSysLogInfo);
-    //connect(&convertSysEvtxToXmlProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{getSecDatafromXml();});
-    convertSysEvtxToXmlProcess.start("powershell", args);
-}
-
-void MainController::convertSysEvtxToJson(){
-    qDebug() << "IN CONVERT Sys EVTX TO JSON........";
-
-    QStringList args;
-    args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/;"
-         << "./evtx_dump-v0_8_1 -o json C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/system/system.evtx | Out-File -FilePath C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/json/system/system.json";
-
-    convertSysEvtxToJsonProcess.connect(&convertSysEvtxToJsonProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutSysLogInfo);
-    convertSysEvtxToJsonProcess.connect(&convertSysEvtxToJsonProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorSysLogInfo);
-    //connect(&convertSysEvtxToJsonProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{getSecDatafromXml();});
-    convertSysEvtxToJsonProcess.start("powershell", args);
-}
-
-void MainController::getSecDatafromXml(){
-    QFile file("C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/xml/security/security.xml");
-
-    qDebug() << "Trying to open XML file........";
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        qDebug() << "Failed to open file!";
-        return;
-    }
-
-    QXmlStreamReader xml(&file);
-    //while (!xml.atEnd() && !xml.hasError())
-    while (!xml.atEnd()){
-        xml.readNext();
-        //if (xml.isStartElement())
-       // {
-            QString name = xml.name().toString();
-            if (name == "EventData"){
-
-                QString data = xml.readElementText();
-                //if(data.isEmpty() || data == "\n"){
-                    //continue;
-                    //xml.readNext();
-                    //continue;
-                    //xml.readNext();
-                    //continue;
-                //}
-               // else{
-                qDebug() << "element name: '" << name  << "'"
-                     << ", text: '" << data
-                     << "'" ;
-                //}
-            }
-       // }
-    }
-
-    if (xml.hasError()){
-       qDebug() << "XML ERROR IS........" + xml.errorString();
-    }
-
-    else if (xml.atEnd()){
-        qDebug() << "XML END........Reached end, done";
-    }
-}
-
-void MainController::getSecDataFromJson(){
-    qDebug() << "In get SEC data from JSON file.......";
-
-    QFile file("C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/json/security/security.json");
-    if(!file.open(QIODevice::ReadOnly)) {
-
-    }
-
-    QTextStream in(&file);
-
-    while(!in.atEnd()) {
-        jsonStringData = in.readAll();
-
-    }
-    file.close();
-
-    QJsonDocument json_doc = QJsonDocument::fromJson(jsonStringData.toUtf8());
-    QJsonObject jsonObject = json_doc.object();
-     //QJsonArray array = json_doc.array();
-
-     //foreach(const QJsonValue &v, array){
-     //    QJsonObject obj = v.toObject();
-    // }
-    ///
-
-    //Get the desired info from the JSON data.
-    //QJsonObject obdata = jsonObject["Event"].toObject();
-    //QString test = obdata.value("EventData").toObject().value("SubjectUserName").toString();
-    QString test = jsonObject.value("Event").toObject().value("EventData").toObject().value("SubjectUserName").toString();
-    qDebug() << "The json data is: " +  test;
-    //rank = obdata["rank"].toString();
-    //marketCapUsd = obdata["marketCapUsd"].toString();
-    //availableSupply = obdata["supply"].toString();
-    //maxSupply = obdata["maxSupply"].toString();
 }
