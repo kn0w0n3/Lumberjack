@@ -1,7 +1,7 @@
 # Lumberjack
 Windows Log Viewer 
 
-![GUI_6_13_23](https://github.com/kn0w0n3/Lumberjack/assets/22214754/585e27ba-ca1e-4ed4-a33d-dda559348d97)    
+![GUI_6_14_23](https://github.com/kn0w0n3/Lumberjack/assets/22214754/2c755263-6555-4f49-9932-a95375a4e95d)      
  
 # **Work Environment:**       
 ![QtLogo](https://user-images.githubusercontent.com/22214754/179895211-d52559ab-35df-4fcc-bf69-7377739330d4.png)  
