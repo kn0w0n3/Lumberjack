@@ -20,6 +20,7 @@ Window {
         }
     }
 
+
     Timer {
         id: dateTimer
         interval: 1000
@@ -34,44 +35,6 @@ Window {
     }
 
     //Main Controller Connections
-    Connections {
-        target: mainController
-
-        onSecurityEventCount2Qml:{
-            var receivedSecTxt = secEventCountX
-            secEventCountTxt.text = receivedSecTxt;
-            console.log("SecSignal Detected")
-
-        }
-        // function onSecurityEventCount2Qml() {
-        // secEventCountTxt.text = secEventCountX
-        //console.log("Signal javascript function Detected")
-        // }
-
-        onAppEventCount2Qml:{
-            var receivedAppTxt = appEventCountX
-            appEventCountTxt.text = receivedAppTxt;
-            console.log("App Signal Detected")
-
-        }
-        onSysEventCount2Qml:{
-            var reveivedSysTxt = sysEventCountX
-            sysEventCountTxt.text = reveivedSysTxt;
-            console.log("Sys Signal Detected")
-
-        }
-        onProcessingStatus2Qml:{
-
-            summaryText.text = processingStatus;
-
-        }
-
-        //function onSecurityEventCount2Qml(secEventCountX) {
-        //secEventCountTxt.text = 11;
-        //console.log("Signal Detected")
-        // }
-    }
-
 
     Rectangle {
         id: mainWin
@@ -79,7 +42,7 @@ Window {
         y: 0
         width: 1280
         height: 720
-        visible: true
+        visible: false
         color: "#000000"
 
         Image {
@@ -298,187 +261,67 @@ Window {
 
     }
 
-    Rectangle {
-        id: convertEvtxWin
-        x: 0
-        y: 0
-        width: 1284
-        height: 720
-        visible: false
-        color: "#000000"
+    Connections {
+        target: mainController
 
-        Image {
-            id: image
-            x: 0
-            y: 0
-            width: 1284
-            height: 720
-            source: "images/bg.png"
-            fillMode: Image.PreserveAspectFit
-
-            Text {
-                id: text6
-                x: 569
-                y: 8
-                width: 147
-                height: 28
-                color: "#ffffff"
-                text: qsTr("EVTX Converter")
-                font.pixelSize: 21
-            }
-
-            Button {
-                id: button4
-                x: 153
-                y: 139
-                width: 75
-                height: 25
-                text: qsTr("Select FIle")
-                hoverEnabled: false
-                background: Rectangle {
-                    color: "#161e20"
-                    radius: 50
-                }
-                layer.enabled: true
-                layer.effect: DropShadow {
-                    width: 100
-                    visible: true
-                    color: "#ffffff"
-                    radius: 8
-                    horizontalOffset: 2
-                    spread: 0
-                    verticalOffset: 2
-                    transparentBorder: true
-                    samples: 17
-                }
-                palette.buttonText: "#ffffff"
-            }
-
-            Rectangle {
-                id: rectangle2
-                x: 240
-                y: 138
-                width: 200
-                height: 25
-                color: "#000000"
-                border.color: "#ffffff"
-            }
-
-            Button {
-                id: saveToBtn
-                x: 817
-                y: 137
-                width: 75
-                height: 25
-                text: qsTr("Save To")
-                hoverEnabled: false
-                background: Rectangle {
-                    color: "#161e20"
-                    radius: 50
-                }
-                layer.enabled: true
-                layer.effect: DropShadow {
-                    width: 100
-                    visible: true
-                    color: "#ffffff"
-                    radius: 8
-                    horizontalOffset: 2
-                    spread: 0
-                    verticalOffset: 2
-                    transparentBorder: true
-                    samples: 17
-                }
-                palette.buttonText: "#ffffff"
-            }
-
-            Rectangle {
-                id: rectangle3
-                x: 904
-                y: 138
-                width: 200
-                height: 25
-                color: "#000000"
-                border.color: "#ffffff"
-            }
+        onSecurityEventCount2Qml:{
+            var receivedSecTxt = secEventCountX
+            secEventCountTxt.text = receivedSecTxt;
+            //console.log("SecSignal Detected")
+        }
+        onAppEventCount2Qml:{
+            var receivedAppTxt = appEventCountX
+            appEventCountTxt.text = receivedAppTxt;
+            //console.log("App Signal Detected")
+        }
+        onSysEventCount2Qml:{
+            var reveivedSysTxt = sysEventCountX
+            sysEventCountTxt.text = reveivedSysTxt;
+            //console.log("Sys Signal Detected")
+        }
+        onProcessingStatus2Qml:{
+            summaryText.text = processingStatus;
+        }
+        onDataToLogViewer:{
+            logViewerWinTxtArea.text += logData + "\n";
+            //console.log("Log Data Signal Detected")
+        }
+        onPopulateFlagDataToQml:{
+            //iFlagText.text = eventIdFlag
+            //console.log("flag is: " + flagText.text)
+            eventModel.append({"listEntry": " Event ID: " + eventIdFlag})
+        }
+        //Display the file path
+        onFilePathToQml:{
+            cew_SelectFileTxt.text = filePath
+        }
+        //Display the dir path
+        onDirPathToQml:{
+            cew_SelectDirTxt.text = dirPath
+        }
+        //Display the save to path
+        onSaveToPathToQml:{
+            cew_SaveToTxt.text = saveToPath
+        }
+        onFileConvertEvtxStatus:{
+            cew_logTxtArea.text += curStatus + "\n"
+        }
+        onFileNameToQml:{
+            cew_fileSaveAsNameTxt.text = fileName
         }
 
-        ComboBox {
-            id: control1
-            x: 575
-            y: 141
-            width: 116
-            height: 21
-            popup: Popup {
-                y: control1.height - 1
-                width: control1.width
-                padding: 1
-                background: Rectangle {
-                    color: "#ffffff"
-                    radius: 5
-                    border.color: "#ffffff"
-                }
-                contentItem: ListView {
-                    ScrollIndicator.vertical: ScrollIndicator {
-                    }
-                    currentIndex: control1.highlightedIndex
-                    clip: true
-                    model: control1.popup.visible ? control1.delegateModel : null
-                    implicitHeight: contentHeight
-                }
-                implicitHeight: contentItem.implicitHeight
-            }
-            background: Rectangle {
-                color: "#000000"
-                radius: 2
-                border.color: control1.pressed ? "#ffffff" : "#ffffff"
-                border.width: control1.visualFocus ? 2 : 1
-                implicitWidth: 120
-                implicitHeight: 40
-            }
-            contentItem: Text {
-                color: control1.pressed ? "#000000" : "#ffffff"
-                text: control1.displayText
-                elide: Text.ElideRight
-                verticalAlignment: Text.AlignVCenter
-                rightPadding: control1.indicator.width + control1.spacing
-                font: control1.font
-                leftPadding: 0
-            }
-            indicator: Canvas {
-                x: control1.width - width - control1.rightPadding
-                y: control1.topPadding + (control1.availableHeight - height) / 2
-                width: 12
-                height: 8
-                Connections {
-                    target: control1
-                }
-                contextType: "2d"
-                onPaint: {
-                    context.reset();
-                    context.moveTo(0, 0);
-                    context.lineTo(width, 0);
-                    context.lineTo(width / 2, height);
-                    context.closePath();
-                    context.fillStyle = control1.pressed ? "#ffffff" : "#ffffff";
-                    context.fill();
-                }
-            }
-            delegate: ItemDelegate {
-                width: control1.width
-                contentItem: Text {
-                    color: "#000000"
-                    text: control1.textRole
-                          ? (Array.isArray(control1.model) ? modelData[control1.textRole] : model[control1.textRole])
-                          : modelData
-                    elide: Text.ElideRight
-                    verticalAlignment: Text.AlignVCenter
-                    font: control1.font
-                }
-                highlighted: control1.highlightedIndex === index
-            }
-            model: ["Convert To", "JSON", "XML", "CSV"]
-        }
+        //function onSecurityEventCount2Qml(secEventCountX) {
+        //secEventCountTxt.text = 11;
+        //console.log("Signal Detected")
+        // }
+        // function onSecurityEventCount2Qml() {
+        // secEventCountTxt.text = secEventCountX
+        //console.log("Signal javascript function Detected")
+        // }
     }
+
+
+
 
     Rectangle {
         id: logViewerWin
@@ -489,37 +332,50 @@ Window {
         visible: false
         color: "#000000"
 
+        Image {
+            id: logViewWinBg
+            x: 0
+            y: 0
+            width: 1280
+            height: 720
+            source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/bg.png"
+            fillMode: Image.PreserveAspectFit
+        }
+
         Rectangle {
             id: rectangle
-            x: 82
+            x: 133
             y: 70
-            width: 1158
-            height: 520
+            width: 1075
+            height: 490
             color: "#000000"
             border.color: "#ffffff"
         }
 
         ScrollView {
             id: scrollView
-            x: 82
-            y: 70
-            width: 1158
-            height: 509
-        }
+            x: 136
+            y: 74
+            width: 1068
+            height: 480
+            clip: true
 
-        TextArea {
-            id: textArea
-            x: 85
-            y: 73
-            width: 1151
-            height: 513
-            placeholderText: qsTr("Text Area")
-            background: Rectangle {color: "black"}
+            TextArea {
+                id: logViewerWinTxtArea
+                x: 0
+                y: 0
+                width: 1068
+                height: 480
+                color: "#ffffff"
+                font.pointSize: 13
+                placeholderText: qsTr("Text Area")
+                background: Rectangle {color: "black"}
+            }
         }
 
         ComboBox {
             id: control
-            x: 82
+            x: 133
             y: 43
             width: 116
             height: 21
@@ -624,8 +480,8 @@ Window {
 
         Button {
             id: selectFileBtn
-            x: 82
-            y: 612
+            x: 133
+            y: 578
             width: 100
             height: 25
             text: qsTr("Select File")
@@ -648,10 +504,449 @@ Window {
             }
             palette.buttonText: "#ffffff"
         }
+
     }
 
+
     Rectangle {
-        id: logViewerSettings
+        id: convertEvtxWin
+        x: 0
+        y: 0
+        width: 1280
+        height: 720
+        visible: true
+        color: "#000000"
+
+        Image {
+            id: image
+            x: 0
+            y: 0
+            width: 1280
+            height: 720
+            source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/bg.png"
+            fillMode: Image.PreserveAspectFit
+
+            Text {
+                id: bannerText
+                x: 605
+                y: 8
+                width: 147
+                height: 28
+                color: "#ffffff"
+                text: qsTr("EVTX Converter")
+                font.pixelSize: 21
+            }
+
+            Button {
+                id: evtxWinSelectFileBtn
+                x: 213
+                y: 447
+                width: 75
+                height: 25
+                text: qsTr("Select FIle")
+                hoverEnabled: false
+                background: Rectangle {
+                    color: "#161e20"
+                    radius: 50
+                }
+                layer.enabled: true
+                layer.effect: DropShadow {
+                    width: 100
+                    visible: true
+                    color: "#ffffff"
+                    radius: 8
+                    horizontalOffset: 2
+                    spread: 0
+                    verticalOffset: 2
+                    transparentBorder: true
+                    samples: 17
+                }
+                palette.buttonText: "#ffffff"
+                onClicked: {
+                    mainController.ce_SelectFile()
+
+                }
+            }
+
+            Rectangle {
+                id: ecw_SelectFileRect
+                x: 304
+                y: 449
+                width: 839
+                height: 25
+                color: "#000000"
+                border.color: "#ffffff"
+
+                Text {
+                    id: cew_SelectFileTxt
+                    x: 2
+                    y: 2
+                    width: 834
+                    height: 21
+                    color: "#ffffff"
+                    text: qsTr("")
+                    font.pixelSize: 15
+                }
+            }
+
+            Button {
+                id: ce_SaveToBtn
+                x: 213
+                y: 533
+                width: 75
+                height: 25
+                text: qsTr("Save To")
+                hoverEnabled: false
+                background: Rectangle {
+                    color: "#161e20"
+                    radius: 50
+                }
+                layer.enabled: true
+                layer.effect: DropShadow {
+                    width: 100
+                    visible: true
+                    color: "#ffffff"
+                    radius: 8
+                    horizontalOffset: 2
+                    spread: 0
+                    verticalOffset: 2
+                    transparentBorder: true
+                    samples: 17
+                }
+                palette.buttonText: "#ffffff"
+                onClicked: {
+                    mainController.ce_SaveToPath()
+                }
+            }
+
+            Rectangle {
+                id: ecw_SaveToRect
+                x: 304
+                y: 533
+                width: 839
+                height: 25
+                color: "#000000"
+                border.color: "#ffffff"
+
+                Text {
+                    id: cew_SaveToTxt
+                    x: 2
+                    y: 2
+                    width: 835
+                    height: 21
+                    color: "#ffffff"
+                    text: qsTr("")
+                    font.pixelSize: 15
+                }
+            }
+
+            Rectangle {
+                id: ecw_TxtDataRect
+                x: 213
+                y: 64
+                width: 930
+                height: 360
+                color: "#000000"
+                border.color: "#ffffff"
+
+                ScrollView {
+                    id: ecw_scrollview
+                    x: 3
+                    y: 3
+                    width: 924
+                    height: 353
+
+                    TextArea {
+                        id: cew_logTxtArea
+                        x: -7
+                        y: -3
+                        color: "#ffffff"
+                        placeholderText: qsTr("Text Area")
+                        background: Rectangle {color: "black"}
+                    }
+                }
+            }
+
+            Button {
+                id: cew_selectDirBtn
+                x: 213
+                y: 492
+                width: 75
+                height: 25
+                text: qsTr("Select Dir")
+                layer.effect: DropShadow {
+                    width: 100
+                    visible: true
+                    color: "#ffffff"
+                    radius: 8
+                    samples: 17
+                    transparentBorder: true
+                    horizontalOffset: 2
+                    spread: 0
+                    verticalOffset: 2
+                }
+                layer.enabled: true
+                background: Rectangle {
+                    color: "#161e20"
+                    radius: 50
+                }
+                hoverEnabled: false
+                palette.buttonText: "#ffffff"
+                onClicked: {
+                    mainController.ce_SelectDir()
+                }
+            }
+
+            Rectangle {
+                id: ecw_SelectDirRect
+                x: 304
+                y: 492
+                width: 839
+                height: 25
+                color: "#000000"
+                border.color: "#ffffff"
+
+                Text {
+                    id: cew_SelectDirTxt
+                    x: 2
+                    y: 2
+                    width: 835
+                    height: 21
+                    color: "#ffffff"
+                    text: qsTr("")
+                    font.pixelSize: 15
+                }
+            }
+
+            Button {
+                id: cew_StartBtn
+                x: 450
+                y: 614
+                width: 125
+                height: 27
+                text: qsTr("Start")
+                layer.effect: DropShadow {
+                    width: 100
+                    visible: true
+                    color: "#ffffff"
+                    radius: 8
+                    samples: 17
+                    transparentBorder: true
+                    horizontalOffset: 2
+                    spread: 0
+                    verticalOffset: 2
+                }
+                layer.enabled: true
+                background: Rectangle {
+                    color: "#161e20"
+                    radius: 50
+                }
+                hoverEnabled: false
+                palette.buttonText: "#ffffff"
+                onClicked: {
+                    if(control1.currentText === "Convert To"){
+                        cew_logTxtArea.text += "Please select a conversion type..."+ "\n"
+                        console.log("Please select a conversion type...")
+                        return;
+                    }
+                    else if(cew_SelectFileTxt.text === "" && cew_SelectDirTxt.text === ""){
+                        cew_logTxtArea.text += "Select a file or directory..."+ "\n"
+                        console.log("Select file and select dir felds are empty...")
+                        return;
+                    }
+
+                    else if(cew_SaveToTxt.text === ""){
+                        cew_logTxtArea.text += "Select a location to save the converted files" + "\n"
+                        console.log("Select a location to save the converted files...")
+                        return;
+                    }
+                    else if(cew_fileSaveAsNameTxt.text === ""){
+                        cew_logTxtArea.text += "Please enter a name for the file to be converted. Do not include the extension..." + "\n"
+                        console.log("Please enter a name for the new file. Do not include the extension...")
+                        return;
+                    }
+
+                    else if(cew_SelectFileTxt.text !== "" && cew_SelectDirTxt.text !== ""){
+                        //This situation should not happen because one field is set to "" when the other is populated, but just in case...
+                        console.log("Select file or dir not both...")
+                        return;
+                    }
+                    else if(cew_SelectFileTxt.text !== "" && cew_SelectDirTxt.text === ""){
+                        console.log("Select file has text and selct dir does not...")
+                        if(cew_fileSaveAsNameTxt.text === ""){
+                            console.log("Please enter a file name...")
+                            return;
+                        }
+                        else{
+                            mainController.fileConvertEvtx(control1.currentText, cew_SelectFileTxt.text, cew_SaveToTxt.text, cew_fileSaveAsNameTxt.text)
+                            console.log("SENDING DATA TO C++...")
+                            //console.log("control.currentText " + control.currentText)
+                            //console.log("cew_SelectFileTxt.text " + cew_SelectFileTxt.text)
+                            //console.log("cew_SaveToTxt.text " + cew_SaveToTxt.text)
+                            //console.log("cew_fileSaveAsNameTxt.text " + cew_fileSaveAsNameTxt.text)
+                        }
+                    }
+                    else if(cew_SelectDirTxt.text !== "" && cew_SelectFileTxt.text === ""){
+                        console.log("Select dir has text and selct file does not...")
+                        if(cew_fileSaveAsNameTxt.text !== ""){
+                            console.log("Error: File name must be blank for directory conversion. Files will be converted using original file names....")
+                            return;
+                        }
+                        else{
+                            mainController.fileConvertEvtx(control1.currentText, cew_SelectDirTxt.text, cew_SaveToTxt.text)
+                            console.log("SENDING DATA TO C++...")
+                        }
+                    }
+                }
+            }
+
+            Rectangle {
+                id: ecw_FIleNameRect
+                x: 304
+                y: 573
+                width: 839
+                height: 25
+                color: "#000000"
+                border.color: "#ffffff"
+
+                TextEdit {
+                    id: cew_fileSaveAsNameTxt
+                    x: 2
+                    y: 2
+                    width: 835
+                    height: 21
+                    color: "#ffffff"
+                    text: qsTr("")
+                    font.pixelSize: 16
+                }
+            }
+
+            Text {
+                id: fileNameLabel
+                x: 218
+                y: 574
+                color: "#ffffff"
+                text: qsTr("File name:")
+                font.pixelSize: 16
+            }
+
+            Button {
+                id: cew_ClearBtn
+                x: 855
+                y: 614
+                width: 125
+                height: 27
+                text: qsTr("Clear")
+                layer.effect: DropShadow {
+                    width: 100
+                    visible: true
+                    color: "#ffffff"
+                    radius: 8
+                    samples: 17
+                    transparentBorder: true
+                    horizontalOffset: 2
+                    spread: 0
+                    verticalOffset: 2
+                }
+                layer.enabled: true
+                background: Rectangle {
+                    color: "#161e20"
+                    radius: 50
+                }
+                hoverEnabled: false
+                palette.buttonText: "#ffffff"
+                onClicked: {
+                    cew_logTxtArea.clear()
+                    cew_SelectFileTxt.text = ""
+                    cew_SelectDirTxt.text = ""
+                    cew_SaveToTxt.text = ""
+                    cew_fileSaveAsNameTxt.text = ""
+                }
+            }
+        }
+
+        ComboBox {
+            id: control1
+            x: 213
+            y: 36
+            width: 116
+            height: 21
+            popup: Popup {
+                y: control1.height - 1
+                width: control1.width
+                padding: 1
+                background: Rectangle {
+                    color: "#ffffff"
+                    radius: 5
+                    border.color: "#ffffff"
+                }
+                contentItem: ListView {
+                    ScrollIndicator.vertical: ScrollIndicator {
+                    }
+                    currentIndex: control1.highlightedIndex
+                    clip: true
+                    model: control1.popup.visible ? control1.delegateModel : null
+                    implicitHeight: contentHeight
+                }
+                implicitHeight: contentItem.implicitHeight
+            }
+            background: Rectangle {
+                color: "#000000"
+                radius: 2
+                border.color: control1.pressed ? "#ffffff" : "#ffffff"
+                border.width: control1.visualFocus ? 2 : 1
+                implicitWidth: 120
+                implicitHeight: 40
+            }
+            contentItem: Text {
+                color: control1.pressed ? "#000000" : "#ffffff"
+                text: control1.displayText
+                elide: Text.ElideRight
+                verticalAlignment: Text.AlignVCenter
+                rightPadding: control1.indicator.width + control1.spacing
+                font: control1.font
+                leftPadding: 0
+            }
+            indicator: Canvas {
+                x: control1.width - width - control1.rightPadding
+                y: control1.topPadding + (control1.availableHeight - height) / 2
+                width: 12
+                height: 8
+                Connections {
+                    target: control1
+                }
+                contextType: "2d"
+                onPaint: {
+                    context.reset();
+                    context.moveTo(0, 0);
+                    context.lineTo(width, 0);
+                    context.lineTo(width / 2, height);
+                    context.closePath();
+                    context.fillStyle = control1.pressed ? "#ffffff" : "#ffffff";
+                    context.fill();
+                }
+            }
+            delegate: ItemDelegate {
+                width: control1.width
+                contentItem: Text {
+                    color: "#000000"
+                    text: control1.textRole
+                          ? (Array.isArray(control1.model) ? modelData[control1.textRole] : model[control1.textRole])
+                          : modelData
+                    elide: Text.ElideRight
+                    verticalAlignment: Text.AlignVCenter
+                    font: control1.font
+                }
+                highlighted: control1.highlightedIndex === index
+            }
+            model: ["Convert To", "JSON", "Full JSON", "XML", "CSV"]
+        }
+    }
+
+
+
+    Rectangle {
+        id: flagsWin
         x: 0
         y: 0
         width: 1280
@@ -659,41 +954,62 @@ Window {
         visible: false
         color: "#000000"
 
+        Image {
+            id: image4
+            x: 0
+            y: 0
+            width: 1280
+            height: 720
+            source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/bg.png"
+            fillMode: Image.PreserveAspectFit
+
+            Rectangle {
+                id: rectangle4
+                x: 419
+                y: 72
+                width: 777
+                height: 346
+                color: "#000000"
+                border.color: "#ffffff"
+            }
+        }
+
         Text {
             id: text3
-            x: 595
+            x: 609
             y: 8
-            width: 91
+            width: 62
             height: 33
             color: "#ffffff"
-            text: qsTr("Settings")
+            text: qsTr("Flags")
             font.pixelSize: 25
         }
 
         Rectangle {
             id: rectangle1
-            x: 290
-            y: 136
-            width: 130
+            x: 175
+            y: 73
+            width: 200
             height: 28
             color: "#000000"
             border.color: "#ffffff"
 
             TextInput {
-                id: textInput
-                x: 0
-                y: 0
-                width: 130
+                id: flagTxtInput
+                x: 2
+                y: 1
+                width: 196
                 height: 28
-                text: qsTr("Text Input")
-                font.pixelSize: 12
+                color: "#ffffff"
+                text: qsTr("")
+                font.pixelSize: 17
             }
         }
 
         Rectangle {
             id: currentFlags
-            x: 762
-            y: 106
+            x: 175
+            y: 218
             width: 200
             height: 200
             color: "#000000"
@@ -705,6 +1021,7 @@ Window {
                 y: 2
                 width: 196
                 height: 195
+                clip: true
 
                 model: ListModel {
                     id:eventModel
@@ -712,29 +1029,36 @@ Window {
                         listEntry: ""
                     }
                 }
+
                 delegate: Rectangle{
-                    id: iremindLabelText
+                    id: flagLabelText
                     width: 196
                     height: 23
                     color: "#000000"
                     border.color: "#ffffff"
                     radius: 5
                     Text {
-                        id:reminderText
+                        id: iFlagText
+                        color: "#ffffff"
                         //text: _billName + "   |   " + _dueDate + "    |   " + _dateToNotify + "    |   " + _amountDue
                         text: listEntry
                         font.bold: false
                         anchors.verticalCenter: parent.verticalCenter
                     }
                 }
+                Component.onCompleted: {
+                    eventModel.remove(0)
+                    mainController.populateFlagData()
+
+                }
             }
         }
 
         Text {
             id: text4
-            x: 762
-            y: 78
-            width: 200
+            x: 175
+            y: 190
+            width: 180
             height: 22
             color: "#ffffff"
             text: qsTr("Current Event ID Flags")
@@ -743,9 +1067,9 @@ Window {
 
         Text {
             id: text5
-            x: 290
-            y: 108
-            width: 93
+            x: 178
+            y: 45
+            width: 69
             height: 22
             color: "#ffffff"
             text: qsTr("Event ID")
@@ -753,9 +1077,9 @@ Window {
         }
 
         Button {
-            id: button2
-            x: 196
-            y: 136
+            id: addFlagBtn
+            x: 176
+            y: 109
             width: 74
             height: 28
             text: qsTr("Add")
@@ -777,12 +1101,16 @@ Window {
                 samples: 17
             }
             palette.buttonText: "#ffffff"
+
+            onClicked: {
+                mainController.saveFlagData(flagTxtInput.text)
+            }
         }
 
         Button {
-            id: button3
-            x: 762
-            y: 324
+            id: deleteFlagBtn
+            x: 175
+            y: 424
             width: 75
             height: 24
             text: qsTr("Delete")
@@ -805,6 +1133,72 @@ Window {
             }
             palette.buttonText: "#ffffff"
         }
+
+    }
+
+
+    Rectangle {
+        id: schedulerWin
+        x: 0
+        y: 0
+        width: 1280
+        height: 720
+        visible: false
+        color: "#000000"
+        border.color: "#000000"
+
+        Image {
+            id: image3
+            x: 0
+            y: 0
+            width: 1280
+            height: 720
+            source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/bg.png"
+            fillMode: Image.PreserveAspectFit
+
+            Text {
+                id: bannerTxt
+                x: 584
+                y: 8
+                width: 113
+                height: 34
+                color: "#ffffff"
+                text: qsTr("Scheduler")
+                font.pixelSize: 25
+            }
+        }
+    }
+
+
+
+    Rectangle {
+        id: settingsWin
+        x: 0
+        y: 0
+        width: 1280
+        height: 720
+        visible: false
+        color: "#000000"
+        border.color: "#000000"
+        Image {
+            id: settingsWinBg
+            x: 0
+            y: 0
+            width: 1280
+            height: 720
+            source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/bg.png"
+            fillMode: Image.PreserveAspectFit
+            Text {
+                id: settingsWinBannerTxt
+                x: 594
+                y: 8
+                width: 92
+                height: 34
+                color: "#ffffff"
+                text: qsTr("Settings")
+                font.pixelSize: 25
+            }
+        }
     }
 
     Rectangle {
@@ -822,7 +1216,7 @@ Window {
     Image {
         id: toolsBtn
         x: 5
-        y: 265
+        y: 433
         width: 60
         height: 50
         //source: "images/toolsBtn.png"
@@ -847,10 +1241,12 @@ Window {
             onClicked: {
                 mainWin.visible = false
                 logViewerWin.visible = false
-                logViewerSettings.visible = true
+                flagsWin.visible = false
+                convertEvtxWin.visible = false
+                settingsWin.visible = true
+                schedulerWin.visible = false
             }
         }
-
     }
 
     Image {
@@ -883,6 +1279,10 @@ Window {
                 mouseAreaViewLogBtn.visible = true
                 evtxConvertBtn.visible = true
                 mouseAreaConvertEvtx.visible = true
+                scheduleBtn.visible = true
+                mouseAreaScheduleBtn.visible = true
+                flagsBtn.visible = true
+                flagsBtnMouseArea.visible = true
             }
         }
     }
@@ -914,7 +1314,10 @@ Window {
                 mouseAreaConvertEvtx.visible = false
                 dotsBtn.visible = true
                 mouseAreaDotsBtn.visible =  true
-
+                scheduleBtn.visible = false
+                mouseAreaScheduleBtn.visible = false
+                flagsBtn.visible = false
+                flagsBtnMouseArea.visible = false
             }
         }
     }
@@ -985,7 +1388,10 @@ Window {
             onClicked: {
                 mainWin.visible = true
                 logViewerWin.visible = false
-                logViewerSettings.visible = false
+                flagsWin.visible = false
+                convertEvtxWin.visible = false
+                flagsWin.visible = false
+                settingsWin.visible = false
             }
         }
     }
@@ -1016,10 +1422,14 @@ Window {
             onClicked: {
                 mainWin.visible = false
                 logViewerWin.visible = true
-                logViewerSettings.visible = false
+                convertEvtxWin.visible = false
+                flagsWin.visible = false
+                settingsWin.visible = false
+                schedulerWin.visible = false
             }
         }
     }
+
 
     Image {
         id: evtxConvertBtn
@@ -1044,6 +1454,84 @@ Window {
                 evtxConvertBtn.width = 63
                 evtxConvertBtn.height = 53
             }
+            onClicked: {
+                mainWin.visible = false
+                logViewerWin.visible = false
+                flagsWin.visible = false
+                convertEvtxWin.visible = true
+                settingsWin.visible = false
+                schedulerWin.visible = false
+            }
         }
     }
+
+    Image {
+        id: flagsBtn
+        x: 5
+        y: 266
+        width: 60
+        height: 50
+        source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/flagBtn.png"
+        fillMode: Image.PreserveAspectFit
+        MouseArea {
+            id: flagsBtnMouseArea
+            x: 0
+            y: 0
+            width: 60
+            height: 50
+            onClicked: {
+                mainWin.visible = false
+                logViewerWin.visible = false
+                flagsWin.visible = true
+                convertEvtxWin.visible = false
+                settingsWin.visible = false
+                schedulerWin.visible = false
+            }
+            onExited: {
+                flagsBtn.width = 60
+                flagsBtn.height = 50
+            }
+            onEntered: {
+                flagsBtn.width = 63
+                flagsBtn.height = 53
+            }
+            hoverEnabled: true
+        }
+    }
+
+    Image {
+        id: scheduleBtn
+        x: 5
+        y: 350
+        width: 60
+        height: 50
+        source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/scheduleBtn.png"
+        fillMode: Image.PreserveAspectFit
+        MouseArea {
+            id: mouseAreaScheduleBtn
+            x: 0
+            y: 0
+            width: 60
+            height: 50
+            onClicked: {
+                mainWin.visible = false
+                logViewerWin.visible = false
+                flagsWin.visible = false
+                convertEvtxWin.visible = false
+                settingsWin.visible = false
+                schedulerWin.visible = true
+            }
+            onExited: {
+                scheduleBtn.width = 60
+                scheduleBtn.height = 50
+            }
+            onEntered: {
+                scheduleBtn.width = 63
+                scheduleBtn.height = 53
+            }
+            hoverEnabled: true
+        }
+    }
+
+
 }

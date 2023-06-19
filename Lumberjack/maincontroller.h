@@ -18,6 +18,12 @@
 #include <QJsonArray>
 #include <QStringList>
 #include <QObject>
+#include <QThread>
+#include <QStringList>
+#include <QFile>
+#include <QFileInfo>
+#include <QFileDialog>
+#include <QDate>
 
 class MainController:  public QWidget{
     Q_OBJECT
@@ -30,6 +36,16 @@ signals:
     void appEventCount2Qml(QString appEventCountX);
     void sysEventCount2Qml(QString sysEventCountX);
     void processingStatus2Qml(QString processingStatus);
+    void dataToLogViewer(QString logData);
+    void populateFlagDataToQml(QString eventIdFlag);
+
+    //File info
+    void fileNameToQml(QString fileName);
+    void filePathToQml(QString filePath);
+    void dirPathToQml(QString dirPath);
+    void saveToPathToQml(QString saveToPath);
+
+    void fileConvertEvtxStatus(QString curStatus);
 
 public slots:
     void getSystemLogs();
@@ -42,6 +58,9 @@ public slots:
     void processErrorAppLogInfo();
     void processStdOutSysLogInfo();
     void processErrorSysLogInfo();
+
+    void processConvertStdOutInfo();
+    void processConvertErrorInfo();
 
     void sendLogInfoToQml();
 
@@ -58,6 +77,19 @@ public slots:
     void getAppDataFromJson();
     void getSysDataFromJson();
 
+    void populateFlagData();
+    void saveFlagData(QString);
+
+    void ce_SelectFile();
+    void ce_SelectDir();
+    void ce_SaveToPath();
+
+    void fileConvertEvtx(QString, QString, QString, QString);
+    void dirConvertEvtx(QString, QString, QString);
+
+    void updateEvtxConvertStatus();
+    void checkDirectories();
+
 private:
     QProcess getWinLogs;
 
@@ -73,6 +105,11 @@ private:
     QProcess convertSysEvtxToXmlProcess;
     QProcess convertSysEvtxToJsonProcess;
 
+    QProcess convertEvtxToXmlProcess;
+    QProcess convertEvtxToJsonProcess;
+    QProcess convertEvtxToFullJsonProcess;
+
+
     //Byte arrays for std out info
     QByteArray b_StdOutSecLogInfo;
     QByteArray b_StdErrSecLogInfo;
@@ -83,6 +120,8 @@ private:
     QByteArray b_StdOutSysLogInfo;
     QByteArray b_StdErrSysLogInfo;
 
+    QByteArray b_StdOutConvertInfo;
+    QByteArray b_StdErrConvertInfo;
 
     //Strings for std out info
     QString s_StdOutSecLogInfo;
@@ -93,6 +132,9 @@ private:
 
     QString s_StdOutSysLogInfo;
     QString s_StdErrSysLogInfo;
+
+    QString s_StdOutConvertInfo;
+    QString s_StdErrConvertInfo;
 
 
 
@@ -107,6 +149,16 @@ private:
     int numbOfAppEvents = 0;
     int numbOfSysEvents = 0;
 
+    QString result = "";
+
+    QStringList flagList;
+
+    QString convertEvtxFileName = "";
+    QString convertEvtxFullFilePath = "";
+    QString convertEvtxFilePathOnly = "";
+    QString convertEvtxFileSize = "";
+
+    QString eventId_ = "";
 };
 
 #endif // MAINCONTROLLER_H
