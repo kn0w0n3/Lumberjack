@@ -1,7 +1,7 @@
 # Lumberjack
 Windows Log Viewer 
 
-![GUI_6_13_23](https://github.com/kn0w0n3/Lumberjack/assets/22214754/585e27ba-ca1e-4ed4-a33d-dda559348d97)    
+![GUI_6_16_23](https://github.com/kn0w0n3/Lumberjack/assets/22214754/1d1aa783-ed4e-4224-98cd-61f5fe179697)          
  
 # **Work Environment:**       
 ![QtLogo](https://user-images.githubusercontent.com/22214754/179895211-d52559ab-35df-4fcc-bf69-7377739330d4.png)  
@@ -15,5 +15,7 @@ https://www.qt.io/
 # **Requirements:**   
 https://aka.ms/dotnet-core-applaunch?framework=Microsoft.NETCore.App&framework_version=6.0.0&arch=x64&rid=win10-x64  
 
-https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-6.0.16-windows-x64-installer?cid=getdotnetcore  
+https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-6.0.16-windows-x64-installer?cid=getdotnetcore    
 
+# **Resources:**   
+https://github.com/EricZimmerman/evtx  
