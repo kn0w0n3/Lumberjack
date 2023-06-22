@@ -1,17 +1,7 @@
 #include "maincontroller.h"
 
 MainController::MainController(QWidget *parent) : QWidget(parent){
-    //getSecurityLogs();
-    //getApplicationLogs();
-    //getSystemLogs();
-    //getSecDatafromXml();
-    //getSecDataFromJson();
-    //convertSecEvtxToJson();
-    //populateFlagData();
-
-    //TODO:
-   //Check if directories exist. If not, create them.
-    //QDateTime::currentDateTime();
+    checkDirectories();
 }
 
 //Save system logs to evtx file
@@ -21,7 +11,7 @@ void MainController::getSystemLogs(){
     QStringList args;
 
     args  << "$log = Get-WmiObject -Class Win32_NTEventlogFile | Where-Object LogfileName -EQ 'system';"
-          << "$log.BackupEventlog('C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/system/system.evtx')";
+          << "$log.BackupEventlog('C:/Program Files/Lumberjack/evtx/system/system.evtx')";
 
     getSystemLogsProcess.connect(&getSystemLogsProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutSysLogInfo);
     getSystemLogsProcess.connect(&getSystemLogsProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorSysLogInfo);
@@ -36,7 +26,7 @@ void MainController::getApplicationLogs(){
     QStringList args;
 
     args  << "$log = Get-WmiObject -Class Win32_NTEventlogFile | Where-Object LogfileName -EQ 'application';"
-          << "$log.BackupEventlog('C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/application/application.evtx')";
+          << "$log.BackupEventlog('C:/Program Files/Lumberjack/evtx/application/application.evtx')";
 
     getApplicationLogsProcess.connect(&getApplicationLogsProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutAppLogInfo);
     getApplicationLogsProcess.connect(&getApplicationLogsProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorAppLogInfo);
@@ -51,7 +41,7 @@ void MainController::getSecurityLogs(){
     QStringList args;
 
     args  << "$log = Get-WmiObject -Class Win32_NTEventlogFile | Where-Object LogfileName -EQ 'security';" <<
-             "$log.BackupEventlog('C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/security/security.evtx')";
+             "$log.BackupEventlog('C:/Program Files/Lumberjack/evtx/security/security.evtx')";
 
     getSecurityLogsProcess.connect(&getSecurityLogsProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutSecLogInfo);
     getSecurityLogsProcess.connect(&getSecurityLogsProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorSecLogInfo);
@@ -65,7 +55,7 @@ void MainController::convertSecEvtxToXml(){
 
     QStringList args;
     args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/EvtxeCmd/;"
-         << "./EvtxECmd.exe -f C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/security/security.evtx --xml C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/xml/security/ --xmlf security.xml";
+         << "./EvtxECmd.exe -f C:/Program Files/Lumberjack/evtx/security/security.evtx --xml C:/Program Files/Lumberjack/xml/security/ --xmlf security.xml";
 
     convertSecEvtxToXmlProcess.connect(&convertSecEvtxToXmlProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutSecLogInfo);
     convertSecEvtxToXmlProcess.connect(&convertSecEvtxToXmlProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorSecLogInfo);
@@ -81,7 +71,7 @@ void MainController::convertSecEvtxToJson(){
     emit processingStatus2Qml("Processing data, please wait...");
     QStringList args;
     args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/EvtxeCmd/;"
-         << "./EvtxECmd.exe -f C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/security/security.evtx --fj --json C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/json/security/ --jsonf security.json";
+         << "./EvtxECmd.exe -f C:/Program Files/Lumberjack/evtx/security/security.evtx --fj --json C:/Program Files/Lumberjack/json/security/ --jsonf security.json";
 
     convertSecEvtxToJsonProcess.connect(&convertSecEvtxToJsonProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutSecLogInfo);
     convertSecEvtxToJsonProcess.connect(&convertSecEvtxToJsonProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorSecLogInfo);
@@ -98,7 +88,7 @@ void MainController::convertAppEvtxToJson(){
     emit processingStatus2Qml("Processing data, please wait...");
     QStringList args;
     args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/EvtxeCmd/;"
-         << "./EvtxECmd.exe -f C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/application/application.evtx --json C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/json/application/ --fj --jsonf application.json";
+         << "./EvtxECmd.exe -f C:/Program Files/Lumberjack/evtx/application/application.evtx --json C:/Program Files/Lumberjack/json/application/ --fj --jsonf application.json";
 
     convertAppEvtxToJsonProcess.connect(&convertAppEvtxToJsonProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutAppLogInfo);
     convertAppEvtxToJsonProcess.connect(&convertAppEvtxToJsonProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorAppLogInfo);
@@ -115,7 +105,7 @@ void MainController::convertSysEvtxToJson(){
     emit processingStatus2Qml("Processing data, please wait...");
     QStringList args;
     args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/EvtxeCmd/;"
-         << "./EvtxECmd.exe -f C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/evtx/system/system.evtx --json C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/json/system/ --fj --jsonf system.json";
+         << "./EvtxECmd.exe -f C:/Program Files/Lumberjack/evtx/system/system.evtx --json C:/Program Files/Lumberjack/json/system/ --fj --jsonf system.json";
 
     convertSysEvtxToJsonProcess.connect(&convertSysEvtxToJsonProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutSysLogInfo);
     convertSysEvtxToJsonProcess.connect(&convertSysEvtxToJsonProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorSysLogInfo);
@@ -131,7 +121,7 @@ void MainController::getSecDatafromXml(){
 void MainController::getSecDataFromJson(){
     //qDebug() << "In get SEC data from JSON file.......";
 
-    QFile file("C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/json/security/security.json");
+    QFile file("C:/Program Files/Lumberjack/json/security/security.json");
     if(!file.open(QIODevice::ReadOnly)){
 
     }
@@ -151,22 +141,8 @@ void MainController::getSecDataFromJson(){
         QJsonDocument json_doc = QJsonDocument::fromJson(tArray);
         QJsonObject jsonObject = json_doc.object();
         QJsonObject obdata = jsonObject.value("Event").toObject().value("System").toObject();
-        QJsonObject obdata2 = jsonObject.value("Event").toObject().value("System").toObject().value("TimeCreated").toObject();
-        eventId_ = obdata["EventID"].toString();
-
-        //Temp fix formatting
-        if(eventId_.length() < 5){
-            int x = 5 - eventId_.length();
-
-            while( x > 0){
-                x--;
-                eventId_.append("0");
-            }
-        }
-        QString computerName = obdata["Computer"].toString();
-        QString channel_ = obdata["Channel"].toString();
-        QString timeCreated = obdata2["@SystemTime"].toString();
-        result += "Event ID: " + eventId_+ "     |     Computer Name: " + computerName + "     |     Channel: " + channel_ + "     |     Time Created: " + timeCreated + "\n";
+        QString eventId = obdata["EventID"].toString();
+        result += "Event ID: " + eventId + "\n";
        // QJsonObject obdata = jsonObject.value("PayloadData4").toObject();
         //QString eventId = obdata["EventID"].toString();
         //qDebug()<< "Event ID is: " + eventId;
@@ -198,7 +174,7 @@ void MainController::getAppDataFromJson(){
     //qDebug() << "In get App data from JSON file.......";
 
     emit processingStatus2Qml("Processing data, please wait...");
-    QFile file("C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/json/application/application.json");
+    QFile file("C:/Program Files/Lumberjack/json/application/application.json");
     if(!file.open(QIODevice::ReadOnly)) {
 
     }
@@ -232,7 +208,7 @@ void MainController::getAppDataFromJson(){
 void MainController::getSysDataFromJson(){
     //qDebug() << "In get Sys data from JSON file.......";
     emit processingStatus2Qml("Processing data, please wait...");
-    QFile file("C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/json/system/system.json");
+    QFile file("C:/Program Files/Lumberjack/json/system/system.json");
     if(!file.open(QIODevice::ReadOnly)){
         //error
     }
@@ -265,7 +241,7 @@ void MainController::getSysDataFromJson(){
 void MainController::populateFlagData(){
     //qDebug() << "In populate flag data.......";
 
-    QFile file("C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/flags/flags.txt");
+    QFile file("C:/Program Files/Lumberjack/flags/flags.txt");
     if(!file.open(QIODevice::ReadOnly)) {
         //qDebug() << "Flag file not open";
     }
@@ -292,7 +268,7 @@ void MainController::populateFlagData(){
 //Save flag data to file
 void MainController::saveFlagData(QString flagData){
     //qDebug() << "In Save Flag Data";
-    QFile file("C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/flags/flags.txt");
+    QFile file("C:/Program Files/Lumberjack/flags/flags.txt");
     if(file.open(QIODevice::WriteOnly | QIODevice::Append)) {
         QTextStream out(&file);
         out << flagData + "\n";
@@ -338,7 +314,6 @@ void MainController::ce_SaveToPath(){
     emit saveToPathToQml(dir);
 }
 
-//Convert an extx file to json, xml, or csv
 void MainController::fileConvertEvtx(QString convertType, QString fPah, QString savePath, QString iFileName ){
     if(convertType == "JSON"){
         //qDebug() << "IN CONVERT EVTX TO JSON........";
@@ -346,7 +321,7 @@ void MainController::fileConvertEvtx(QString convertType, QString fPah, QString 
         emit fileConvertEvtxStatus("Please Wait....");
         QStringList args;
         //Set a permanent location for deployment
-        args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/EvtxeCmd/;"
+        args << "Set-Location -Path C:/Program Files/Lumberjack/EvtxeCmd/;"
              << "./EvtxECmd.exe -f " + fPah.trimmed() +  " --json " +  savePath.trimmed() + " --jsonf " + iFileName.trimmed() + ".json";
 
         convertEvtxToJsonProcess.connect(&convertEvtxToJsonProcess, &QProcess::readyReadStandardOutput, this, &MainController::processConvertStdOutInfo);
@@ -354,13 +329,13 @@ void MainController::fileConvertEvtx(QString convertType, QString fPah, QString 
         connect(&convertEvtxToJsonProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
         convertEvtxToJsonProcess.start("powershell", args);
     }
-    else if(convertType == "Full JSON"){
+    else if(convertType == " Full JSON"){
         //qDebug() << "IN CONVERT EVTX TO  Full JSON........";
         emit fileConvertEvtxStatus("EVTX to FUll JSON conversion process starting " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
         emit fileConvertEvtxStatus("Please Wait....");
         QStringList args;
         //Set a permanent location for deployment
-        args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/EvtxeCmd/;"
+        args << "Set-Location -Path C:/Program Files/Lumberjack/EvtxeCmd/;"
              << "./EvtxECmd.exe -f " + fPah.trimmed() +  " --fj --json " +  savePath.trimmed() + " --jsonf " + iFileName.trimmed() + ".json";
 
         //convertEvtxToFullJsonProcess.connect(&convertEvtxToFullJsonProcess, &QProcess::readyReadStandardOutput, this, &MainController::processConvertStdOutInfo);
@@ -375,7 +350,7 @@ void MainController::fileConvertEvtx(QString convertType, QString fPah, QString 
         emit fileConvertEvtxStatus("Please Wait....");
 
         QStringList args;
-        args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/EvtxeCmd/;"
+        args << "Set-Location -Path C:/Program Files/Lumberjack/EvtxeCmd/;"
              << "./EvtxECmd.exe -f " + fPah.trimmed() +  " --xml " +  savePath.trimmed() + " --xmlf " + iFileName.trimmed() + ".xml";
 
         //convertSecEvtxToXmlProcess.connect(&convertSecEvtxToXmlProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutSecLogInfo);
@@ -390,7 +365,7 @@ void MainController::fileConvertEvtx(QString convertType, QString fPah, QString 
         emit fileConvertEvtxStatus("Please Wait....");
 
         QStringList args;
-        args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/EvtxeCmd/;"
+        args << "Set-Location -Path C:/Program Files/Lumberjack/EvtxeCmd/;"
              << "./EvtxECmd.exe -f " + fPah.trimmed() +  " --csv " +  savePath.trimmed() + " --csvf " + iFileName.trimmed() + ".csv";
 
         //convertSecEvtxToXmlProcess.connect(&convertSecEvtxToXmlProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutSecLogInfo);
@@ -401,72 +376,6 @@ void MainController::fileConvertEvtx(QString convertType, QString fPah, QString 
     else{
         //error
     }
-}
-
-//Convert a directory of evtx files to json, xml, or csv
-void MainController::dirConvertEvtx(QString convertType, QString fPah, QString savePath){
-    if(convertType == "JSON"){
-        //qDebug() << "IN CONVERT EVTX TO JSON........";
-        emit fileConvertEvtxStatus("EVTX to JSON conversion process starting " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
-        emit fileConvertEvtxStatus("Please Wait....");
-        QStringList args;
-        //Set a permanent location for deployment
-        args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/EvtxeCmd/;"
-             << "./EvtxECmd.exe -f " + fPah.trimmed() +  " --json " +  savePath.trimmed() + " --jsonf " + iFileName.trimmed() + ".json";
-
-        convertEvtxToJsonProcess.connect(&convertEvtxToJsonProcess, &QProcess::readyReadStandardOutput, this, &MainController::processConvertStdOutInfo);
-        convertEvtxToJsonProcess.connect(&convertEvtxToJsonProcess, &QProcess::readyReadStandardError, this, &MainController::processConvertErrorInfo);
-        connect(&convertEvtxToJsonProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
-        convertEvtxToJsonProcess.start("powershell", args);
-    }
-    else if(convertType == "Full JSON"){
-        //qDebug() << "IN CONVERT EVTX TO  Full JSON........";
-        emit fileConvertEvtxStatus("EVTX to FUll JSON conversion process starting " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
-        emit fileConvertEvtxStatus("Please Wait....");
-        QStringList args;
-        //Set a permanent location for deployment
-        args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/EvtxeCmd/;"
-             << "./EvtxECmd.exe -f " + fPah.trimmed() +  " --fj --json " +  savePath.trimmed() + " --jsonf " + iFileName.trimmed() + ".json";
-
-        //convertEvtxToFullJsonProcess.connect(&convertEvtxToFullJsonProcess, &QProcess::readyReadStandardOutput, this, &MainController::processConvertStdOutInfo);
-        //convertEvtxToFullJsonProcess.connect(&convertEvtxToFullJsonProcess, &QProcess::readyReadStandardError, this, &MainController::processConvertErrorInfo);
-        connect(&convertEvtxToJsonProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
-        convertEvtxToJsonProcess.start("powershell", args);
-
-    }
-    else if(convertType == "XML"){
-        //qDebug() << "IN CONVERT EVTX TO XML........";
-        emit fileConvertEvtxStatus("EVTX to XML conversion process starting " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
-        emit fileConvertEvtxStatus("Please Wait....");
-
-        QStringList args;
-        args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/EvtxeCmd/;"
-             << "./EvtxECmd.exe -f " + fPah.trimmed() +  " --xml " +  savePath.trimmed() + " --xmlf " + iFileName.trimmed() + ".xml";
-
-        //convertSecEvtxToXmlProcess.connect(&convertSecEvtxToXmlProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutSecLogInfo);
-        //convertSecEvtxToXmlProcess.connect(&convertSecEvtxToXmlProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorSecLogInfo);
-        connect(&convertSecEvtxToXmlProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
-        convertSecEvtxToXmlProcess.start("powershell", args);
-
-    }
-    else if(convertType == "CSV"){
-        //qDebug() << "IN CONVERT EVTX TO CSV........";
-        emit fileConvertEvtxStatus("EVTX to CSV conversion process starting " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
-        emit fileConvertEvtxStatus("Please Wait....");
-
-        QStringList args;
-        args << "Set-Location -Path C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/EvtxeCmd/;"
-             << "./EvtxECmd.exe -f " + fPah.trimmed() +  " --csv " +  savePath.trimmed() + " --csvf " + iFileName.trimmed() + ".csv";
-
-        //convertSecEvtxToXmlProcess.connect(&convertSecEvtxToXmlProcess, &QProcess::readyReadStandardOutput, this, &MainController::processStdOutSecLogInfo);
-        //convertSecEvtxToXmlProcess.connect(&convertSecEvtxToXmlProcess, &QProcess::readyReadStandardError, this, &MainController::processErrorSecLogInfo);
-        connect(&convertSecEvtxToXmlProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
-        convertSecEvtxToXmlProcess.start("powershell", args);
-    }
-    else{
-        //error
-    }
-
 }
 
 void MainController::updateEvtxConvertStatus(){
@@ -477,9 +386,116 @@ void MainController::updateEvtxConvertStatus(){
     emit saveToPathToQml("");
 }
 
+
+//Verify that the required directories exist
 void MainController::checkDirectories(){
-    //Try to access the C drive program files folder. This is where the EvtxECmd.exe program will live as well.
-    //Create a directory in mydocuments for output files. Get user name for path?
+    QDir mainDir("C:/Program Files/Lumberjack");
+
+    QDir evtxDir("C:/Program Files/Lumberjack/evtx");
+    QDir evtxSysDir("C:/Program Files/Lumberjack/evtx/system");
+    QDir evtxAppDir("C:/Program Files/Lumberjack/application");
+    QDir evtxSecDir("C:/Program Files/Lumberjack/evtx/security");
+
+    QDir imagesDir ("C:/Program Files/Lumberjack/images");
+
+    QDir jsonDir ("C:/Program Files/Lumberjack/json");
+    QDir jsonAppDir ("C:/Program Files/Lumberjack/json/application");
+    QDir jsonSysDir ("C:/Program Files/Lumberjack/json/system");
+    QDir jsonSecDir ("C:/Program Files/Lumberjack/json/security");
+
+
+    QDir xmlDir ("C:/Program Files/Lumberjack/xml");
+    QDir xmlAppDir ("C:/Program Files/Lumberjack/xml/application");
+    QDir xmlSysDir ("C:/Program Files/Lumberjack/xml/system");
+    QDir xmlSecDir ("C:/Program Files/Lumberjack/xml/security");
+
+    QDir csvDir ("C:/Program Files/Lumberjack/csv");
+    QDir csvAppDir ("C:/Program Files/Lumberjack/csv/application");
+    QDir csvSysDir ("C:/Program Files/Lumberjack/csv/system");
+    QDir csvSecDir ("C:/Program Files/Lumberjack/csv/security");
+
+    QDir evtxCmdDir("C:/Program Files/Lumberjack/EvtxeCmd");
+    QDir evtxCmdDirMaps("C:/Program Files/Lumberjack/EvtxeCmd/Maps");
+    QDir liveSave("C:/Program Files/Lumberjack/livesave");
+    QDir flagsDir("C:/Program Files/Lumberjack/flags");
+
+    if (!mainDir.exists()){
+        QDir().mkdir("C:/Program Files/Lumberjack");
+        //qDebug() << "Error Dir does not exist or can't be reached. There is a space in the path name: Program Files";
+        qDebug() << "Trying to create dir C:/Program Files/EvtxConverter ";
+    }
+    else{
+        qDebug() << "Dir Exists";
+    }
+    if(!evtxDir.exists()){
+        QDir().mkdir("C:/Program Files/Lumberjack/evtx");
+        //qDebug() << "Error Dir does not exist or can't be reached. There is a space in the path name: Program Files";
+        qDebug() << "Trying to create dir C:/Program Files/Lumberjack/evtx ";
+    }
+    if(!evtxSysDir.exists()){
+        QDir().mkdir("C:/Program Files/Lumberjack/evtx/system");
+    }
+    if(!evtxAppDir.exists()){
+        QDir().mkdir("C:/Program Files/Lumberjack/evtx/application");
+    }
+    if(!evtxSecDir.exists()){
+        QDir().mkdir("C:/Program Files/Lumberjack/evtx/security");
+    }
+    if(!imagesDir.exists()){
+        QDir().mkdir("C:/Program Files/Lumberjack/images");
+    }
+    if(!jsonDir.exists()){
+        QDir().mkdir("C:/Program Files/Lumberjack/json");
+    }
+    if(!jsonAppDir.exists()){
+        QDir().mkdir("C:/Program Files/Lumberjack/json/application");
+    }
+    if(!jsonSysDir.exists()){
+        QDir().mkdir("C:/Program Files/Lumberjack/json/system");
+    }
+    if(!jsonSecDir.exists()){
+        QDir().mkdir("C:/Program Files/Lumberjack/json/security");
+    }
+    if(!xmlDir.exists()){
+        QDir().mkdir("C:/Program Files/Lumberjack/xml");
+    }
+    if(!xmlAppDir.exists()){
+        QDir().mkdir("C:/Program Files/Lumberjack/xml/application");
+    }
+    if(!xmlSysDir.exists()){
+        QDir().mkdir("C:/Program Files/Lumberjack/xml/system");
+    }
+    if(!xmlSecDir.exists()){
+        QDir().mkdir("C:/Program Files/Lumberjack/xml/security");
+    }
+    if(!csvDir.exists()){
+        QDir().mkdir("C:/Program Files/Lumberjack/csv");
+    }
+    if(!csvAppDir.exists()){
+        QDir().mkdir("C:/Program Files/Lumberjack/csv/application");
+    }
+    if(!csvSysDir.exists()){
+        QDir().mkdir("C:/Program Files/Lumberjack/csv/system");
+    }
+    if(!csvSecDir.exists()){
+        QDir().mkdir("C:/Program Files/Lumberjack/csv/security");
+    }
+    if(!evtxCmdDir.exists()){
+        QDir().mkdir("C:/Program Files/Lumberjack/EvtxeCmd");
+    }
+    if(!evtxCmdDirMaps.exists()){
+        QDir().mkdir("C:/Program Files/Lumberjack/EvtxeCmd/Maps");
+    }
+    if(!liveSave.exists()){
+        QDir().mkdir("C:/Program Files/Lumberjack/livesave");
+    }
+    if(!flagsDir.exists()){
+        QDir().mkdir("C:/Program Files/Lumberjack/flags");
+    }
+}
+
+void MainController::liveSave(){
+
 }
 
 void MainController::processStdOutSecLogInfo(){

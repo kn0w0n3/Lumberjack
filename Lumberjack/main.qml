@@ -20,7 +20,6 @@ Window {
         }
     }
 
-
     Timer {
         id: dateTimer
         interval: 1000
@@ -35,14 +34,13 @@ Window {
     }
 
     //Main Controller Connections
-
     Rectangle {
         id: mainWin
         x: 0
         y: 0
         width: 1280
         height: 720
-        visible: false
+        visible: true
         color: "#000000"
 
         Image {
@@ -93,7 +91,7 @@ Window {
                 y: 401
                 width: 100
                 height: 25
-                text: qsTr("Start")
+                text: qsTr("Scan")
                 hoverEnabled: false
                 background: Rectangle {
                     color: "#161e20"
@@ -120,8 +118,8 @@ Window {
             }
 
             Button {
-                id: button1
-                x: 492
+                id: mainWinSaveBtn
+                x: 590
                 y: 401
                 width: 100
                 height: 25
@@ -144,6 +142,39 @@ Window {
                     samples: 17
                 }
                 palette.buttonText: "#ffffff"
+                onClicked: {
+                    mainController.liveSave()
+                }
+            }
+
+            Button {
+                id: mainWinClearBtn
+                x: 837
+                y: 401
+                width: 100
+                height: 25
+                text: qsTr("Clear")
+                layer.enabled: true
+                background: Rectangle {
+                    color: "#161e20"
+                    radius: 50
+                }
+                hoverEnabled: false
+                layer.effect: DropShadow {
+                    width: 100
+                    visible: true
+                    color: "#ffffff"
+                    radius: 8
+                    samples: 17
+                    horizontalOffset: 2
+                    verticalOffset: 2
+                    transparentBorder: true
+                    spread: 0
+                }
+                palette.buttonText: "#ffffff"
+                onClicked: {
+
+                }
             }
         }
 
@@ -514,7 +545,7 @@ Window {
         y: 0
         width: 1280
         height: 720
-        visible: true
+        visible: false
         color: "#000000"
 
         Image {
@@ -539,9 +570,9 @@ Window {
 
             Button {
                 id: evtxWinSelectFileBtn
-                x: 213
+                x: 170
                 y: 447
-                width: 75
+                width: 120
                 height: 25
                 text: qsTr("Select FIle")
                 hoverEnabled: false
@@ -591,9 +622,9 @@ Window {
 
             Button {
                 id: ce_SaveToBtn
-                x: 213
-                y: 533
-                width: 75
+                x: 170
+                y: 575
+                width: 120
                 height: 25
                 text: qsTr("Save To")
                 hoverEnabled: false
@@ -622,7 +653,7 @@ Window {
             Rectangle {
                 id: ecw_SaveToRect
                 x: 304
-                y: 533
+                y: 575
                 width: 839
                 height: 25
                 color: "#000000"
@@ -642,9 +673,9 @@ Window {
 
             Rectangle {
                 id: ecw_TxtDataRect
-                x: 213
+                x: 170
                 y: 64
-                width: 930
+                width: 973
                 height: 360
                 color: "#000000"
                 border.color: "#ffffff"
@@ -653,13 +684,14 @@ Window {
                     id: ecw_scrollview
                     x: 3
                     y: 3
-                    width: 924
+                    width: 966
                     height: 353
 
                     TextArea {
                         id: cew_logTxtArea
                         x: -7
                         y: -3
+                        width: 966
                         color: "#ffffff"
                         placeholderText: qsTr("Text Area")
                         background: Rectangle {color: "black"}
@@ -669,11 +701,11 @@ Window {
 
             Button {
                 id: cew_selectDirBtn
-                x: 213
+                x: 170
                 y: 492
-                width: 75
+                width: 120
                 height: 25
-                text: qsTr("Select Dir")
+                text: qsTr("Select Dir - Combine")
                 layer.effect: DropShadow {
                     width: 100
                     visible: true
@@ -720,8 +752,8 @@ Window {
 
             Button {
                 id: cew_StartBtn
-                x: 450
-                y: 614
+                x: 453
+                y: 676
                 width: 125
                 height: 27
                 text: qsTr("Start")
@@ -779,7 +811,7 @@ Window {
                         }
                         else{
                             mainController.fileConvertEvtx(control1.currentText, cew_SelectFileTxt.text, cew_SaveToTxt.text, cew_fileSaveAsNameTxt.text)
-                            console.log("SENDING DATA TO C++...")
+                            //console.log("SENDING DATA TO C++...")
                             //console.log("control.currentText " + control.currentText)
                             //console.log("cew_SelectFileTxt.text " + cew_SelectFileTxt.text)
                             //console.log("cew_SaveToTxt.text " + cew_SaveToTxt.text)
@@ -793,8 +825,7 @@ Window {
                             return;
                         }
                         else{
-                            mainController.fileConvertEvtx(control1.currentText, cew_SelectDirTxt.text, cew_SaveToTxt.text)
-                            console.log("SENDING DATA TO C++...")
+
                         }
                     }
                 }
@@ -803,7 +834,7 @@ Window {
             Rectangle {
                 id: ecw_FIleNameRect
                 x: 304
-                y: 573
+                y: 621
                 width: 839
                 height: 25
                 color: "#000000"
@@ -823,8 +854,8 @@ Window {
 
             Text {
                 id: fileNameLabel
-                x: 218
-                y: 574
+                x: 217
+                y: 624
                 color: "#ffffff"
                 text: qsTr("File name:")
                 font.pixelSize: 16
@@ -832,8 +863,8 @@ Window {
 
             Button {
                 id: cew_ClearBtn
-                x: 855
-                y: 614
+                x: 849
+                y: 676
                 width: 125
                 height: 27
                 text: qsTr("Clear")
@@ -863,12 +894,62 @@ Window {
                     cew_fileSaveAsNameTxt.text = ""
                 }
             }
+
+            Rectangle {
+                id: cew_selectDirSeparateRect
+                x: 304
+                y: 535
+                width: 839
+                height: 25
+                color: "#000000"
+                border.color: "#ffffff"
+                Text {
+                    id: selectDirSeparateTxt
+                    x: 2
+                    y: 2
+                    width: 835
+                    height: 21
+                    color: "#ffffff"
+                    text: qsTr("")
+                    font.pixelSize: 15
+                }
+            }
+
+            Button {
+                id: cew_selectDirSeparateBtn
+                x: 170
+                y: 535
+                width: 120
+                height: 25
+                text: qsTr("Select Dir - Separate")
+                hoverEnabled: false
+                layer.effect: DropShadow {
+                    width: 100
+                    visible: true
+                    color: "#ffffff"
+                    radius: 8
+                    horizontalOffset: 2
+                    transparentBorder: true
+                    verticalOffset: 2
+                    samples: 17
+                    spread: 0
+                }
+                layer.enabled: true
+                palette.buttonText: "#ffffff"
+                background: Rectangle {
+                    color: "#161e20"
+                    radius: 50
+                }
+                onClicked: {
+
+                }
+            }
         }
 
         ComboBox {
             id: control1
-            x: 213
-            y: 36
+            x: 170
+            y: 38
             width: 116
             height: 21
             popup: Popup {
@@ -942,7 +1023,6 @@ Window {
             model: ["Convert To", "JSON", "Full JSON", "XML", "CSV"]
         }
     }
-
 
 
     Rectangle {
@@ -1104,6 +1184,7 @@ Window {
 
             onClicked: {
                 mainController.saveFlagData(flagTxtInput.text)
+                flagTxtInput.text = ""
             }
         }
 
@@ -1165,6 +1246,184 @@ Window {
                 color: "#ffffff"
                 text: qsTr("Scheduler")
                 font.pixelSize: 25
+            }
+
+            Text {
+                id: text6
+                x: 290
+                y: 466
+                width: 114
+                height: 34
+                color: "#ffffff"
+                text: qsTr("Days to run: ")
+                font.pixelSize: 20
+            }
+
+            Text {
+                id: text7
+                x: 290
+                y: 526
+                width: 114
+                height: 27
+                color: "#ffffff"
+                text: qsTr("Time to run:")
+                font.pixelSize: 21
+            }
+
+            Rectangle {
+                id: sw_infoRect
+                x: 290
+                y: 101
+                width: 701
+                height: 345
+                color: "#000000"
+                border.color: "#ffffff"
+            }
+
+            Text {
+                id: text8
+                x: 290
+                y: 79
+                width: 95
+                height: 16
+                color: "#ffffff"
+                text: qsTr("Current Schedule")
+                font.pixelSize: 12
+            }
+
+            Text {
+                id: text9
+                x: 421
+                y: 459
+                color: "#ffffff"
+                text: qsTr("S")
+                font.pixelSize: 12
+            }
+
+            Text {
+                id: text10
+                x: 450
+                y: 459
+                color: "#ffffff"
+                text: qsTr("M")
+                font.pixelSize: 12
+            }
+
+            Text {
+                id: text12
+                x: 506
+                y: 459
+                color: "#ffffff"
+                text: qsTr("W")
+                font.pixelSize: 12
+            }
+
+            Text {
+                id: text11
+                x: 481
+                y: 459
+                color: "#ffffff"
+                text: qsTr("T")
+                font.pixelSize: 12
+            }
+
+            Text {
+                id: text13
+                x: 533
+                y: 459
+                color: "#ffffff"
+                text: qsTr("T")
+                font.pixelSize: 12
+            }
+
+            Text {
+                id: text14
+                x: 560
+                y: 459
+                color: "#ffffff"
+                text: qsTr("F")
+                font.pixelSize: 12
+            }
+
+            Text {
+                id: text15
+                x: 587
+                y: 459
+                color: "#ffffff"
+                text: qsTr("S")
+                font.pixelSize: 12
+            }
+
+            CheckBox {
+                id: checkBox
+                x: 418
+                y: 477
+            }
+
+            CheckBox {
+                id: checkBox1
+                x: 449
+                y: 477
+            }
+
+            CheckBox {
+                id: checkBox2
+                x: 478
+                y: 477
+            }
+
+            CheckBox {
+                id: checkBox3
+                x: 505
+                y: 477
+            }
+
+            CheckBox {
+                id: checkBox4
+                x: 530
+                y: 477
+            }
+
+            CheckBox {
+                id: checkBox5
+                x: 555
+                y: 477
+            }
+
+            CheckBox {
+                id: checkBox6
+                x: 584
+                y: 477
+                width: 31
+                height: 12
+                text: qsTr("")
+            }
+        }
+
+        Button {
+            id: sw_saveBtn
+            x: 291
+            y: 585
+            width: 100
+            height: 25
+            text: qsTr("Save")
+            layer.enabled: true
+            hoverEnabled: false
+            palette.buttonText: "#ffffff"
+            background: Rectangle {
+                color: "#161e20"
+                radius: 50
+            }
+            layer.effect: DropShadow {
+                width: 100
+                visible: true
+                color: "#ffffff"
+                radius: 8
+                verticalOffset: 2
+                transparentBorder: true
+                spread: 0
+                samples: 17
+                horizontalOffset: 2
             }
         }
     }

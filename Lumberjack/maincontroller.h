@@ -5,21 +5,20 @@
 #include <QProcess>
 #include <QStringList>
 #include <QDebug>
-#include <QFile>
+
 #include <QTextStream>
 //#include <QByteArray>
 #include <QDomDocument>
-#include <QXmlStreamReader>
+//#include <QXmlStreamReader>
 
 #include <QJsonDocument>
-#include <QJsonParseError>
+//#include <QJsonParseError>
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QJsonArray>
 #include <QStringList>
-#include <QObject>
-#include <QThread>
-#include <QStringList>
+
+//#include <QThread>
 #include <QFile>
 #include <QFileInfo>
 #include <QFileDialog>
@@ -85,10 +84,12 @@ public slots:
     void ce_SaveToPath();
 
     void fileConvertEvtx(QString, QString, QString, QString);
-    void dirConvertEvtx(QString, QString, QString);
 
     void updateEvtxConvertStatus();
+
     void checkDirectories();
+
+    void liveSave();
 
 private:
     QProcess getWinLogs;
@@ -157,8 +158,6 @@ private:
     QString convertEvtxFullFilePath = "";
     QString convertEvtxFilePathOnly = "";
     QString convertEvtxFileSize = "";
-
-    QString eventId_ = "";
 };
 
 #endif // MAINCONTROLLER_H
