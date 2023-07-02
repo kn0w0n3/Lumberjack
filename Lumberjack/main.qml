@@ -9,6 +9,130 @@ Window {
     height: 720
     visible: true
     title: qsTr("Lumberjack")
+    maximumWidth: 1280
+    maximumHeight: 720
+    minimumWidth: 1280
+    minimumHeight: 720
+
+    Connections {
+        target: mainController
+
+        onSecurityEventCount2Qml:{
+            var receivedSecTxt = secEventCountX
+            secEventCountTxt.text = receivedSecTxt;
+            //console.log("SecSignal Detected")
+        }
+        onAppEventCount2Qml:{
+            var receivedAppTxt = appEventCountX
+            appEventCountTxt.text = receivedAppTxt;
+            //console.log("App Signal Detected")
+        }
+        onSysEventCount2Qml:{
+            var reveivedSysTxt = sysEventCountX
+            sysEventCountTxt.text = reveivedSysTxt;
+            //console.log("Sys Signal Detected")
+        }
+        onProcessingStatus2Qml:{
+            summaryText.text = processingStatus;
+        }
+        onDataToLogViewer:{
+            logViewerWinTxtArea.text += logData + "\n";
+            //console.log("Log Data Signal Detected")
+        }
+        onPopulateFlagDataToQml:{
+            //iFlagText.text = eventIdFlag
+            //console.log("flag is: " + flagText.text)
+            eventModel.append({"listEntry": " Event ID: " + eventIdFlag})
+        }
+        //Display the file path
+        onFilePathToQml:{
+            cew_SelectFileTxt.text = filePath
+        }
+        //Display the dir path
+        onDirPathToQml:{
+            cew_SelectDirTxt.text = dirPath
+        }
+        //Display the save to path
+        onSaveToPathToQml:{
+            cew_SaveToTxt.text = saveToPath
+        }
+        onFileConvertEvtxStatus:{
+            cew_logTxtArea.text += curStatus + "\n"
+        }
+        onFileNameToQml:{
+            cew_fileSaveAsNameTxt.text = fileName
+        }
+        onSaveScheduleDataSaveStatus:{
+            sw_ScrollViewTxtArea.text += shedulerSaveStatus + "\n"
+        }
+        onSavedHourTxtToQml:{
+            control2.currentIndex = s_Hour
+        }
+        onSavedMinTxtToQml:{
+            control3.currentIndex = s_Minute
+        }
+        onSavedAmpmTxtToQml:{
+            if(s_Ampm === "am"){
+                control4.currentIndex = 1
+            }
+            else if(s_Ampm === "pm"){
+                control4.currentIndex = 2
+            }
+            else{
+                control4.currentIndex = 0
+            }
+        }
+        onSavedDaysDataToQml:{
+            console.log("IN QML DYS DATA SLOT")
+            if(dayX === "1"){
+                checkBox_1.checkState = Qt.Checked
+            }
+            if(dayX === "2"){
+                checkBox_2.checkState = Qt.Checked
+            }
+            if(dayX === "3"){
+                checkBox_3.checkState = Qt.Checked
+            }
+            if(dayX === "4"){
+                checkBox_4.checked = Qt.Checked
+            }
+            if(dayX === "5"){
+                checkBox_5.checked = Qt.Checked
+            }
+            if(dayX === "6"){
+                checkBox_6.checked = Qt.Checked
+            }
+            if(dayX === "7"){
+                checkBox_7.checked = Qt.Checked
+            }
+        }
+        onSavedClearLogDataToQML:{
+            if(cl_CheckedStatus === "true"){
+                //switch2.stateChanged(2)
+                switch2.checked = true
+                switch2.text = "<font color=\"white\">On</font>"
+            }
+
+        }
+        onSavedAutoBackupDataToQML:{
+            if(bu_CheckedStatus === "true"){
+                switch1.checked = true
+                switch1.text = "<font color=\"white\">On</font>"
+            }
+        }
+        onArchivedLogEntryToQml:{
+            model.append({text: logName})
+        }
+
+        //function onSecurityEventCount2Qml(secEventCountX) {
+        //secEventCountTxt.text = 11;
+        //console.log("Signal Detected")
+        // }
+        // function onSecurityEventCount2Qml() {
+        // secEventCountTxt.text = secEventCountX
+        //console.log("Signal javascript function Detected")
+        // }
+    }
 
     Timer {
         id: clockTimer
@@ -32,6 +156,57 @@ Window {
             curDateTxt.text = currentDate.toLocaleDateString(locale, Locale.ShortFormat);
         }
     }
+
+    Timer {
+        id: scheduleDateTimer
+        interval: 1000
+        repeat: true
+        running: true
+        property var locale: Qt.locale()
+        property date currentDate: new Date()
+        property string dateString
+        onTriggered:{
+            var curDayOfTheWeek  = currentDate.getDay().toString()
+            //console.log("Current day of the week is: " + curDayOfTheWeek)
+            //curDateTxt.text = currentDate.toLocaleDateString(locale, Locale.ShortFormat);
+        }
+    }
+
+
+    Timer {
+        id: updateLogSummaryTimer
+        interval: 1800000
+        repeat: true
+        running: true
+        property var locale: Qt.locale()
+        property date currentDate: new Date()
+        property string dateString
+        onTriggered:{
+            mainController.updateCurrentLogSummary()
+            //locale: Qt.locale("en_US");
+            //QDateTime date = QDateTime::currentDateTime();
+            //QString dateString = locale.toString(date);
+            //console.log(date);
+            //curDateTxt.text = currentDate.toLocaleDateString(locale, Locale.ShortFormat);
+        }
+    }
+
+    Timer {
+        id: schedulerTimer
+        interval: 1000
+        repeat: true
+        running: true
+        onTriggered:{
+            var currentTime =  Qt.formatTime(new Date(),"hh:mm ap")
+            var timeToCompare = control2.currentText + ":" + control3.currentText + " " + control4.currentText
+            //console.log("Current time: " + currentTime)
+            //console.log("Time to compare is: " + timeToCompare)
+            if(currentTime === timeToCompare){
+                console.log("THE TIME MATCHES............")
+            }
+        }
+    }
+
 
     //Main Controller Connections
     Rectangle {
@@ -80,6 +255,7 @@ Window {
                 y: 3
                 width: 72
                 height: 30
+                visible: false
                 color: "#ffffff"
                 text: qsTr("Home")
                 font.pixelSize: 25
@@ -91,7 +267,8 @@ Window {
                 y: 401
                 width: 100
                 height: 25
-                text: qsTr("Scan")
+                visible: false
+                text: qsTr("Start")
                 hoverEnabled: false
                 background: Rectangle {
                     color: "#161e20"
@@ -118,11 +295,12 @@ Window {
             }
 
             Button {
-                id: mainWinSaveBtn
-                x: 590
+                id: button1
+                x: 492
                 y: 401
                 width: 100
                 height: 25
+                visible: false
                 text: qsTr("Save")
                 hoverEnabled: false
                 background: Rectangle {
@@ -142,39 +320,6 @@ Window {
                     samples: 17
                 }
                 palette.buttonText: "#ffffff"
-                onClicked: {
-                    mainController.liveSave()
-                }
-            }
-
-            Button {
-                id: mainWinClearBtn
-                x: 837
-                y: 401
-                width: 100
-                height: 25
-                text: qsTr("Clear")
-                layer.enabled: true
-                background: Rectangle {
-                    color: "#161e20"
-                    radius: 50
-                }
-                hoverEnabled: false
-                layer.effect: DropShadow {
-                    width: 100
-                    visible: true
-                    color: "#ffffff"
-                    radius: 8
-                    samples: 17
-                    horizontalOffset: 2
-                    verticalOffset: 2
-                    transparentBorder: true
-                    spread: 0
-                }
-                palette.buttonText: "#ffffff"
-                onClicked: {
-
-                }
             }
         }
 
@@ -183,10 +328,9 @@ Window {
             x: 342
             y: 157
             width: 597
-            height: 225
+            height: 273
             color: "#000000"
             border.color: "#ffffff"
-
 
             Text {
                 id: errorLabel
@@ -290,67 +434,45 @@ Window {
             }
         }
 
+        Image {
+            id: homeTextImg
+            x: 587
+            y: 8
+            width: 107
+            height: 37
+            visible: true
+
+            //*******BUG*******
+            //This will make the image display in the designer, but the image does not siplay during run time
+            //source:"images/home-text.png"
+
+            //This will make the image display during run time, but the image wn't display in designer
+            source:"/images/home-text.png"
+            fillMode: Image.PreserveAspectFit
+        }
+
+        Text {
+            id: informationLabel1
+            x: 361
+            y: 371
+            width: 68
+            height: 38
+            color: "#ffffff"
+            text: qsTr("Flags:")
+            font.pixelSize: 25
+        }
+
+        Text {
+            id: sysEventCountTxt1
+            x: 725
+            y: 370
+            width: 110
+            height: 38
+            color: "#ffffff"
+            text: qsTr("0")
+            font.pixelSize: 25
+        }
     }
-
-    Connections {
-        target: mainController
-
-        onSecurityEventCount2Qml:{
-            var receivedSecTxt = secEventCountX
-            secEventCountTxt.text = receivedSecTxt;
-            //console.log("SecSignal Detected")
-        }
-        onAppEventCount2Qml:{
-            var receivedAppTxt = appEventCountX
-            appEventCountTxt.text = receivedAppTxt;
-            //console.log("App Signal Detected")
-        }
-        onSysEventCount2Qml:{
-            var reveivedSysTxt = sysEventCountX
-            sysEventCountTxt.text = reveivedSysTxt;
-            //console.log("Sys Signal Detected")
-        }
-        onProcessingStatus2Qml:{
-            summaryText.text = processingStatus;
-        }
-        onDataToLogViewer:{
-            logViewerWinTxtArea.text += logData + "\n";
-            //console.log("Log Data Signal Detected")
-        }
-        onPopulateFlagDataToQml:{
-            //iFlagText.text = eventIdFlag
-            //console.log("flag is: " + flagText.text)
-            eventModel.append({"listEntry": " Event ID: " + eventIdFlag})
-        }
-        //Display the file path
-        onFilePathToQml:{
-            cew_SelectFileTxt.text = filePath
-        }
-        //Display the dir path
-        onDirPathToQml:{
-            cew_SelectDirTxt.text = dirPath
-        }
-        //Display the save to path
-        onSaveToPathToQml:{
-            cew_SaveToTxt.text = saveToPath
-        }
-        onFileConvertEvtxStatus:{
-            cew_logTxtArea.text += curStatus + "\n"
-        }
-        onFileNameToQml:{
-            cew_fileSaveAsNameTxt.text = fileName
-        }
-
-        //function onSecurityEventCount2Qml(secEventCountX) {
-        //secEventCountTxt.text = 11;
-        //console.log("Signal Detected")
-        // }
-        // function onSecurityEventCount2Qml() {
-        // secEventCountTxt.text = secEventCountX
-        //console.log("Signal javascript function Detected")
-        // }
-    }
-
 
 
 
@@ -410,7 +532,15 @@ Window {
             y: 43
             width: 116
             height: 21
-            model: ["Filter", "Application", "System", "Security", "Custom"]
+            //model: ["Available Logs", "Application", "System", "Security", "Custom"]
+            model: ListModel{
+                id: model
+                ListElement {text: "Select Log"}
+            }
+            onAccepted: {
+                if (find(editText) === -1)
+                    model.append({text: editText})
+            }
 
             delegate: ItemDelegate {
                 width: control.width
@@ -496,6 +626,10 @@ Window {
                     radius: 5
                 }
             }
+            Component.onCompleted: {
+                //populate saved logs
+                mainController.getArchivedLogsList()
+            }
         }
 
         Text {
@@ -504,18 +638,19 @@ Window {
             y: 8
             width: 108
             height: 26
+            visible: false
             color: "#ffffff"
             text: qsTr("Log Viewer")
             font.pixelSize: 21
         }
 
         Button {
-            id: selectFileBtn
+            id: openLogBtn
             x: 133
             y: 578
-            width: 100
+            width: 135
             height: 25
-            text: qsTr("Select File")
+            text: qsTr("View Log")
             hoverEnabled: false
             background: Rectangle {
                 color: "#161e20"
@@ -536,8 +671,43 @@ Window {
             palette.buttonText: "#ffffff"
         }
 
-    }
+        Image {
+            id: logViewTxtImg
+            x: 584
+            y: 8
+            width: 174
+            height: 46
+            source: "/images/log-viewer-text.png"
+            fillMode: Image.PreserveAspectFit
+        }
 
+        Button {
+            id: markReviewedBtn
+            x: 327
+            y: 578
+            width: 135
+            height: 25
+            text: qsTr("Mark as Reviewed")
+            palette.buttonText: "#ffffff"
+            layer.enabled: true
+            hoverEnabled: false
+            layer.effect: DropShadow {
+                width: 100
+                visible: true
+                color: "#ffffff"
+                radius: 8
+                spread: 0
+                transparentBorder: true
+                horizontalOffset: 2
+                verticalOffset: 2
+                samples: 17
+            }
+            background: Rectangle {
+                color: "#161e20"
+                radius: 50
+            }
+        }
+    }
 
     Rectangle {
         id: convertEvtxWin
@@ -563,6 +733,7 @@ Window {
                 y: 8
                 width: 147
                 height: 28
+                visible: false
                 color: "#ffffff"
                 text: qsTr("EVTX Converter")
                 font.pixelSize: 21
@@ -798,30 +969,27 @@ Window {
                         return;
                     }
 
-                    else if(cew_SelectFileTxt.text !== "" && cew_SelectDirTxt.text !== ""){
-                        //This situation should not happen because one field is set to "" when the other is populated, but just in case...
-                        console.log("Select file or dir not both...")
-                        return;
-                    }
+                    //else if(cew_SelectFileTxt.text !== "" && cew_SelectDirTxt.text !== ""){
+                    //This situation should not happen because one field is set to "" when the other is populated, but just in case...
+                    // console.log("Select file or dir not both...")
+                    //return;
+                    //}
                     else if(cew_SelectFileTxt.text !== "" && cew_SelectDirTxt.text === ""){
                         console.log("Select file has text and selct dir does not...")
                         if(cew_fileSaveAsNameTxt.text === ""){
+                            cew_logTxtArea.text += "Please enter a file name...\n"
                             console.log("Please enter a file name...")
                             return;
                         }
                         else{
                             mainController.fileConvertEvtx(control1.currentText, cew_SelectFileTxt.text, cew_SaveToTxt.text, cew_fileSaveAsNameTxt.text)
-                            //console.log("SENDING DATA TO C++...")
-                            //console.log("control.currentText " + control.currentText)
-                            //console.log("cew_SelectFileTxt.text " + cew_SelectFileTxt.text)
-                            //console.log("cew_SaveToTxt.text " + cew_SaveToTxt.text)
-                            //console.log("cew_fileSaveAsNameTxt.text " + cew_fileSaveAsNameTxt.text)
                         }
                     }
                     else if(cew_SelectDirTxt.text !== "" && cew_SelectFileTxt.text === ""){
                         console.log("Select dir has text and selct file does not...")
                         if(cew_fileSaveAsNameTxt.text !== ""){
-                            console.log("Error: File name must be blank for directory conversion. Files will be converted using original file names....")
+                            cew_logTxtArea.text += "Error: File name must be blank for directory conversion.\n"
+                            //console.log("Error: File name must be blank for directory conversion. Files will be converted using original file names....")
                             return;
                         }
                         else{
@@ -1022,6 +1190,16 @@ Window {
             }
             model: ["Convert To", "JSON", "Full JSON", "XML", "CSV"]
         }
+
+        Image {
+            id: image5
+            x: 502
+            y: 0
+            width: 276
+            height: 59
+            source: "/images/evtx-converter-text.png"
+            fillMode: Image.PreserveAspectFit
+        }
     }
 
 
@@ -1051,6 +1229,22 @@ Window {
                 height: 346
                 color: "#000000"
                 border.color: "#ffffff"
+
+                ScrollView {
+                    id: scrollView1
+                    x: 3
+                    y: 3
+                    width: 771
+                    height: 340
+
+                    TextArea {
+                        id: flagsWinTxtArea
+                        color: "#ffffff"
+                        anchors.fill: parent
+                        placeholderText: qsTr("Text Area")
+                        background: Rectangle {color: "black"}
+                    }
+                }
             }
         }
 
@@ -1060,6 +1254,7 @@ Window {
             y: 8
             width: 62
             height: 33
+            visible: false
             color: "#ffffff"
             text: qsTr("Flags")
             font.pixelSize: 25
@@ -1086,6 +1281,10 @@ Window {
             }
         }
 
+
+
+
+
         Rectangle {
             id: currentFlags
             x: 175
@@ -1102,7 +1301,11 @@ Window {
                 width: 196
                 height: 195
                 clip: true
+                highlight: highlight
+                highlightFollowsCurrentItem: false
+                focus: true
 
+                // highlightFollowsCurrentItem: true
                 model: ListModel {
                     id:eventModel
                     ListElement {
@@ -1117,13 +1320,32 @@ Window {
                     color: "#000000"
                     border.color: "#ffffff"
                     radius: 5
+
                     Text {
                         id: iFlagText
                         color: "#ffffff"
-                        //text: _billName + "   |   " + _dueDate + "    |   " + _dateToNotify + "    |   " + _amountDue
                         text: listEntry
                         font.bold: false
                         anchors.verticalCenter: parent.verticalCenter
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                listView.currentIndex = index
+                                if(flagLabelText.color.toString() === "#000000"){
+                                    flagLabelText.color = "#ffffff"
+                                    flagLabelText.border.color = "#000000"
+                                    iFlagText.color = "#000000"
+                                    console.log("Listview item clicked...")
+                                }
+                                else if(flagLabelText.color.toString() !== "#000000"){
+                                    flagLabelText.color = "#000000"
+                                    flagLabelText.border.color = "#ffffff"
+                                    iFlagText.color = "#ffffff"
+                                    console.log("Listview item clicked...")
+                                }
+
+                            }
+                        }
                     }
                 }
                 Component.onCompleted: {
@@ -1183,8 +1405,20 @@ Window {
             palette.buttonText: "#ffffff"
 
             onClicked: {
-                mainController.saveFlagData(flagTxtInput.text)
-                flagTxtInput.text = ""
+                if(flagTxtInput.text === ""){
+                    //console.log("Error: Enter an event ID")
+                    flagsWinTxtArea.text += "Error: Enter an event ID \n"
+                    return;
+                }
+                else if(flagTxtInput.text !== ""){
+                    mainController.saveFlagData(flagTxtInput.text)
+                    flagsWinTxtArea.text += "Flag successfully added.... \n"
+                    flagTxtInput.text = "";
+                }
+                else{
+                    flagsWinTxtArea.text += "An unknown error occurred. Try again..... \n"
+                    return;
+                }
             }
         }
 
@@ -1215,8 +1449,16 @@ Window {
             palette.buttonText: "#ffffff"
         }
 
+        Image {
+            id: image6
+            x: 627
+            y: 8
+            width: 132
+            height: 51
+            source: "/images/flags-text.png"
+            fillMode: Image.PreserveAspectFit
+        }
     }
-
 
     Rectangle {
         id: schedulerWin
@@ -1227,6 +1469,12 @@ Window {
         visible: false
         color: "#000000"
         border.color: "#000000"
+        Component.onCompleted: {
+            mainController.populateSchedulerTimeData()
+            mainController.populateShedulerDaysData()
+            mainController.popSchdlerClrLogData()
+            mainController.popSchdlerBkupData()
+        }
 
         Image {
             id: image3
@@ -1243,6 +1491,7 @@ Window {
                 y: 8
                 width: 113
                 height: 34
+                visible: false
                 color: "#ffffff"
                 text: qsTr("Scheduler")
                 font.pixelSize: 25
@@ -1250,24 +1499,24 @@ Window {
 
             Text {
                 id: text6
-                x: 290
-                y: 466
-                width: 114
+                x: 292
+                y: 445
+                width: 112
                 height: 34
                 color: "#ffffff"
                 text: qsTr("Days to run: ")
-                font.pixelSize: 20
+                font.pixelSize: 17
             }
 
             Text {
                 id: text7
-                x: 290
-                y: 526
-                width: 114
+                x: 292
+                y: 393
+                width: 104
                 height: 27
                 color: "#ffffff"
                 text: qsTr("Time to run:")
-                font.pixelSize: 21
+                font.pixelSize: 17
             }
 
             Rectangle {
@@ -1275,14 +1524,33 @@ Window {
                 x: 290
                 y: 101
                 width: 701
-                height: 345
+                height: 273
                 color: "#000000"
                 border.color: "#ffffff"
+
+                ScrollView {
+                    id: sw_ScrollVIew
+                    x: 2
+                    y: 2
+                    width: 697
+                    height: 269
+
+                    TextArea {
+                        id: sw_ScrollViewTxtArea
+                        x: -7
+                        y: -3
+                        color: "#ffffff"
+                        text: ""
+                        font.pointSize: 11
+                        placeholderText: qsTr("Text Area")
+                        background: Rectangle {color: "black"}
+                    }
+                }
             }
 
             Text {
                 id: text8
-                x: 290
+                x: 292
                 y: 79
                 width: 95
                 height: 16
@@ -1293,8 +1561,8 @@ Window {
 
             Text {
                 id: text9
-                x: 421
-                y: 459
+                x: 423
+                y: 438
                 color: "#ffffff"
                 text: qsTr("S")
                 font.pixelSize: 12
@@ -1302,8 +1570,8 @@ Window {
 
             Text {
                 id: text10
-                x: 450
-                y: 459
+                x: 452
+                y: 438
                 color: "#ffffff"
                 text: qsTr("M")
                 font.pixelSize: 12
@@ -1311,8 +1579,8 @@ Window {
 
             Text {
                 id: text12
-                x: 506
-                y: 459
+                x: 508
+                y: 438
                 color: "#ffffff"
                 text: qsTr("W")
                 font.pixelSize: 12
@@ -1320,8 +1588,8 @@ Window {
 
             Text {
                 id: text11
-                x: 481
-                y: 459
+                x: 483
+                y: 438
                 color: "#ffffff"
                 text: qsTr("T")
                 font.pixelSize: 12
@@ -1329,8 +1597,8 @@ Window {
 
             Text {
                 id: text13
-                x: 533
-                y: 459
+                x: 535
+                y: 438
                 color: "#ffffff"
                 text: qsTr("T")
                 font.pixelSize: 12
@@ -1338,8 +1606,8 @@ Window {
 
             Text {
                 id: text14
-                x: 560
-                y: 459
+                x: 562
+                y: 438
                 color: "#ffffff"
                 text: qsTr("F")
                 font.pixelSize: 12
@@ -1347,65 +1615,112 @@ Window {
 
             Text {
                 id: text15
-                x: 587
-                y: 459
+                x: 589
+                y: 438
                 color: "#ffffff"
                 text: qsTr("S")
                 font.pixelSize: 12
             }
 
             CheckBox {
-                id: checkBox
-                x: 418
-                y: 477
-            }
-
-            CheckBox {
-                id: checkBox1
-                x: 449
-                y: 477
-            }
-
-            CheckBox {
-                id: checkBox2
-                x: 478
-                y: 477
-            }
-
-            CheckBox {
-                id: checkBox3
-                x: 505
-                y: 477
-            }
-
-            CheckBox {
-                id: checkBox4
-                x: 530
-                y: 477
-            }
-
-            CheckBox {
-                id: checkBox5
-                x: 555
-                y: 477
-            }
-
-            CheckBox {
-                id: checkBox6
-                x: 584
-                y: 477
-                width: 31
-                height: 12
+                id: checkBox_7
+                x: 420
+                y: 455
+                height: 14
                 text: qsTr("")
+            }
+
+            CheckBox {
+                id: checkBox_1
+                x: 452
+                y: 455
+                height: 14
+                text: qsTr("")
+            }
+
+            CheckBox {
+                id: checkBox_2
+                x: 480
+                y: 455
+                width: 12
+                height: 14
+                text: qsTr("")
+            }
+
+            CheckBox {
+                id: checkBox_3
+                x: 508
+                y: 455
+                height: 14
+                text: qsTr("")
+            }
+
+            CheckBox {
+                id: checkBox_4
+                x: 532
+                y: 455
+                height: 14
+                text: qsTr("")
+            }
+
+            CheckBox {
+                id: checkBox_5
+                x: 559
+                y: 455
+                height: 14
+                text: qsTr("")
+            }
+
+            CheckBox {
+                id: checkBox_6
+                x: 586
+                y: 455
+                height: 14
+                text: qsTr("")
+            }
+
+            Switch {
+                id: switch1
+                x: 399
+                y: 555
+                visible: true
+                text: "<font color=\"white\">Off</font>"
+                onToggled: {
+                    if(checked){
+                        switch1.text= qsTr("<font color=\"white\">On</font>")
+                    }
+                    else{
+                        switch1.text= qsTr("<font color=\"white\">Off</font>")
+                    }
+                }
+            }
+
+            Text {
+                id: text16
+                x: 292
+                y: 498
+                color: "#ffffff"
+                text: qsTr("Clear Logs After Backup:")
+                font.pixelSize: 17
+            }
+
+            Text {
+                id: text17
+                x: 294
+                y: 555
+                color: "#ffffff"
+                text: qsTr("Auto Backup:")
+                font.pixelSize: 17
             }
         }
 
         Button {
             id: sw_saveBtn
-            x: 291
-            y: 585
+            x: 323
+            y: 610
             width: 100
             height: 25
+            visible: true
             text: qsTr("Save")
             layer.enabled: true
             hoverEnabled: false
@@ -1425,10 +1740,327 @@ Window {
                 samples: 17
                 horizontalOffset: 2
             }
+            onClicked: {
+                sw_ScrollViewTxtArea.text += "Saving data....\n"
+                var c_Hour = control2.currentText
+                var cMinute = control3.currentText
+                var dayNight = control4.currentText
+                var daysList = []
+                //var cb1_result = checkBox_1.checkState.toString()
+                //var clearLogsSwitch = switch2.checked
+                // var cb2_result = checkBox_2.checkState.toString()
+                //var cb1_result = checkBox_1.checkState.toString()
+                //console.log("The switch result is: " + clearLogsSwitch)
+
+
+                if(checkBox_1.checkState.toString() === "2"){
+                    console.log("IN CHECKBOX 1 IF STATEMENT")
+                    daysList.push("1")
+                    //mainController.saveSchedulerDayData("1")
+                }
+                if(checkBox_2.checkState.toString() === "2"){
+                    daysList.push("2")
+                    //mainController.saveSchedulerDayData("2")
+                }
+                if(checkBox_3.checkState.toString() === "2"){
+                    daysList.push("3")
+                    // mainController.saveSchedulerDayData("3")
+                }
+                if(checkBox_4.checkState.toString() === "2"){
+                    daysList.push("4")
+                    //mainController.saveSchedulerDayData("4")
+                }
+                if(checkBox_5.checkState.toString() === "2"){
+                    daysList.push("5")
+                    //mainController.saveSchedulerDayData("5")
+                }
+                if(checkBox_6.checkState.toString() === "2"){
+                    daysList.push("6")
+                    //mainController.saveSchedulerDayData("6")
+                }
+                if(checkBox_7.checkState.toString() === "2"){
+                    daysList.push("7")
+                    //mainController.saveSchedulerDayData("7")
+                }
+
+                if(switch2.checked){
+                    mainController.saveSchdlerClrLogData("true")
+                    console.log("The switch result is: " + switch2.checked)
+                }
+
+                if(switch1.checked){
+                    mainController.saveSchdlerBkupData("true")
+                    console.log("The switch result is: " + switch1.checked)
+                }
+
+                mainController.saveSchedulerTimeData(c_Hour, cMinute, dayNight)
+                mainController.saveSchedulerDayData(daysList)
+                console.log("The list is: " + daysList)
+            }
+        }
+
+        Image {
+            id: image7
+            x: 542
+            y: 8
+            width: 196
+            height: 37
+            source: "/images/scheduler-text.png"
+            fillMode: Image.PreserveAspectFit
+        }
+
+        ComboBox {
+            id: control2
+            x: 415
+            y: 395
+            width: 116
+            height: 21
+            visible: true
+            background: Rectangle {
+                color: "#000000"
+                radius: 2
+                border.color: control2.pressed ? "#ffffff" : "#ffffff"
+                border.width: control2.visualFocus ? 2 : 1
+                implicitWidth: 120
+                implicitHeight: 40
+            }
+            popup: Popup {
+                y: control2.height - 1
+                width: control2.width
+                background: Rectangle {
+                    color: "#ffffff"
+                    radius: 5
+                    border.color: "#ffffff"
+                }
+                contentItem: ListView {
+                    clip: true
+                    model: control2.popup.visible ? control2.delegateModel : null
+                    ScrollIndicator.vertical: ScrollIndicator {
+                    }
+                    currentIndex: control2.highlightedIndex
+                    implicitHeight: contentHeight
+                }
+                padding: 1
+                implicitHeight: contentItem.implicitHeight
+            }
+            contentItem: Text {
+                color: control2.pressed ? "#000000" : "#ffffff"
+                text: control2.displayText
+                elide: Text.ElideRight
+                verticalAlignment: Text.AlignVCenter
+                font: control2.font
+                leftPadding: 0
+                rightPadding: control2.indicator.width + control2.spacing
+            }
+            model: ["Hour", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"]
+            indicator: Canvas {
+                x: control2.width - width - control2.rightPadding
+                y: control2.topPadding + (control2.availableHeight - height) / 2
+                width: 12
+                height: 8
+                onPaint: {
+                    context.reset();
+                    context.moveTo(0, 0);
+                    context.lineTo(width, 0);
+                    context.lineTo(width / 2, height);
+                    context.closePath();
+                    context.fillStyle = control2.pressed ? "#ffffff" : "#ffffff";
+                    context.fill();
+                }
+                Connections {
+                    target: control2
+                }
+                contextType: "2d"
+            }
+            delegate: ItemDelegate {
+                width: control2.width
+                highlighted: control2.highlightedIndex === index
+                contentItem: Text {
+                    color: "#000000"
+                    text: control2.textRole
+                          ? (Array.isArray(control2.model) ? modelData[control2.textRole] : model[control2.textRole])
+                          : modelData
+                    elide: Text.ElideRight
+                    verticalAlignment: Text.AlignVCenter
+                    font: control2.font
+                }
+            }
+        }
+
+        ComboBox {
+            id: control3
+            x: 559
+            y: 395
+            width: 116
+            height: 21
+            background: Rectangle {
+                color: "#000000"
+                radius: 2
+                border.color: control3.pressed ? "#ffffff" : "#ffffff"
+                border.width: control3.visualFocus ? 2 : 1
+                implicitWidth: 120
+                implicitHeight: 40
+            }
+            popup: Popup {
+                y: control3.height - 1
+                width: control3.width
+                background: Rectangle {
+                    color: "#ffffff"
+                    radius: 5
+                    border.color: "#ffffff"
+                }
+                contentItem: ListView {
+                    clip: true
+                    model: control3.popup.visible ? control3.delegateModel : null
+                    ScrollIndicator.vertical: ScrollIndicator {
+                    }
+                    currentIndex: control3.highlightedIndex
+                    implicitHeight: contentHeight
+                }
+                padding: 1
+                implicitHeight: contentItem.implicitHeight
+            }
+            contentItem: Text {
+                color: control3.pressed ? "#000000" : "#ffffff"
+                text: control3.displayText
+                elide: Text.ElideRight
+                verticalAlignment: Text.AlignVCenter
+                font: control3.font
+                leftPadding: 0
+                rightPadding: control3.indicator.width + control3.spacing
+            }
+            model: ["Minute", "00","01", "02", "03", "04", "05", "06", "07", "08", "09", "10",
+                "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21",
+                "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32",
+                "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43",
+                "44", "45", "46", "47", "48", "49", "50","51", "52", "53", " 54",
+                "55", "56", "57", "58", "59"]
+            indicator: Canvas {
+                x: control3.width - width - control3.rightPadding
+                y: control3.topPadding + (control3.availableHeight - height) / 2
+                width: 12
+                height: 8
+                onPaint: {
+                    context.reset();
+                    context.moveTo(0, 0);
+                    context.lineTo(width, 0);
+                    context.lineTo(width / 2, height);
+                    context.closePath();
+                    context.fillStyle = control3.pressed ? "#ffffff" : "#ffffff";
+                    context.fill();
+                }
+                Connections {
+                    target: control3
+                }
+                contextType: "2d"
+            }
+            delegate: ItemDelegate {
+                width: control3.width
+                highlighted: control3.highlightedIndex === index
+                contentItem: Text {
+                    color: "#000000"
+                    text: control3.textRole
+                          ? (Array.isArray(control3.model) ? modelData[control3.textRole] : model[control3.textRole])
+                          : modelData
+                    elide: Text.ElideRight
+                    verticalAlignment: Text.AlignVCenter
+                    font: control3.font
+                }
+            }
+        }
+
+        ComboBox {
+            id: control4
+            x: 703
+            y: 395
+            width: 116
+            height: 21
+            background: Rectangle {
+                color: "#000000"
+                radius: 2
+                border.color: control4.pressed ? "#ffffff" : "#ffffff"
+                border.width: control4.visualFocus ? 2 : 1
+                implicitWidth: 120
+                implicitHeight: 40
+            }
+            popup: Popup {
+                y: control4.height - 1
+                width: control4.width
+                background: Rectangle {
+                    color: "#ffffff"
+                    radius: 5
+                    border.color: "#ffffff"
+                }
+                contentItem: ListView {
+                    clip: true
+                    model: control4.popup.visible ? control4.delegateModel : null
+                    ScrollIndicator.vertical: ScrollIndicator {
+                    }
+                    currentIndex: control4.highlightedIndex
+                    implicitHeight: contentHeight
+                }
+                padding: 1
+                implicitHeight: contentItem.implicitHeight
+            }
+            contentItem: Text {
+                color: control4.pressed ? "#000000" : "#ffffff"
+                text: control4.displayText
+                elide: Text.ElideRight
+                verticalAlignment: Text.AlignVCenter
+                font: control4.font
+                leftPadding: 0
+                rightPadding: control4.indicator.width + control4.spacing
+            }
+            model: ["am/pm", "am", "pm"]
+            indicator: Canvas {
+                x: control4.width - width - control4.rightPadding
+                y: control4.topPadding + (control4.availableHeight - height) / 2
+                width: 12
+                height: 8
+                onPaint: {
+                    context.reset();
+                    context.moveTo(0, 0);
+                    context.lineTo(width, 0);
+                    context.lineTo(width / 2, height);
+                    context.closePath();
+                    context.fillStyle = control4.pressed ? "#ffffff" : "#ffffff";
+                    context.fill();
+                }
+                Connections {
+                    target: control4
+                }
+                contextType: "2d"
+            }
+            delegate: ItemDelegate {
+                width: control4.width
+                highlighted: control4.highlightedIndex === index
+                contentItem: Text {
+                    color: "#000000"
+                    text: control4.textRole
+                          ? (Array.isArray(control4.model) ? modelData[control4.textRole] : model[control4.textRole])
+                          : modelData
+                    elide: Text.ElideRight
+                    verticalAlignment: Text.AlignVCenter
+                    font: control4.font
+                }
+            }
+        }
+
+        Switch {
+            id: switch2
+            x: 479
+            y: 498
+            text: "<font color=\"white\">Off</font>"
+            onToggled: {
+                if(checked){
+                    switch2.text= qsTr("<font color=\"white\">On</font>")
+                }
+                else{
+                    switch2.text= qsTr("<font color=\"white\">Off</font>")
+                }
+            }
         }
     }
-
-
 
     Rectangle {
         id: settingsWin
@@ -1464,20 +2096,18 @@ Window {
         id: sidePanelRect
         x: 0
         y: 0
-        width: 70
+        width: 50
         height: 720
         opacity: 0.373
         color: "#515050"
-
-
     }
 
     Image {
         id: toolsBtn
         x: 5
-        y: 433
-        width: 60
-        height: 50
+        y: 315
+        width: 40
+        height: 40
         //source: "images/toolsBtn.png"
         source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/toolsBtn.png"
         fillMode: Image.PreserveAspectFit
@@ -1486,16 +2116,16 @@ Window {
             id: mouseAreaToolsBtn
             x: 0
             y: 0
-            width: 60
-            height: 50
+            width: 40
+            height: 40
             hoverEnabled: true
             onEntered: {
-                toolsBtn.width = 63
-                toolsBtn.height = 53
+                toolsBtn.width = 43
+                toolsBtn.height = 43
             }
             onExited: {
-                toolsBtn.width = 60
-                toolsBtn.height = 50
+                toolsBtn.width = 40
+                toolsBtn.height = 40
             }
             onClicked: {
                 mainWin.visible = false
@@ -1510,10 +2140,10 @@ Window {
 
     Image {
         id: dotsBtn
-        x: -2
-        y: 696
-        width: 72
-        height: 15
+        x: 1
+        y: 689
+        width: 50
+        height: 12
         visible: false
         source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/GopenMenuDots.png"
         fillMode: Image.PreserveAspectFit
@@ -1522,8 +2152,8 @@ Window {
             id: mouseAreaDotsBtn
             x: 0
             y: 0
-            width: 72
-            height: 15
+            width: 50
+            height: 12
             onClicked: {
                 sidePanelRect.visible = true
                 toolsBtn.visible = true
@@ -1548,17 +2178,17 @@ Window {
 
     Image {
         id: menuBtn
-        x: 8
+        x: 4
         y: 662
-        width: 50
-        height: 50
+        width: 40
+        height: 40
         source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/GmenuClose.png"
         fillMode: Image.PreserveAspectFit
 
         MouseArea {
             id: mouseAreaMenuBtn
-            width: 50
-            height: 50
+            width: 40
+            height: 40
             onClicked: {
                 sidePanelRect.visible = false
                 toolsBtn.visible = false
@@ -1594,7 +2224,7 @@ Window {
 
     Text {
         id: clockText
-        x: 1210
+        x: 1204
         y: 28
         width: 74
         height: 20
@@ -1605,23 +2235,22 @@ Window {
 
     Text {
         id: logViewerTitleText
-        x: 1143
-        y: 676
-        width: 129
-        height: 36
+        x: 1127
+        y: 682
+        width: 147
+        height: 29
         visible: true
         color: "#ffffff"
-        text: qsTr("Lumberjack")
-        font.pixelSize: 25
+        text: qsTr("Secret City Labs")
+        font.pixelSize: 21
     }
-
 
     Image {
         id: homeBtn
         x: 5
-        y: 8
-        width: 60
-        height: 50
+        y: 10
+        width: 40
+        height: 40
         visible: true
         source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/homeBtnImg.png"
         clip: false
@@ -1633,16 +2262,16 @@ Window {
             id: mouseAreaHomeBtn
             x: 0
             y: 0
-            width: 60
-            height: 50
+            width: 40
+            height: 40
             hoverEnabled: true
             onEntered: {
-                homeBtn.width = 63
-                homeBtn.height = 53
+                homeBtn.width = 43
+                homeBtn.height = 43
             }
             onExited: {
-                homeBtn.width = 60
-                homeBtn.height = 50
+                homeBtn.width = 40
+                homeBtn.height = 40
             }
             onClicked: {
                 mainWin.visible = true
@@ -1651,6 +2280,7 @@ Window {
                 convertEvtxWin.visible = false
                 flagsWin.visible = false
                 settingsWin.visible = false
+                schedulerWin.visible = false
             }
         }
     }
@@ -1658,25 +2288,25 @@ Window {
     Image {
         id: viewLogBtn
         x: 5
-        y: 92
-        width: 60
-        height: 50
+        y: 73
+        width: 40
+        height: 40
         source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/searchBtn.png"
         fillMode: Image.PreserveAspectFit
         MouseArea {
             id: mouseAreaViewLogBtn
             x: 0
             y: 0
-            width: 60
-            height: 50
+            width: 40
+            height: 40
             onExited: {
-                viewLogBtn.width = 60
-                viewLogBtn.height = 50
+                viewLogBtn.width = 43
+                viewLogBtn.height = 43
             }
             hoverEnabled: true
             onEntered: {
-                viewLogBtn.width = 63
-                viewLogBtn.height = 53
+                viewLogBtn.width = 40
+                viewLogBtn.height = 40
             }
             onClicked: {
                 mainWin.visible = false
@@ -1689,29 +2319,28 @@ Window {
         }
     }
 
-
     Image {
         id: evtxConvertBtn
         x: 5
-        y: 180
-        width: 60
-        height: 50
+        y: 134
+        width: 40
+        height: 40
         source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/convertBtn.png"
         fillMode: Image.PreserveAspectFit
         MouseArea {
             id: mouseAreaConvertEvtx
             x: 0
             y: 0
-            width: 60
-            height: 50
+            width: 40
+            height: 40
             onExited: {
-                evtxConvertBtn.width = 60
-                evtxConvertBtn.height = 50
+                evtxConvertBtn.width = 43
+                evtxConvertBtn.height = 43
             }
             hoverEnabled: true
             onEntered: {
-                evtxConvertBtn.width = 63
-                evtxConvertBtn.height = 53
+                evtxConvertBtn.width = 40
+                evtxConvertBtn.height = 40
             }
             onClicked: {
                 mainWin.visible = false
@@ -1727,17 +2356,17 @@ Window {
     Image {
         id: flagsBtn
         x: 5
-        y: 266
-        width: 60
-        height: 50
+        y: 194
+        width: 40
+        height: 40
         source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/flagBtn.png"
         fillMode: Image.PreserveAspectFit
         MouseArea {
             id: flagsBtnMouseArea
             x: 0
             y: 0
-            width: 60
-            height: 50
+            width: 40
+            height: 40
             onClicked: {
                 mainWin.visible = false
                 logViewerWin.visible = false
@@ -1747,12 +2376,12 @@ Window {
                 schedulerWin.visible = false
             }
             onExited: {
-                flagsBtn.width = 60
-                flagsBtn.height = 50
+                flagsBtn.width = 43
+                flagsBtn.height = 43
             }
             onEntered: {
-                flagsBtn.width = 63
-                flagsBtn.height = 53
+                flagsBtn.width = 40
+                flagsBtn.height = 40
             }
             hoverEnabled: true
         }
@@ -1761,17 +2390,17 @@ Window {
     Image {
         id: scheduleBtn
         x: 5
-        y: 350
-        width: 60
-        height: 50
+        y: 255
+        width: 40
+        height: 40
         source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/scheduleBtn.png"
         fillMode: Image.PreserveAspectFit
         MouseArea {
             id: mouseAreaScheduleBtn
             x: 0
             y: 0
-            width: 60
-            height: 50
+            width: 40
+            height: 40
             onClicked: {
                 mainWin.visible = false
                 logViewerWin.visible = false
@@ -1781,16 +2410,14 @@ Window {
                 schedulerWin.visible = true
             }
             onExited: {
-                scheduleBtn.width = 60
-                scheduleBtn.height = 50
+                scheduleBtn.width = 43
+                scheduleBtn.height = 43
             }
             onEntered: {
-                scheduleBtn.width = 63
-                scheduleBtn.height = 53
+                scheduleBtn.width = 40
+                scheduleBtn.height = 40
             }
             hoverEnabled: true
         }
     }
-
-
 }

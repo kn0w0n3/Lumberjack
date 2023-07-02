@@ -1,10 +1,9 @@
 <RCC>
     <qresource prefix="/">
-        <file>images/homeBtnImg.png</file>
-        <file>images/toolsBtn.png</file>
-        <file>images/GmenuClose.png</file>
-        <file>images/GopenMenuDots.png</file>
-        <file>images/helpBtn.png</file>
-        <file>images/J_homeBtnImg.jpg</file>
+        <file>images/home-text.png</file>
+        <file>images/log-viewer-text.png</file>
+        <file>images/evtx-converter-text.png</file>
+        <file>images/scheduler-text.png</file>
+        <file>images/flags-text.png</file>
     </qresource>
 </RCC>
