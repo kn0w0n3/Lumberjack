@@ -1,8 +1,14 @@
 # Lumberjack
-Windows Log Viewer 
+Windows Log Viewer | Automatic Backup | Audit Tool  
 
 ![Lumberjack_GUI_7-2-23](https://github.com/kn0w0n3/Lumberjack/assets/22214754/f235e66f-0fb9-4eb6-9d44-4002b2281057)            
- 
+
+ # **Usage:**  
+ 1) Automatically backup and clear Windows event logs 
+ 2) Set flags for specific events
+ 3) View saved logs
+ 4) Convert EVTX files to JSON, XML, or CSV  
+
 # **Work Environment:**       
 ![QtLogo](https://user-images.githubusercontent.com/22214754/179895211-d52559ab-35df-4fcc-bf69-7377739330d4.png)  
 Qt Creator 10.0.1  
