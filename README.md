@@ -1,7 +1,7 @@
 # Lumberjack
 Windows Log Viewer | Automatic Backup | Audit Tool  
 
-![Lumberjack_GUI_7-2-23](https://github.com/kn0w0n3/Lumberjack/assets/22214754/f235e66f-0fb9-4eb6-9d44-4002b2281057)            
+![Lumberjack_GUI_7-2-23_2](https://github.com/kn0w0n3/Lumberjack/assets/22214754/417e60cb-bdef-419e-ac3f-529e2cf7840b)              
 
  # **Usage:**  
  1) Automatically backup and clear Windows event logs 
