@@ -3,220 +3,27 @@ import QtQuick
 import QtQuick.Controls 2.15
 import Qt5Compat.GraphicalEffects
 import QtQml.Models 2.12
+import TableModel 0.1
 
 Window {
     width: 1280
     height: 720
     visible: true
+    visibility: Window.AutomaticVisibility
     title: qsTr("Lumberjack")
     maximumWidth: 1280
     maximumHeight: 720
     minimumWidth: 1280
     minimumHeight: 720
 
-    Connections {
-        target: mainController
 
-        onSecurityEventCount2Qml:{
-            var receivedSecTxt = secEventCountX
-            secEventCountTxt.text = receivedSecTxt;
-            //console.log("SecSignal Detected")
-        }
-        onAppEventCount2Qml:{
-            var receivedAppTxt = appEventCountX
-            appEventCountTxt.text = receivedAppTxt;
-            //console.log("App Signal Detected")
-        }
-        onSysEventCount2Qml:{
-            var reveivedSysTxt = sysEventCountX
-            sysEventCountTxt.text = reveivedSysTxt;
-            //console.log("Sys Signal Detected")
-        }
-        onProcessingStatus2Qml:{
-            summaryText.text = processingStatus;
-        }
-        onDataToLogViewer:{
-            logViewerWinTxtArea.text += logData + "\n";
-            //console.log("Log Data Signal Detected")
-        }
-        onPopulateFlagDataToQml:{
-            //iFlagText.text = eventIdFlag
-            //console.log("flag is: " + flagText.text)
-            eventModel.append({"listEntry": " Event ID: " + eventIdFlag})
-        }
-        //Display the file path
-        onFilePathToQml:{
-            cew_SelectFileTxt.text = filePath
-        }
-        //Display the dir path
-        onDirPathToQml:{
-            cew_SelectDirTxt.text = dirPath
-        }
-        //Display the save to path
-        onSaveToPathToQml:{
-            cew_SaveToTxt.text = saveToPath
-        }
-        onFileConvertEvtxStatus:{
-            cew_logTxtArea.text += curStatus + "\n"
-        }
-        onFileNameToQml:{
-            cew_fileSaveAsNameTxt.text = fileName
-        }
-        onSaveScheduleDataSaveStatus:{
-            sw_ScrollViewTxtArea.text += shedulerSaveStatus + "\n"
-        }
-        onSavedHourTxtToQml:{
-            control2.currentIndex = s_Hour
-        }
-        onSavedMinTxtToQml:{
-            control3.currentIndex = s_Minute
-        }
-        onSavedAmpmTxtToQml:{
-            if(s_Ampm === "am"){
-                control4.currentIndex = 1
-            }
-            else if(s_Ampm === "pm"){
-                control4.currentIndex = 2
-            }
-            else{
-                control4.currentIndex = 0
-            }
-        }
-        onSavedDaysDataToQml:{
-            console.log("IN QML DYS DATA SLOT")
-            if(dayX === "1"){
-                checkBox_1.checkState = Qt.Checked
-            }
-            if(dayX === "2"){
-                checkBox_2.checkState = Qt.Checked
-            }
-            if(dayX === "3"){
-                checkBox_3.checkState = Qt.Checked
-            }
-            if(dayX === "4"){
-                checkBox_4.checked = Qt.Checked
-            }
-            if(dayX === "5"){
-                checkBox_5.checked = Qt.Checked
-            }
-            if(dayX === "6"){
-                checkBox_6.checked = Qt.Checked
-            }
-            if(dayX === "7"){
-                checkBox_7.checked = Qt.Checked
-            }
-        }
-        onSavedClearLogDataToQML:{
-            if(cl_CheckedStatus === "true"){
-                //switch2.stateChanged(2)
-                switch2.checked = true
-                switch2.text = "<font color=\"white\">On</font>"
-            }
-
-        }
-        onSavedAutoBackupDataToQML:{
-            if(bu_CheckedStatus === "true"){
-                switch1.checked = true
-                switch1.text = "<font color=\"white\">On</font>"
-            }
-        }
-        onArchivedLogEntryToQml:{
-            model.append({text: logName})
-        }
-
-        //function onSecurityEventCount2Qml(secEventCountX) {
-        //secEventCountTxt.text = 11;
-        //console.log("Signal Detected")
-        // }
-        // function onSecurityEventCount2Qml() {
-        // secEventCountTxt.text = secEventCountX
-        //console.log("Signal javascript function Detected")
-        // }
-    }
-
-    Timer {
-        id: clockTimer
-        interval: 1000
-        repeat: true
-        running: true
-        onTriggered:{
-            clockText.text =  Qt.formatTime(new Date(),"hh:mm:ss")
-        }
-    }
-
-    Timer {
-        id: dateTimer
-        interval: 1000
-        repeat: true
-        running: true
-        property var locale: Qt.locale()
-        property date currentDate: new Date()
-        property string dateString
-        onTriggered:{
-            curDateTxt.text = currentDate.toLocaleDateString(locale, Locale.ShortFormat);
-        }
-    }
-
-    Timer {
-        id: scheduleDateTimer
-        interval: 1000
-        repeat: true
-        running: true
-        property var locale: Qt.locale()
-        property date currentDate: new Date()
-        property string dateString
-        onTriggered:{
-            var curDayOfTheWeek  = currentDate.getDay().toString()
-            //console.log("Current day of the week is: " + curDayOfTheWeek)
-            //curDateTxt.text = currentDate.toLocaleDateString(locale, Locale.ShortFormat);
-        }
-    }
-
-
-    Timer {
-        id: updateLogSummaryTimer
-        interval: 1800000
-        repeat: true
-        running: true
-        property var locale: Qt.locale()
-        property date currentDate: new Date()
-        property string dateString
-        onTriggered:{
-            mainController.updateCurrentLogSummary()
-            //locale: Qt.locale("en_US");
-            //QDateTime date = QDateTime::currentDateTime();
-            //QString dateString = locale.toString(date);
-            //console.log(date);
-            //curDateTxt.text = currentDate.toLocaleDateString(locale, Locale.ShortFormat);
-        }
-    }
-
-    Timer {
-        id: schedulerTimer
-        interval: 1000
-        repeat: true
-        running: true
-        onTriggered:{
-            var currentTime =  Qt.formatTime(new Date(),"hh:mm ap")
-            var timeToCompare = control2.currentText + ":" + control3.currentText + " " + control4.currentText
-            //console.log("Current time: " + currentTime)
-            //console.log("Time to compare is: " + timeToCompare)
-            if(currentTime === timeToCompare){
-                console.log("THE TIME MATCHES............")
-            }
-        }
-    }
-
-
-    //Main Controller Connections
     Rectangle {
         id: mainWin
-        x: 0
-        y: 0
         width: 1280
         height: 720
         visible: true
         color: "#000000"
+        //anchors.fill: parent
 
         Image {
             id: mainWinBgImg
@@ -224,19 +31,10 @@ Window {
             y: 0
             width: 1280
             height: 720
+            visible: true
             source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/bg.png"
             fillMode: Image.PreserveAspectFit
-
-            Image {
-                id: image1
-                x: 1094
-                y: 681
-                width: 40
-                height: 31
-                visible: false
-                source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/eagle.png"
-                fillMode: Image.PreserveAspectFit
-            }
+            //anchors.fill: parent
 
             Image {
                 id: image2
@@ -331,6 +129,9 @@ Window {
             height: 273
             color: "#000000"
             border.color: "#ffffff"
+            //anchors.verticalCenter: parent.v
+
+
 
             Text {
                 id: errorLabel
@@ -474,6 +275,202 @@ Window {
         }
     }
 
+    Connections {
+        target: mainController
+
+        onSecurityEventCount2Qml:{
+            var receivedSecTxt = secEventCountX
+            secEventCountTxt.text = receivedSecTxt;
+        }
+        onAppEventCount2Qml:{
+            var receivedAppTxt = appEventCountX
+            appEventCountTxt.text = receivedAppTxt;
+        }
+        onSysEventCount2Qml:{
+            var reveivedSysTxt = sysEventCountX
+            sysEventCountTxt.text = reveivedSysTxt;
+        }
+        onProcessingStatus2Qml:{
+            summaryText.text = processingStatus;
+        }
+        onDataToLogViewer:{
+            logViewerWinTxtArea.text += logData + "\n";
+        }
+        onPopulateFlagDataToQml:{
+            eventModel.append({"listEntry": " Event ID: " + eventIdFlag})
+        }
+        //Display the file path
+        onFilePathToQml:{
+            cew_SelectFileTxt.text = filePath
+        }
+        //Display the dir path
+        onDirPathToQml:{
+            cew_SelectDirTxt.text = dirPath
+        }
+        //Display the save to path
+        onSaveToPathToQml:{
+            cew_SaveToTxt.text = saveToPath
+        }
+        onFileConvertEvtxStatus:{
+            cew_logTxtArea.text += curStatus + "\n"
+        }
+        onFileNameToQml:{
+            cew_fileSaveAsNameTxt.text = fileName
+        }
+        onSaveScheduleDataSaveStatus:{
+            sw_ScrollViewTxtArea.text += shedulerSaveStatus + "\n"
+        }
+        onSavedHourTxtToQml:{
+            control2.currentIndex = s_Hour
+        }
+        onSavedMinTxtToQml:{
+            control3.currentIndex = s_Minute
+        }
+        onSavedAmpmTxtToQml:{
+            if(s_Ampm === "am"){
+                control4.currentIndex = 1
+            }
+            else if(s_Ampm === "pm"){
+                control4.currentIndex = 2
+            }
+            else{
+                control4.currentIndex = 0
+            }
+        }
+        onSavedDaysDataToQml:{
+            console.log("IN QML DYS DATA SLOT")
+            if(dayX === "1"){
+                checkBox_1.checkState = Qt.Checked
+            }
+            if(dayX === "2"){
+                checkBox_2.checkState = Qt.Checked
+            }
+            if(dayX === "3"){
+                checkBox_3.checkState = Qt.Checked
+            }
+            if(dayX === "4"){
+                checkBox_4.checked = Qt.Checked
+            }
+            if(dayX === "5"){
+                checkBox_5.checked = Qt.Checked
+            }
+            if(dayX === "6"){
+                checkBox_6.checked = Qt.Checked
+            }
+            if(dayX === "7"){
+                checkBox_7.checked = Qt.Checked
+            }
+        }
+        onSavedClearLogDataToQML:{
+            if(cl_CheckedStatus === "true"){
+                //switch2.stateChanged(2)
+                switch2.checked = true
+                switch2.text = "<font color=\"white\">On</font>"
+            }
+
+        }
+        onSavedAutoBackupDataToQML:{
+            if(bu_CheckedStatus === "true"){
+                switch1.checked = true
+                switch1.text = "<font color=\"white\">On</font>"
+            }
+        }
+        onArchivedLogEntryToQml:{
+            model.append({text: logName})
+        }
+        onDirPathSepToQml:{
+            selectDirSeparateTxt.text = sepPath
+        }
+        onFileMoveStatusToQml:{
+            logViewerWinTxtArea.text += moveFileStatus + "\n"
+            control.model.remove(control.currentIndex)
+        }
+
+        //function onSecurityEventCount2Qml(secEventCountX) {
+        //secEventCountTxt.text = 11;
+        //console.log("Signal Detected")
+        // }
+        // function onSecurityEventCount2Qml() {
+        // secEventCountTxt.text = secEventCountX
+        //console.log("Signal javascript function Detected")
+        // }
+    }
+
+    Timer {
+        id: clockTimer
+        interval: 1000
+        repeat: true
+        running: true
+        onTriggered:{
+            clockText.text =  Qt.formatTime(new Date(),"hh:mm:ss")
+        }
+    }
+
+    Timer {
+        id: dateTimer
+        interval: 1000
+        repeat: true
+        running: true
+        property var locale: Qt.locale()
+        property date currentDate: new Date()
+        property string dateString
+        onTriggered:{
+            curDateTxt.text = currentDate.toLocaleDateString(locale, Locale.ShortFormat);
+        }
+    }
+
+    Timer {
+        id: scheduleDateTimer
+        interval: 1000
+        repeat: true
+        running: true
+        property var locale: Qt.locale()
+        property date currentDate: new Date()
+        property string dateString
+        onTriggered:{
+            var curDayOfTheWeek  = currentDate.getDay().toString()
+            //console.log("Current day of the week is: " + curDayOfTheWeek)
+            //curDateTxt.text = currentDate.toLocaleDateString(locale, Locale.ShortFormat);
+        }
+    }
+
+
+    Timer {
+        id: updateLogSummaryTimer
+        interval: 1800000
+        repeat: true
+        running: true
+        property var locale: Qt.locale()
+        property date currentDate: new Date()
+        property string dateString
+        onTriggered:{
+            mainController.updateCurrentLogSummary()
+            //locale: Qt.locale("en_US");
+            //QDateTime date = QDateTime::currentDateTime();
+            //QString dateString = locale.toString(date);
+            //console.log(date);
+            //curDateTxt.text = currentDate.toLocaleDateString(locale, Locale.ShortFormat);
+        }
+    }
+
+    Timer {
+        id: schedulerTimer
+        interval: 1000
+        repeat: true
+        running: true
+        onTriggered:{
+            var currentTime =  Qt.formatTime(new Date(),"hh:mm ap")
+            var timeToCompare = control2.currentText + ":" + control3.currentText + " " + control4.currentText
+            //console.log("Current time: " + currentTime)
+            //console.log("Time to compare is: " + timeToCompare)
+            if(currentTime === timeToCompare){
+                console.log("THE TIME MATCHES............")
+            }
+        }
+    }
+
+    //Main Controller Connections
+
 
 
     Rectangle {
@@ -502,7 +499,63 @@ Window {
             width: 1075
             height: 490
             color: "#000000"
-            border.color: "#ffffff"
+            border.color: "#000000"
+
+
+            TableView {
+                x: 120
+                y: 71
+                //width: 1020
+                height: 483
+                //rightMargin: 100
+                anchors.fill: parent
+                anchors.topMargin: 8
+                columnSpacing: 1
+                rowSpacing: 1
+                clip: true
+
+
+
+                //horizontalScrollBarPolicy: Qt.ScrollBarAsNeeded
+                //verticalScrollBarPolicy: Qt.ScrollBarAsNeeded
+                ScrollBar.horizontal: ScrollBar {
+                            policy: ScrollBar.AlwaysOn
+                            height:  5
+                            background: Rectangle {
+                                implicitHeight: 7
+                                color: "#000000"
+                            }
+                       }
+
+                ScrollBar.vertical: ScrollBar {
+                            policy: ScrollBar.AlwaysOn
+                            width: 5
+                            //contentItem: Rectangle {
+                                //implicitWidth: 3
+                               // border.color: "#ffffff"
+                                //color: "#ffffff"
+                                //color: scrollBar.pressed ? "orange" : "green"
+                               // }
+                            background: Rectangle {
+                                implicitWidth: 7
+                                color: "#000000"
+                            }
+                        }
+                model: TableModel {}
+
+                delegate: Rectangle {
+                    implicitWidth: 250
+                    implicitHeight: 50
+                    color: "#000000"
+                    border.color: "#ffffff"
+                    Text {
+                        text: tabledata
+                        color: "#ffffff"
+                        font.pointSize: 10
+                        anchors.centerIn: parent
+                    }
+                }
+            }
         }
 
         ScrollView {
@@ -511,6 +564,7 @@ Window {
             y: 74
             width: 1068
             height: 480
+            visible: false
             clip: true
 
             TextArea {
@@ -519,6 +573,7 @@ Window {
                 y: 0
                 width: 1068
                 height: 480
+                visible: false
                 color: "#ffffff"
                 font.pointSize: 13
                 placeholderText: qsTr("Text Area")
@@ -530,7 +585,7 @@ Window {
             id: control
             x: 133
             y: 43
-            width: 116
+            width: 200
             height: 21
             //model: ["Available Logs", "Application", "System", "Security", "Custom"]
             model: ListModel{
@@ -669,6 +724,9 @@ Window {
                 samples: 17
             }
             palette.buttonText: "#ffffff"
+            onClicked: {
+                //Load the selected log file
+            }
         }
 
         Image {
@@ -705,6 +763,12 @@ Window {
             background: Rectangle {
                 color: "#161e20"
                 radius: 50
+            }
+            onClicked: {
+                //Move the selected log file to the reviewed folder
+                //var fileName = control.currentText
+                mainController.moveAuditLogToReviewedFolder(control.currentText)
+                console.log("Current text is: " + control.currentText)
             }
         }
     }
@@ -952,8 +1016,8 @@ Window {
                         console.log("Please select a conversion type...")
                         return;
                     }
-                    else if(cew_SelectFileTxt.text === "" && cew_SelectDirTxt.text === ""){
-                        cew_logTxtArea.text += "Select a file or directory..."+ "\n"
+                    else if(cew_SelectFileTxt.text === "" && cew_SelectDirTxt.text === "" && selectDirSeparateTxt.text === ""){
+                        cew_logTxtArea.text += "Select a file or directory..." + "\n"
                         console.log("Select file and select dir felds are empty...")
                         return;
                     }
@@ -963,36 +1027,49 @@ Window {
                         console.log("Select a location to save the converted files...")
                         return;
                     }
-                    else if(cew_fileSaveAsNameTxt.text === ""){
+                    /*
+                    else if(cew_SelectFileTxt.text !== "" && cew_fileSaveAsNameTxt.text === ""){
                         cew_logTxtArea.text += "Please enter a name for the file to be converted. Do not include the extension..." + "\n"
                         console.log("Please enter a name for the new file. Do not include the extension...")
                         return;
                     }
-
+*/
                     //else if(cew_SelectFileTxt.text !== "" && cew_SelectDirTxt.text !== ""){
                     //This situation should not happen because one field is set to "" when the other is populated, but just in case...
                     // console.log("Select file or dir not both...")
                     //return;
                     //}
-                    else if(cew_SelectFileTxt.text !== "" && cew_SelectDirTxt.text === ""){
-                        console.log("Select file has text and selct dir does not...")
+                    else if(cew_SelectFileTxt.text !== "" && cew_SelectDirTxt.text === "" && selectDirSeparateTxt.text === ""){
+                        //console.log("Select file has text and selct dirs does not...")
                         if(cew_fileSaveAsNameTxt.text === ""){
-                            cew_logTxtArea.text += "Please enter a file name...\n"
-                            console.log("Please enter a file name...")
+                            //console.log("Please enter a file name...")
+                            cew_logTxtArea.text += "Please enter a file name.....\n"
                             return;
                         }
                         else{
                             mainController.fileConvertEvtx(control1.currentText, cew_SelectFileTxt.text, cew_SaveToTxt.text, cew_fileSaveAsNameTxt.text)
                         }
                     }
-                    else if(cew_SelectDirTxt.text !== "" && cew_SelectFileTxt.text === ""){
-                        console.log("Select dir has text and selct file does not...")
+                    else if(cew_SelectDirTxt.text !== "" && cew_SelectFileTxt.text === "" && selectDirSeparateTxt.text === ""){
+                        //console.log("Select dir combine has text. select file and select dir separate does not...")
                         if(cew_fileSaveAsNameTxt.text !== ""){
-                            cew_logTxtArea.text += "Error: File name must be blank for directory conversion.\n"
-                            //console.log("Error: File name must be blank for directory conversion. Files will be converted using original file names....")
+                            //console.log("Error: File name must be blank for directory conversion.....")
+                            cew_logTxtArea.text += "Error: File name must be blank for directory conversion.....\n"
                             return;
                         }
                         else{
+                            mainController.dirConvertEvtx(control1.currentText, cew_SelectDirTxt.text, cew_SaveToTxt.text)
+                            //console.log("SENDING Dir DATA TO C++...")
+                        }
+                    }
+                    else if(selectDirSeparateTxt.text !== "" && cew_SelectDirTxt.text === "" &&  cew_SelectFileTxt.text === ""){
+                        if(cew_fileSaveAsNameTxt.text !== ""){
+                            //console.log("Error: File name must be blank for directory conversion.....")
+                            cew_logTxtArea.text += "Error: File name must be blank for directory conversion.....\n"
+                            return;
+                        }
+                        else{
+                            mainController.dirConvertEachEvtx(control1.currentText, cew_SaveToTxt.text)
 
                         }
                     }
@@ -1109,7 +1186,7 @@ Window {
                     radius: 50
                 }
                 onClicked: {
-
+                    mainController.selectDirConvertEachEvtx()
                 }
             }
         }
@@ -2100,6 +2177,7 @@ Window {
         height: 720
         opacity: 0.373
         color: "#515050"
+        //anchors.fill: parent
     }
 
     Image {
@@ -2233,17 +2311,22 @@ Window {
         font.pixelSize: 16
     }
 
+
     Text {
         id: logViewerTitleText
-        x: 1127
-        y: 682
-        width: 147
-        height: 29
+        x: 1152
+        y: 689
+        width: 126
+        height: 26
         visible: true
         color: "#ffffff"
         text: qsTr("Secret City Labs")
-        font.pixelSize: 21
+        font.pixelSize: 18
+        //anchors.right: parent.right
+        //anchors.bottom: parent.bottom
     }
+
+
 
     Image {
         id: homeBtn
@@ -2420,4 +2503,19 @@ Window {
             hoverEnabled: true
         }
     }
+
+    Image {
+        id: alienLogoImg
+        x: 1106
+        y: 685
+        width: 40
+        height: 30
+        source: "file:C:/Lumberjack/images/alien_logo.png"
+        fillMode: Image.PreserveAspectFit
+        //anchors.right: parent.right
+        //anchors.bottom: parent.bottom
+        //anchors.rightMargin: 135
+    }
+
+
 }
