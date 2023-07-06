@@ -16,7 +16,6 @@ Window {
     minimumWidth: 1280
     minimumHeight: 720
 
-
     Rectangle {
         id: mainWin
         width: 1280
@@ -247,7 +246,7 @@ Window {
             //This will make the image display in the designer, but the image does not siplay during run time
             //source:"images/home-text.png"
 
-            //This will make the image display during run time, but the image wn't display in designer
+            //This will make the image display during run time, but the image won't display in designer
             source:"/images/home-text.png"
             fillMode: Image.PreserveAspectFit
         }
@@ -297,7 +296,7 @@ Window {
             logViewerWinTxtArea.text += logData + "\n";
         }
         onPopulateFlagDataToQml:{
-            eventModel.append({"listEntry": " Event ID: " + eventIdFlag})
+            eventModel.append({"listEntry": " " + eventIdFlag + "                                                  "})
         }
         //Display the file path
         onFilePathToQml:{
@@ -384,6 +383,12 @@ Window {
         onFileMoveStatusToQml:{
             logViewerWinTxtArea.text += moveFileStatus + "\n"
             control.model.remove(control.currentIndex)
+        }
+        onFlagsToRemove:{
+            listView.model.remove(i_flag)
+        }
+        onFlagsToAdd:{
+            eventModel.append({"listEntry": " " + i_AddFlag + "                                                  "})
         }
 
         //function onSecurityEventCount2Qml(secEventCountX) {
@@ -519,28 +524,28 @@ Window {
                 //horizontalScrollBarPolicy: Qt.ScrollBarAsNeeded
                 //verticalScrollBarPolicy: Qt.ScrollBarAsNeeded
                 ScrollBar.horizontal: ScrollBar {
-                            policy: ScrollBar.AlwaysOn
-                            height:  5
-                            background: Rectangle {
-                                implicitHeight: 7
-                                color: "#000000"
-                            }
-                       }
+                    policy: ScrollBar.AlwaysOn
+                    height:  5
+                    background: Rectangle {
+                        implicitHeight: 7
+                        color: "#000000"
+                    }
+                }
 
                 ScrollBar.vertical: ScrollBar {
-                            policy: ScrollBar.AlwaysOn
-                            width: 5
-                            //contentItem: Rectangle {
-                                //implicitWidth: 3
-                               // border.color: "#ffffff"
-                                //color: "#ffffff"
-                                //color: scrollBar.pressed ? "orange" : "green"
-                               // }
-                            background: Rectangle {
-                                implicitWidth: 7
-                                color: "#000000"
-                            }
-                        }
+                    policy: ScrollBar.AlwaysOn
+                    width: 5
+                    //contentItem: Rectangle {
+                    //implicitWidth: 3
+                    // border.color: "#ffffff"
+                    //color: "#ffffff"
+                    //color: scrollBar.pressed ? "orange" : "green"
+                    // }
+                    background: Rectangle {
+                        implicitWidth: 7
+                        color: "#000000"
+                    }
+                }
                 model: TableModel {}
 
                 delegate: Rectangle {
@@ -745,6 +750,7 @@ Window {
             y: 578
             width: 135
             height: 25
+            visible: true
             text: qsTr("Mark as Reviewed")
             palette.buttonText: "#ffffff"
             layer.enabled: true
@@ -1378,9 +1384,11 @@ Window {
                 width: 196
                 height: 195
                 clip: true
-                highlight: highlight
+                //highlight: highlight
+                //delegate: flagLabelText
                 highlightFollowsCurrentItem: false
                 focus: true
+                //highlight: Rectangle { color: "lightsteelblue"; radius: 5 }
 
                 // highlightFollowsCurrentItem: true
                 model: ListModel {
@@ -1395,12 +1403,12 @@ Window {
                     width: 196
                     height: 23
                     color: "#000000"
-                    border.color: "#ffffff"
+                    border.color: "white"
                     radius: 5
 
                     Text {
                         id: iFlagText
-                        color: "#ffffff"
+                        color: "white"
                         text: listEntry
                         font.bold: false
                         anchors.verticalCenter: parent.verticalCenter
@@ -1524,6 +1532,36 @@ Window {
                 samples: 17
             }
             palette.buttonText: "#ffffff"
+            //Remove selected items from list
+            onClicked: {
+                //var curIndx = listView.currentIndex;
+                var entryCount = listView.count;
+                var newFlagList = [];
+                var flagsToRemoveList = [];
+
+                //console.log("Current index is: " + curIndx)
+                console.log("The count is: " + entryCount);
+
+                for(var i = 0; i < entryCount; i++){
+                    var eventIdTxt = eventModel.get(i).listEntry.toString()
+                    var itemColor = listView.itemAtIndex(i).color.toString()
+                    //console.log("The x text is: " + x)
+                    console.log("The selectedItemColor text is: " + itemColor)
+
+                    if(itemColor === "#ffffff"){
+                        flagsToRemoveList.push(i);
+                        console.log("The item color is white: Inside if statement")
+
+                    }
+                    if(itemColor === "#000000"){
+                        newFlagList.push(eventIdTxt);
+                        console.log("The item color is NOT  white: Inside if statement")
+                    }
+                }
+                console.log("The flags to remove list is: " + flagsToRemoveList)
+                console.log("The new flags list is: " + newFlagList)
+                mainController.updateFlagList(newFlagList, flagsToRemoveList)
+            }
         }
 
         Image {
@@ -1864,9 +1902,17 @@ Window {
                     mainController.saveSchdlerClrLogData("true")
                     console.log("The switch result is: " + switch2.checked)
                 }
+                if(!switch2.checked){
+                    mainController.saveSchdlerClrLogData("false")
+                    console.log("The switch result is: " + switch2.checked)
+                }
 
                 if(switch1.checked){
                     mainController.saveSchdlerBkupData("true")
+                    console.log("The switch result is: " + switch1.checked)
+                }
+                if(!switch1.checked){
+                    mainController.saveSchdlerBkupData("false")
                     console.log("The switch result is: " + switch1.checked)
                 }
 
@@ -2155,17 +2201,192 @@ Window {
             width: 1280
             height: 720
             source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/bg.png"
+            layer.enabled: true
             fillMode: Image.PreserveAspectFit
-            Text {
-                id: settingsWinBannerTxt
-                x: 594
+
+
+            Image {
+                id: settingsTxtImg
+                x: 564
                 y: 8
-                width: 92
-                height: 34
-                color: "#ffffff"
-                text: qsTr("Settings")
-                font.pixelSize: 25
+                width: 152
+                height: 49
+                source: "file:C:/Lumberjack/images/settings-text.png"
+                fillMode: Image.PreserveAspectFit
             }
+        }
+
+        Button {
+            id: saveSettingsBtn
+            x: 577
+            y: 618
+            width: 127
+            height: 25
+            visible: true
+            text: qsTr("Save Settings")
+            layer.effect: DropShadow {
+                width: 100
+                visible: true
+                color: "#ffffff"
+                radius: 8
+                samples: 17
+                verticalOffset: 2
+                spread: 0
+                transparentBorder: true
+                horizontalOffset: 2
+            }
+            background: Rectangle {
+                color: "#161e20"
+                radius: 50
+            }
+            layer.enabled: true
+            hoverEnabled: false
+            palette.buttonText: "#ffffff"
+        }
+
+        Text {
+            id: text18
+            x: 529
+            y: 425
+            width: 115
+            height: 31
+            color: "#ffffff"
+            text: qsTr("Run on Start:")
+            font.pixelSize: 20
+        }
+
+        Switch {
+            id: switch3
+            x: 656
+            y: 428
+            text: qsTr("")
+        }
+
+        Text {
+            id: text19
+            x: 504
+            y: 484
+            width: 140
+            height: 37
+            color: "#ffffff"
+            text: qsTr("Refresh sumary:")
+            font.pixelSize: 20
+        }
+
+        ComboBox {
+            id: control5
+            x: 663
+            y: 492
+            width: 116
+            height: 21
+            visible: true
+            indicator: Canvas {
+                x: control5.width - width - control5.rightPadding
+                y: control5.topPadding + (control5.availableHeight - height) / 2
+                width: 12
+                height: 8
+                onPaint: {
+                    context.reset();
+                    context.moveTo(0, 0);
+                    context.lineTo(width, 0);
+                    context.lineTo(width / 2, height);
+                    context.closePath();
+                    context.fillStyle = control5.pressed ? "#ffffff" : "#ffffff";
+                    context.fill();
+                }
+                Connections {
+                    target: control5
+                }
+                contextType: "2d"
+            }
+            background: Rectangle {
+                color: "#000000"
+                radius: 2
+                border.color: control5.pressed ? "#ffffff" : "#ffffff"
+                border.width: control5.visualFocus ? 2 : 1
+                implicitHeight: 40
+                implicitWidth: 120
+            }
+            delegate: ItemDelegate {
+                width: control5.width
+                highlighted: control5.highlightedIndex === index
+                contentItem: Text {
+                    color: "#000000"
+                    text: control5.textRole
+                          ? (Array.isArray(control5.model) ? modelData[control5.textRole] : model[control5.textRole])
+                          : modelData
+                    elide: Text.ElideRight
+                    verticalAlignment: Text.AlignVCenter
+                    font: control5.font
+                }
+            }
+            model: ["Select Time", "Never", "Every 1 hours", "Every 2 hours", "Every 3 hours", "Every 4 hours", "Every 5 hours", "Every 6 hours", "Every 7 hours", "Every 8 hours", "Every 9 hours", "Every 10 hours", "Every 11 hours", "Every 12 hours"]
+            popup: Popup {
+                y: control5.height - 1
+                width: control5.width
+                implicitHeight: contentItem.implicitHeight
+                background: Rectangle {
+                    color: "#ffffff"
+                    radius: 5
+                    border.color: "#ffffff"
+                }
+                contentItem: ListView {
+                    implicitHeight: contentHeight
+                    clip: true
+                    ScrollIndicator.vertical: ScrollIndicator {
+                    }
+                    model: control5.popup.visible ? control5.delegateModel : null
+                    currentIndex: control5.highlightedIndex
+                }
+                padding: 1
+            }
+            contentItem: Text {
+                color: control5.pressed ? "#000000" : "#ffffff"
+                text: control5.displayText
+                elide: Text.ElideRight
+                verticalAlignment: Text.AlignVCenter
+                font: control5.font
+                leftPadding: 0
+                rightPadding: control5.indicator.width + control5.spacing
+            }
+        }
+
+        Button {
+            id: liveScanBtn
+            x: 658
+            y: 548
+            width: 127
+            height: 25
+            visible: true
+            text: qsTr("Start Live Backup")
+            background: Rectangle {
+                color: "#161e20"
+                radius: 50
+            }
+            layer.enabled: true
+            hoverEnabled: false
+            palette.buttonText: "#ffffff"
+        }
+
+        Text {
+            id: text20
+            x: 533
+            y: 545
+            width: 111
+            height: 37
+            color: "#ffffff"
+            text: qsTr("Live Backup:")
+            font.pixelSize: 20
+        }
+
+        Rectangle {
+            id: rectangle2
+            x: 327
+            y: 102
+            width: 626
+            height: 270
+            color: "#000000"
+            border.color: "#ffffff"
         }
     }
 

@@ -56,6 +56,8 @@ signals:
     void archivedLogEntryToQml(QString logName);
     void dirPathSepToQml(QString sepPath);
     void fileMoveStatusToQml(QString moveFileStatus);
+    void flagsToRemove(QString i_flag);
+    void flagsToAdd(QString i_AddFlag);
 
 
 public slots:
@@ -94,6 +96,7 @@ public slots:
     void createArchive();
     void moveAuditLogToReviewedFolder(QString);
     void updateMovedLogsStatus();
+    void updateFlagList(QStringList, QStringList);
 
 private:
     QProcess getWinLogs;

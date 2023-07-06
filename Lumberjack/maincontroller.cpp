@@ -170,7 +170,7 @@ void MainController::populateFlagData(){
     }
     QTextStream in(&file);
     while (!in.atEnd()){
-        QString temp = in.readLine();
+        QString temp = in.readLine().trimmed();
         emit populateFlagDataToQml(temp);
     }
     file.close();
@@ -187,6 +187,8 @@ void MainController::saveFlagData(QString flagData){
         //error
     }
     file.close();
+    //add item to list in qml
+    emit flagsToAdd(flagData);
 }
 
 //Get file path for evtx file
@@ -474,9 +476,10 @@ void MainController::saveSchedulerTimeData(QString t_Hour, QString t_Minute, QSt
     if (ampm_File.open(QIODevice::ReadWrite)) {
         QTextStream stream(&ampm_File);
         stream << t_Ampm;
-        ampm_File.close();
+
         emit saveScheduleDataSaveStatus("Save completed @ " +  QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
     }
+    ampm_File.close();
 }
 
 //Get the saved time date from files and send it to QML to diplay in the GUI
@@ -490,8 +493,9 @@ void MainController::populateSchedulerTimeData(){
         while (!in.atEnd()){
             QString temp = in.readAll().trimmed();
             emit savedHourTxtToQml(temp);
-            h_File.close();
+
         }
+        h_File.close();
     }
 
     if(s_File.open(QIODevice::ReadOnly)) {
@@ -501,8 +505,9 @@ void MainController::populateSchedulerTimeData(){
             int tempNumFix = temp.toInt() + 1;
             QString newTempString = QString::number(tempNumFix);
             emit savedMinTxtToQml(newTempString);
-            s_File.close();
+
         }
+        s_File.close();
     }
 
     if(a_File.open(QIODevice::ReadOnly)) {
@@ -510,9 +515,10 @@ void MainController::populateSchedulerTimeData(){
         while (!in.atEnd()){
             QString temp = in.readAll().trimmed();
             emit savedAmpmTxtToQml(temp);
-            a_File.close();
+
         }
     }
+    a_File.close();
 }
 
 //Save the selected backup days
@@ -523,9 +529,10 @@ void MainController::saveSchedulerDayData(QStringList daysOfTheWeekList){
         if (dtr_File.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
             QTextStream stream(&dtr_File);
             stream << dayOfTheWeek + "\n";
-            dtr_File.close();
+
         }
     }
+    dtr_File.close();
     emit saveScheduleDataSaveStatus("Shedule Days Save completed @ " +  QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
 }
 
@@ -537,9 +544,11 @@ void MainController::populateShedulerDaysData(){
         while (!in.atEnd()){
             QString temp = in.readLine().trimmed();
             emit savedDaysDataToQml(temp);
-            dtr_File.close();
+
         }
+
     }
+     dtr_File.close();
 }
 
 //Save clear log data after backup choice to file
@@ -547,9 +556,9 @@ void MainController::saveSchdlerClrLogData(QString switchState){
     QFile clearLogsChoice_File("C:/Lumberjack/settings/clearlogs/clearlogs.txt");
         if (clearLogsChoice_File.open(QIODevice::WriteOnly)) {
             QTextStream stream(&clearLogsChoice_File);
-            stream << switchState;
-            clearLogsChoice_File.close();
+            stream << switchState;          
         }
+        clearLogsChoice_File.close();
     emit saveScheduleDataSaveStatus("Clear logs choice Save completed @ " +  QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
 }
 
@@ -561,9 +570,11 @@ void MainController::popSchdlerClrLogData(){
             while (!in.atEnd()){
             QString temp = in.readAll().trimmed();
             emit savedClearLogDataToQML(temp);
-            dtr_File.close();
+
             }
+
     }
+    dtr_File.close();
 }
 
 //Save autobackup choice to file
@@ -572,8 +583,9 @@ void MainController::saveSchdlerBkupData(QString bUpChoice){
     if (backupChoice_File.open(QIODevice::WriteOnly)) {
             QTextStream stream(&backupChoice_File);
             stream << bUpChoice;
-            backupChoice_File.close();
+
     }
+    backupChoice_File.close();
     emit saveScheduleDataSaveStatus("Auto backup choice Save completed @ " +  QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
 }
 
@@ -585,9 +597,10 @@ void MainController::popSchdlerBkupData(){
             while (!in.atEnd()){
             QString temp = in.readAll().trimmed();
             emit savedAutoBackupDataToQML(temp);
-            dtr_File.close();
+
             }
     }
+    dtr_File.close();
 }
 
 //Get the list of archived logs and send to QML
@@ -686,4 +699,21 @@ void MainController::updateMovedLogsStatus(){
     emit fileMoveStatusToQml("Audit log has been moved to the reviewed folder....");
     moveAuditLogToReviewedProcesss->kill();
     //Remove the item from the list in qml
+}
+
+//Overwrite the currentn flag list with the new list
+void MainController::updateFlagList(QStringList newFlagList, QStringList removeFlagsList){
+    QFile::remove("C:/Lumberjack/flags/flags.txt");
+    QFile flagFile("C:/Lumberjack/flags/flags.txt");
+    foreach (const QString &flagData, newFlagList) {
+            if (flagFile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
+            QTextStream stream(&flagFile);
+            stream << flagData + "\n";
+            flagFile.close();
+            }
+    }
+    //emit saveScheduleDataSaveStatus("Shedule Days Save completed @ " +  QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
+    foreach (const QString &removeFlagData, removeFlagsList) {
+            emit flagsToRemove(removeFlagData);
+    }
 }
