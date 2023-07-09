@@ -15,9 +15,12 @@ int main(int argc, char *argv[]){
     //QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling)
 
     MainController mainController;
+    TableModel tableModelz;
+    //tableModelz = new TableModel();
     engine.rootContext()->setContextProperty("mainController", &mainController);
+    engine.rootContext()->setContextProperty("tableModelz",&tableModelz);
 
-    qmlRegisterType<TableModel>("TableModel", 0, 1, "TableModel");
+    //qmlRegisterType<TableModel>("TableModel", 0, 1, "TableModel");
 
     const QUrl url(u"qrc:/Lumberjack/main.qml"_qs);
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,

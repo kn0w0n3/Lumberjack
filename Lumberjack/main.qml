@@ -3,7 +3,7 @@ import QtQuick
 import QtQuick.Controls 2.15
 import Qt5Compat.GraphicalEffects
 import QtQml.Models 2.12
-import TableModel 0.1
+//import TableModel 0.1
 
 Window {
     width: 1280
@@ -274,6 +274,10 @@ Window {
         }
     }
 
+    //Connections {
+        //target: tableModelz
+    //}
+
     Connections {
         target: mainController
 
@@ -508,6 +512,7 @@ Window {
 
 
             TableView {
+                id: tableModel
                 x: 120
                 y: 71
                 //width: 1020
@@ -546,7 +551,7 @@ Window {
                         color: "#000000"
                     }
                 }
-                model: TableModel {}
+                model: tableModelz //{}
 
                 delegate: Rectangle {
                     implicitWidth: 250
@@ -554,7 +559,7 @@ Window {
                     color: "#000000"
                     border.color: "#ffffff"
                     Text {
-                        text: tabledata
+                        text: display
                         color: "#ffffff"
                         font.pointSize: 10
                         anchors.centerIn: parent
@@ -690,6 +695,9 @@ Window {
                 //populate saved logs
                 mainController.getArchivedLogsList()
             }
+            onSelectTextByMouseChanged: {
+
+            }
         }
 
         Text {
@@ -730,7 +738,41 @@ Window {
             }
             palette.buttonText: "#ffffff"
             onClicked: {
+                /*
                 //Load the selected log file
+                //tableModel.loadData(control.currentText.trim())
+                console.log(control.currentText.trim())
+                //tableModelz.loadData(control.currentText.trim())
+                //mainController.createTable()
+                //someObject = {"listEntry": mainController.createTable()}
+                console.log("Text Data changed in drop down ");
+                //Remove rows from table view and add new rows of data
+                console.log("The row count is: " + tableModelz.rowCount());
+                var numRows = tableModelz.rowCount();
+                var counter = 0;
+                var rowCounter = numRows -1;
+                //tableModelz.removeRows(rowCounter,0,tableModel.index(0,0))
+
+                while(counter !== rowCounter){
+                    tableModelz.removeRows(rowCounter,0,tableModel.index(0,0))
+                    counter++;
+                    rowCounter--;
+                }
+                */
+                console.log("The row count is: " + tableModelz.rowCount());
+                var numRows = tableModelz.rowCount();
+                var counter = 0;
+                var rowCounter = numRows -1;
+                //tableModelz.removeRows(rowCounter,0,tableModel.index(0,0))
+
+                while(counter !== (numRows -1)){
+                    tableModelz.removeRows(rowCounter,0,tableModel.index(0,0))
+                    counter++;
+                    rowCounter--;
+                }
+                tableModelz.getSelectedData(control.currentText)
+                tableModelz.insertRows(1,0,tableModel.index(0,0))
+                tableModelz.setSpan(1,0,1,4);
             }
         }
 
@@ -775,6 +817,47 @@ Window {
                 //var fileName = control.currentText
                 mainController.moveAuditLogToReviewedFolder(control.currentText)
                 console.log("Current text is: " + control.currentText)
+            }
+        }
+
+        Button {
+            id: closeLogBtn
+            x: 524
+            y: 578
+            width: 135
+            height: 25
+            visible: true
+            text: qsTr("Close Log")
+            background: Rectangle {
+                color: "#161e20"
+                radius: 50
+            }
+            layer.enabled: true
+            hoverEnabled: false
+            layer.effect: DropShadow {
+                width: 100
+                visible: true
+                color: "#ffffff"
+                radius: 8
+                verticalOffset: 2
+                transparentBorder: true
+                samples: 17
+                spread: 0
+                horizontalOffset: 2
+            }
+            palette.buttonText: "#ffffff"
+            onClicked: {
+                console.log("The row count is: " + tableModelz.rowCount());
+                var numRows = tableModelz.rowCount();
+                var counter = 0;
+                var rowCounter = numRows -1;
+                //tableModelz.removeRows(rowCounter,0,tableModel.index(0,0))
+
+                while(counter !== (numRows -1)){
+                    tableModelz.removeRows(rowCounter,0,tableModel.index(0,0))
+                    counter++;
+                    rowCounter--;
+                }
             }
         }
     }
@@ -2264,12 +2347,12 @@ Window {
 
         Text {
             id: text19
-            x: 504
+            x: 488
             y: 484
             width: 140
             height: 37
             color: "#ffffff"
-            text: qsTr("Refresh sumary:")
+            text: qsTr("Refresh summary:")
             font.pixelSize: 20
         }
 
@@ -2351,23 +2434,6 @@ Window {
             }
         }
 
-        Button {
-            id: liveScanBtn
-            x: 658
-            y: 548
-            width: 127
-            height: 25
-            visible: true
-            text: qsTr("Start Live Backup")
-            background: Rectangle {
-                color: "#161e20"
-                radius: 50
-            }
-            layer.enabled: true
-            hoverEnabled: false
-            palette.buttonText: "#ffffff"
-        }
-
         Text {
             id: text20
             x: 533
@@ -2387,6 +2453,34 @@ Window {
             height: 270
             color: "#000000"
             border.color: "#ffffff"
+        }
+
+        Button {
+            id: saveSettingsBtn1
+            x: 660
+            y: 549
+            width: 124
+            height: 25
+            visible: true
+            text: qsTr("Start Live Scan")
+            layer.enabled: true
+            layer.effect: DropShadow {
+                width: 100
+                visible: true
+                color: "#ffffff"
+                radius: 8
+                horizontalOffset: 2
+                verticalOffset: 2
+                samples: 17
+                transparentBorder: true
+                spread: 0
+            }
+            palette.buttonText: "#ffffff"
+            hoverEnabled: false
+            background: Rectangle {
+                color: "#161e20"
+                radius: 50
+            }
         }
     }
 

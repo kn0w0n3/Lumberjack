@@ -2,6 +2,8 @@
 
 MainController::MainController(QWidget *parent) : QWidget(parent){
     checkDirectories();
+    //TO DO:
+    //Populate archive file name in combobox after backup
 }
 
 //Save system logs to evtx file
@@ -493,7 +495,6 @@ void MainController::populateSchedulerTimeData(){
         while (!in.atEnd()){
             QString temp = in.readAll().trimmed();
             emit savedHourTxtToQml(temp);
-
         }
         h_File.close();
     }
@@ -505,7 +506,6 @@ void MainController::populateSchedulerTimeData(){
             int tempNumFix = temp.toInt() + 1;
             QString newTempString = QString::number(tempNumFix);
             emit savedMinTxtToQml(newTempString);
-
         }
         s_File.close();
     }
@@ -529,7 +529,6 @@ void MainController::saveSchedulerDayData(QStringList daysOfTheWeekList){
         if (dtr_File.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
             QTextStream stream(&dtr_File);
             stream << dayOfTheWeek + "\n";
-
         }
     }
     dtr_File.close();
@@ -544,9 +543,7 @@ void MainController::populateShedulerDaysData(){
         while (!in.atEnd()){
             QString temp = in.readLine().trimmed();
             emit savedDaysDataToQml(temp);
-
         }
-
     }
      dtr_File.close();
 }
@@ -571,8 +568,7 @@ void MainController::popSchdlerClrLogData(){
             QString temp = in.readAll().trimmed();
             emit savedClearLogDataToQML(temp);
 
-            }
-
+            }            
     }
     dtr_File.close();
 }
@@ -583,7 +579,6 @@ void MainController::saveSchdlerBkupData(QString bUpChoice){
     if (backupChoice_File.open(QIODevice::WriteOnly)) {
             QTextStream stream(&backupChoice_File);
             stream << bUpChoice;
-
     }
     backupChoice_File.close();
     emit saveScheduleDataSaveStatus("Auto backup choice Save completed @ " +  QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
@@ -716,4 +711,15 @@ void MainController::updateFlagList(QStringList newFlagList, QStringList removeF
     foreach (const QString &removeFlagData, removeFlagsList) {
             emit flagsToRemove(removeFlagData);
     }
+}
+
+QVariant MainController::createTable(){
+
+    //tableModel = new TableModel();
+
+    //TableModel tableModel;
+    //tableModel = new TableModel();
+    //emit sendTableModelToQml(tableModel);
+   // return QVariant();
+
 }

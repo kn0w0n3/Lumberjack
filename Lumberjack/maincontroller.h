@@ -25,6 +25,8 @@
 #include <QFileDialog>
 #include <QDate>
 #include <QStandardPaths>
+#include "tablemodel.h"
+
 
 class MainController:  public QWidget{
     Q_OBJECT
@@ -58,6 +60,7 @@ signals:
     void fileMoveStatusToQml(QString moveFileStatus);
     void flagsToRemove(QString i_flag);
     void flagsToAdd(QString i_AddFlag);
+    //void sendTableModelToQml(TableModel theModel);
 
 
 public slots:
@@ -97,6 +100,7 @@ public slots:
     void moveAuditLogToReviewedFolder(QString);
     void updateMovedLogsStatus();
     void updateFlagList(QStringList, QStringList);
+    QVariant createTable();
 
 private:
     QProcess getWinLogs;
@@ -155,6 +159,8 @@ private:
     QStringList listOfFilesToConvert;
 
     QString combineAllreports = "";
+
+    TableModel *tableModel;
 
     int numOfSecEvents = 0;
     int numbOfAppEvents = 0;
