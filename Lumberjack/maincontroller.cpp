@@ -47,8 +47,6 @@ void MainController::getSecurityLogs(QString sType){
     getSecurityLogsProcess->start("powershell", args);
 }
 
-//https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-6.0.16-windows-x64-installer?cid=getdotnetcore
-//App wouldn't run because it was missing the above microsoft requirement
 //Convert security evtx to JSON
 void MainController::convertSecEvtxToJson(){
     //qDebug() << "IN CONVERT SEC EVTX TO JSON........";
@@ -120,7 +118,6 @@ void MainController::getSecDataFromJson(){
     if(saveType == "refresh"){
         emit securityEventCount2Qml(QString::number(numOfSecEvents));
     }
-
     numOfSecEvents = 0;  
     evtxProcessingDoneRelay(1);
     convertSecEvtxToJsonProcess->terminate();
@@ -473,9 +470,6 @@ void MainController::checkDirectories(){
     args << "Test-Path -Path " + docsFolder + "/Lumberjack/EvtxeCmd;";
     checkEvtxeCmdPathProcess.connect(&checkEvtxeCmdPathProcess, &QProcess::readyReadStandardOutput, this, &MainController::evtxCmdFolderExistsResponse);
     checkEvtxeCmdPathProcess.start("powershell", args);
-    //getSecurityLogs();
-    //getApplicationLogs();
-    //getSystemLogs();
 }
 
 //Send message to QML when EVTX files have been saved, converted, and parsed

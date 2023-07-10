@@ -20,7 +20,7 @@ Window {
         id: mainWin
         width: 1280
         height: 720
-        visible: false
+        visible: true
         color: "#000000"
         //anchors.fill: parent
 
@@ -927,7 +927,7 @@ Window {
         y: 0
         width: 1280
         height: 720
-        visible: true
+        visible: false
         color: "#000000"
 
         Image {

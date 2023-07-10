@@ -25,7 +25,7 @@
 #include <QFileDialog>
 #include <QDate>
 #include <QStandardPaths>
-#include "tablemodel.h"
+//#include "tablemodel.h"
 
 
 class MainController:  public QWidget{
@@ -111,15 +111,12 @@ public slots:
     void populateRefreshSummaryData();
 
 private:
-    QProcess getWinLogs;
+    //QProcess getWinLogs;
     QProcess *getSystemLogsProcess;
     QProcess *getApplicationLogsProcess;
     QProcess *getSecurityLogsProcess;
-    QProcess convertSecEvtxToXmlProcess;
     QProcess *convertSecEvtxToJsonProcess;
-    QProcess convertAppEvtxToXmlProcess;
     QProcess *convertAppEvtxToJsonProcess;
-    QProcess convertSysEvtxToXmlProcess;
     QProcess *convertSysEvtxToJsonProcess;
     QProcess *convertEvtxToXmlProcess;
     QProcess *convertEvtxToJsonProcess;
@@ -128,28 +125,8 @@ private:
     QProcess checkEvtxeCmdPathProcess;
     QProcess moveEvtxeCmdToDocsProcess;
     QProcess *moveAuditLogToReviewedProcesss;
-
     QProcess *convertEachEvtxFileProcess4;
 
-    //Byte arrays
-    QByteArray b_StdOutSecLogInfo;
-    QByteArray b_StdErrSecLogInfo;
-    QByteArray b_StdOutAppLogInfo;
-    QByteArray b_StdErrAppLogInfo;
-    QByteArray b_StdOutSysLogInfo;
-    QByteArray b_StdErrSysLogInfo;
-    QByteArray b_StdOutConvertInfo;
-    QByteArray b_StdErrConvertInfo;
-
-    //Strings
-    QString s_StdOutSecLogInfo;
-    QString s_StdErrSecLogInfo;
-    QString s_StdOutAppLogInfo;
-    QString s_StdErrAppLogInfo;
-    QString s_StdOutSysLogInfo;
-    QString s_StdErrSysLogInfo;
-    QString s_StdOutConvertInfo;
-    QString s_StdErrConvertInfo;
     QString LogInfoText;
     QString evtxType = "";
     QString jsonStringData;
@@ -159,6 +136,8 @@ private:
     QString convertEvtxFileSize = "";
     QString docsFolder = "";
     QString result = "";
+    QString combineAllreports = "";
+    QString saveType = "";
 
     //String lists
     QStringList secJsonObjects;
@@ -168,10 +147,7 @@ private:
     QStringList listOfLogs;
     QStringList listOfFilesToConvert;
 
-    QString combineAllreports = "";
-    QString saveType = "";
-
-    TableModel *tableModel;
+    //TableModel *tableModel;
 
     int numOfSecEvents = 0;
     int numbOfAppEvents = 0;
