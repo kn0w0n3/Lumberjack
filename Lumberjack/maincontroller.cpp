@@ -481,7 +481,6 @@ void MainController::evtxProcessingDoneRelay(int n){
     }
 }
 
-//
 void MainController::updateCurrentLogSummary(){
     getSecurityLogs("refresh");
 }
@@ -508,7 +507,6 @@ void MainController::saveSchedulerTimeData(QString t_Hour, QString t_Minute, QSt
     if (ampm_File.open(QIODevice::ReadWrite)) {
         QTextStream stream(&ampm_File);
         stream << t_Ampm;
-
         emit saveScheduleDataSaveStatus("Save completed @ " +  QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
     }
     ampm_File.close();
@@ -545,7 +543,6 @@ void MainController::populateSchedulerTimeData(){
         while (!in.atEnd()){
             QString temp = in.readAll().trimmed();
             emit savedAmpmTxtToQml(temp);
-
         }
     }
     a_File.close();
@@ -575,32 +572,31 @@ void MainController::populateShedulerDaysData(){
             emit savedDaysDataToQml(temp);
         }
     }
-     dtr_File.close();
+    dtr_File.close();
 }
 
 //Save clear log data after backup choice to file
 void MainController::saveSchdlerClrLogData(QString switchState){
-    QFile clearLogsChoice_File("C:/Lumberjack/settings/clearlogs/clearlogs.txt");
-        if (clearLogsChoice_File.open(QIODevice::WriteOnly)) {
-            QTextStream stream(&clearLogsChoice_File);
-            stream << switchState;          
-        }
-        clearLogsChoice_File.close();
-    emit saveScheduleDataSaveStatus("Clear logs choice Save completed @ " +  QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
+     QFile clearLogsChoice_File("C:/Lumberjack/settings/clearlogs/clearlogs.txt");
+     if (clearLogsChoice_File.open(QIODevice::WriteOnly)) {
+        QTextStream stream(&clearLogsChoice_File);
+        stream << switchState;
+     }
+     clearLogsChoice_File.close();
+     emit saveScheduleDataSaveStatus("Clear logs choice Save completed @ " +  QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
 }
 
 //Get the saved "clear log after backup" choice data from file and send to QML
 void MainController::popSchdlerClrLogData(){
-    QFile dtr_File("C:/Lumberjack/settings/clearlogs/clearlogs.txt");
-    if(dtr_File.open(QIODevice::ReadOnly)) {
+        QFile dtr_File("C:/Lumberjack/settings/clearlogs/clearlogs.txt");
+        if(dtr_File.open(QIODevice::ReadOnly)) {
             QTextStream in(&dtr_File);
             while (!in.atEnd()){
             QString temp = in.readAll().trimmed();
             emit savedClearLogDataToQML(temp);
-
-            }            
-    }
-    dtr_File.close();
+            }
+        }
+        dtr_File.close();
 }
 
 //Save autobackup choice to file
@@ -645,8 +641,6 @@ void MainController::getArchivedLogsList(){
 void MainController::evtxCmdFolderExistsResponse(){
     QByteArray ba  = checkEvtxeCmdPathProcess.readAllStandardOutput().trimmed();
     QString response = QString(ba);
-
-    //qDebug() <<"The response is: " + response;
     if(response == "True"){
             return;
     }
@@ -737,7 +731,6 @@ void MainController::updateFlagList(QStringList newFlagList, QStringList removeF
             flagFile.close();
             }
     }
-    //emit saveScheduleDataSaveStatus("Shedule Days Save completed @ " +  QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
     foreach (const QString &removeFlagData, removeFlagsList) {
             emit flagsToRemove(removeFlagData);
     }
@@ -754,8 +747,6 @@ void MainController::saveRunAtStartData(QString rasChoice){
             stream << rasChoice;
     }
     runAtStartFile.close();
-    //emit saveScheduleDataSaveStatus("Auto backup choice Save completed @ " +  QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
-
 }
 
 void MainController::populateRunAtStartData(){
