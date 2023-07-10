@@ -251,88 +251,92 @@ void MainController::fileConvertEvtx(QString convertType, QString fPah, QString 
     if(convertType == "JSON"){
         emit fileConvertEvtxStatus("EVTX to JSON conversion process starting " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
         emit fileConvertEvtxStatus("Please Wait....");
+        convertEvtxToFullJsonProcess = new QProcess();
         QStringList args;
         args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
              << "./EvtxECmd.exe -f " + fPah.trimmed() +  " --json " +  savePath.trimmed() + " --jsonf " + iFileName.trimmed() + ".json";
-        connect(&convertEvtxToJsonProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
-        convertEvtxToJsonProcess.start("powershell", args);
+        connect(convertEvtxToJsonProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
+        convertEvtxToJsonProcess->start("powershell", args);
     }
     else if(convertType == " Full JSON"){
         emit fileConvertEvtxStatus("EVTX to FUll JSON conversion process starting " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
         emit fileConvertEvtxStatus("Please Wait....");
+        convertEvtxToFullJsonProcess = new QProcess();
         QStringList args;
         args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
              << "./EvtxECmd.exe -f " + fPah.trimmed() +  " --fj --json " +  savePath.trimmed() + " --jsonf " + iFileName.trimmed() + ".json";
-        connect(&convertEvtxToJsonProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
-        convertEvtxToJsonProcess.start("powershell", args);
+        connect(convertEvtxToFullJsonProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
+        convertEvtxToFullJsonProcess->start("powershell", args);
     }
     else if(convertType == "XML"){
         emit fileConvertEvtxStatus("EVTX to XML conversion process starting " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
         emit fileConvertEvtxStatus("Please Wait....");
-
+        convertEvtxToXmlProcess = new QProcess();
         QStringList args;
         args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
              << "./EvtxECmd.exe -f " + fPah.trimmed() +  " --xml " +  savePath.trimmed() + " --xmlf " + iFileName.trimmed() + ".xml";
-        connect(&convertSecEvtxToXmlProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
-        convertSecEvtxToXmlProcess.start("powershell", args);
+        connect(convertEvtxToXmlProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
+        convertEvtxToXmlProcess->start("powershell", args);
     }
     else if(convertType == "CSV"){
         emit fileConvertEvtxStatus("EVTX to CSV conversion process starting " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
         emit fileConvertEvtxStatus("Please Wait....");
-
+        convertEvtxToCsvProcess = new QProcess();
         QStringList args;
         args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
              << "./EvtxECmd.exe -f " + fPah.trimmed() +  " --csv " +  savePath.trimmed() + " --csvf " + iFileName.trimmed() + ".csv";
-        connect(&convertSecEvtxToXmlProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
-        convertSecEvtxToXmlProcess.start("powershell", args);
+        connect(convertEvtxToCsvProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
+        convertEvtxToCsvProcess->start("powershell", args);
     }
     else{
         //error
     }
 }
 
-//Convert a directory of evtx files to a single json, xml, or csv
+//Convert a directory of evtx files to a single json, xml, or csv. Note: Without using pointer for dynamic memory allocation, duplicate messages of conversion complete were being transmitted
 void MainController::dirConvertEvtx(QString convertType, QString fPah, QString savePath){
     if(convertType == "JSON"){
         emit fileConvertEvtxStatus("EVTX to JSON conversion process starting " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
         emit fileConvertEvtxStatus("Please Wait....");
         qDebug() << "SAVE PATH IS: " + savePath;
+        convertEvtxToJsonProcess = new QProcess();
         QStringList args;
         //Set a permanent location for deployment
         args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
              << "./EvtxECmd.exe -d " + fPah.trimmed() +  " --json " +  savePath.trimmed();
-        connect(&convertEvtxToJsonProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
-        convertEvtxToJsonProcess.start("powershell", args);
+        connect(convertEvtxToJsonProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
+        convertEvtxToJsonProcess->start("powershell", args);
     }
     else if(convertType == "Full JSON"){
         emit fileConvertEvtxStatus("EVTX to FUll JSON conversion process starting " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
         emit fileConvertEvtxStatus("Please Wait....");
+        convertEvtxToFullJsonProcess = new QProcess();
         QStringList args;
         //Set a permanent location for deployment
         args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
              << "./EvtxECmd.exe -d " + fPah.trimmed() +  " --fj --json " +  savePath.trimmed() + " --jsonf ";
-        connect(&convertEvtxToFullJsonProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
-        convertEvtxToFullJsonProcess.start("powershell", args);
+        connect(convertEvtxToFullJsonProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
+        convertEvtxToFullJsonProcess->start("powershell", args);
     }
     else if(convertType == "XML"){
         emit fileConvertEvtxStatus("EVTX to XML conversion process starting " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
         emit fileConvertEvtxStatus("Please Wait....");
-
+        convertEvtxToXmlProcess = new QProcess();
         QStringList args;
         args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
              << "./EvtxECmd.exe -d " + fPah.trimmed() +  " --xml " + savePath.trimmed();
-        connect(&convertEvtxToXmlProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
-        convertEvtxToXmlProcess.start("powershell", args);
+        connect(convertEvtxToXmlProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
+        convertEvtxToXmlProcess->start("powershell", args);
     }
     else if(convertType == "CSV"){
         emit fileConvertEvtxStatus("EVTX to CSV conversion process starting " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
         emit fileConvertEvtxStatus("Please Wait....");
-
+        convertEvtxToCsvProcess = new QProcess();
         QStringList args;
         args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
              << "./EvtxECmd.exe -d " + fPah.trimmed() +  " --csv " +  savePath.trimmed();
-        connect(&convertEvtxToCsvProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
-        convertEvtxToCsvProcess.start("powershell", args);
+        connect(convertEvtxToCsvProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
+        convertEvtxToCsvProcess->start("powershell", args);
     }
     else{
         //error
@@ -374,12 +378,12 @@ void MainController::dirConvertEachEvtx(QString convertType, QString savePath){
             convertEachEvtxFileProcess3->start("powershell", args);
         }
         else if(convertType == "CSV"){
-            QProcess *convertEachEvtxFileProcess3 = new QProcess();
+            convertEachEvtxFileProcess4 = new QProcess();
             QStringList args;
             args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
                  << "./EvtxECmd.exe -f " + evtxFile.trimmed() +  " --csv " +  savePath.trimmed() + " --csvf " + curFileName + ".csv";
-            connect(convertEachEvtxFileProcess3, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
-            convertEachEvtxFileProcess3->start("powershell", args);
+            connect(convertEachEvtxFileProcess4, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
+            convertEachEvtxFileProcess4->start("powershell", args);
         }
         else{
             //error
@@ -401,7 +405,6 @@ void MainController::selectDirConvertEachEvtx(){
     QFileInfoList list = dir.entryInfoList();
     for (int i = 0; i < list.size(); ++i) {
         QFileInfo fileInfo = list.at(i);
-
         listOfFilesToConvert << fileInfo.absoluteFilePath();
     }
 }
@@ -484,7 +487,7 @@ void MainController::evtxProcessingDoneRelay(int n){
     }
 }
 
-//This will currently upadte the main screeen as well as save the audit log
+//
 void MainController::updateCurrentLogSummary(){
     getSecurityLogs("refresh");
 }
@@ -669,9 +672,9 @@ void MainController::evtxCmdFolderExistsResponse(){
 void MainController::createArchive(){
     qDebug() << "In Create Archive...........";
     QString currentDateTime = QDateTime::currentDateTime().toString("MM-dd-yyyy_h-mm-ss-ap");
-    QFile secJsonFile("C:/Lumberjack/json/security/security.json");
-    QFile sysJsonFile("C:/Lumberjack/json/system/system.json");
-    QFile appJsonFile("C:/Lumberjack/json/application/application.json");
+    QFile secJsonFile(docsFolder + "/Lumberjack/json/security/security.json");
+    QFile sysJsonFile(docsFolder + "/Lumberjack/json/system/system.json");
+    QFile appJsonFile(docsFolder + "/Lumberjack/json/application/application.json");
     QFile archiveFile("C:/Lumberjack/audit/archived_reports/audit_" + currentDateTime + ".json");
 
     if(secJsonFile.open(QIODevice::ReadOnly)) {
@@ -748,6 +751,50 @@ void MainController::updateFlagList(QStringList newFlagList, QStringList removeF
 
 void MainController::createBackup(){
     getSecurityLogs("backup");
+}
+
+void MainController::saveRunAtStartData(QString rasChoice){
+    QFile runAtStartFile("C:/Lumberjack/settings/runonstart/runonstart.txt");
+    if (runAtStartFile.open(QIODevice::WriteOnly)) {
+            QTextStream stream(&runAtStartFile);
+            stream << rasChoice;
+    }
+    runAtStartFile.close();
+    //emit saveScheduleDataSaveStatus("Auto backup choice Save completed @ " +  QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
+
+}
+
+void MainController::populateRunAtStartData(){
+    QFile runAtStartFile("C:/Lumberjack/settings/runonstart/runonstart.txt");
+    if(runAtStartFile.open(QIODevice::ReadOnly)) {
+            QTextStream in(&runAtStartFile);
+            while (!in.atEnd()){
+            QString temp = in.readAll().trimmed();
+            emit runOnStartSavedData(temp);
+            }
+    }
+    runAtStartFile.close();
+}
+
+void MainController::saveRefreshSummaryData(QString rsChoice){
+    QFile refreshSummaryFile("C:/Lumberjack/settings/refreshsummary/refreshsummary.txt");
+    if (refreshSummaryFile.open(QIODevice::WriteOnly)) {
+            QTextStream stream(&refreshSummaryFile);
+            stream << rsChoice;
+    }
+    refreshSummaryFile.close();
+}
+
+void MainController::populateRefreshSummaryData(){
+    QFile refreshSummaryFile("C:/Lumberjack/settings/refreshsummary/refreshsummary.txt");
+    if(refreshSummaryFile.open(QIODevice::ReadOnly)) {
+            QTextStream in(&refreshSummaryFile);
+            while (!in.atEnd()){
+            QString temp = in.readAll().trimmed();
+            //emit savedAutoBackupDataToQML(temp);
+            }
+    }
+    refreshSummaryFile.close();
 }
 
 

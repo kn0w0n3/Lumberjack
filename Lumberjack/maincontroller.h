@@ -60,7 +60,8 @@ signals:
     void fileMoveStatusToQml(QString moveFileStatus);
     void flagsToRemove(QString i_flag);
     void flagsToAdd(QString i_AddFlag);
-    //void sendTableModelToQml(TableModel theModel);
+    void runOnStartSavedData(QString rosChoice);
+    void refreshSummaryDavedData(QString rsChoice);
 
 
 public slots:
@@ -104,6 +105,10 @@ public slots:
     void updateMovedLogsStatus();
     void updateFlagList(QStringList, QStringList);
     void createBackup();
+    void saveRunAtStartData(QString);
+    void populateRunAtStartData();
+    void saveRefreshSummaryData(QString);
+    void populateRefreshSummaryData();
 
 private:
     QProcess getWinLogs;
@@ -116,13 +121,15 @@ private:
     QProcess *convertAppEvtxToJsonProcess;
     QProcess convertSysEvtxToXmlProcess;
     QProcess *convertSysEvtxToJsonProcess;
-    QProcess convertEvtxToXmlProcess;
-    QProcess convertEvtxToJsonProcess;
-    QProcess convertEvtxToFullJsonProcess;
-    QProcess convertEvtxToCsvProcess;
+    QProcess *convertEvtxToXmlProcess;
+    QProcess *convertEvtxToJsonProcess;
+    QProcess *convertEvtxToFullJsonProcess;
+    QProcess *convertEvtxToCsvProcess;
     QProcess checkEvtxeCmdPathProcess;
     QProcess moveEvtxeCmdToDocsProcess;
     QProcess *moveAuditLogToReviewedProcesss;
+
+    QProcess *convertEachEvtxFileProcess4;
 
     //Byte arrays
     QByteArray b_StdOutSecLogInfo;

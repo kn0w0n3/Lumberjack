@@ -370,7 +370,6 @@ Window {
                 switch2.checked = true
                 switch2.text = "<font color=\"white\">On</font>"
             }
-
         }
         onSavedAutoBackupDataToQML:{
             if(bu_CheckedStatus === "true"){
@@ -394,6 +393,20 @@ Window {
         onFlagsToAdd:{
             eventModel.append({"listEntry": " " + i_AddFlag + "                                                  "})
         }
+        onRunOnStartSavedData:{
+            if(rosChoice === "true"){
+                rosSwitch.checked = true
+                rosSwitch.text = "<font color=\"white\">On</font>"
+            }
+            else if(rosChoice === "false"){
+                rosSwitch.checked = false
+                rosSwitch.text = "<font color=\"white\">Off</font>"
+            }
+        }
+        onRefreshSummaryDavedData:{
+
+        }
+
 
         //function onSecurityEventCount2Qml(secEventCountX) {
         //secEventCountTxt.text = 11;
@@ -914,7 +927,7 @@ Window {
         y: 0
         width: 1280
         height: 720
-        visible: false
+        visible: true
         color: "#000000"
 
         Image {
@@ -1710,7 +1723,7 @@ Window {
         y: 0
         width: 1280
         height: 720
-        visible: true
+        visible: false
         color: "#000000"
         border.color: "#000000"
         Component.onCompleted: {
@@ -2371,6 +2384,15 @@ Window {
             layer.enabled: true
             hoverEnabled: false
             palette.buttonText: "#ffffff"
+            onClicked: {
+                sw_TxtArea.text += "Saving Settings...\n"
+                if(rosSwitch.checked){
+                    mainController.saveRunAtStartData("true")
+                }
+                else if(!rosSwitch.checked){
+                    mainController.saveRunAtStartData("false")
+                }
+            }
         }
 
         Text {
@@ -2385,10 +2407,19 @@ Window {
         }
 
         Switch {
-            id: switch3
+            id: rosSwitch
             x: 656
             y: 428
-            text: qsTr("")
+            text: "<font color=\"white\">Off</font>"
+            onToggled: {
+                if(checked){
+                    rosSwitch.text= qsTr("<font color=\"white\">On</font>")
+                }
+                else{
+                    rosSwitch.text= qsTr("<font color=\"white\">Off</font>")
+                }
+            }
+
         }
 
         Text {
@@ -2554,6 +2585,9 @@ Window {
 
                 mainController.createBackup();
             }
+        }
+        Component.onCompleted: {
+           mainController.populateRunAtStartData()
         }
     }
 
