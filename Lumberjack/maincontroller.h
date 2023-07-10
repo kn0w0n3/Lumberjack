@@ -66,13 +66,16 @@ signals:
 public slots:
     void getSystemLogs();
     void getApplicationLogs();
-    void getSecurityLogs();
+    void getSecurityLogs(QString);
+
     void convertSecEvtxToJson();
     void convertAppEvtxToJson();
     void convertSysEvtxToJson();
+
     void getSecDataFromJson();
     void getAppDataFromJson();
     void getSysDataFromJson();
+
     void populateFlagData();
     void saveFlagData(QString);
     void ce_SelectFile();
@@ -100,7 +103,7 @@ public slots:
     void moveAuditLogToReviewedFolder(QString);
     void updateMovedLogsStatus();
     void updateFlagList(QStringList, QStringList);
-    QVariant createTable();
+    void createBackup();
 
 private:
     QProcess getWinLogs;
@@ -159,6 +162,7 @@ private:
     QStringList listOfFilesToConvert;
 
     QString combineAllreports = "";
+    QString saveType = "";
 
     TableModel *tableModel;
 

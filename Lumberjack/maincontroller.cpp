@@ -2,13 +2,16 @@
 
 MainController::MainController(QWidget *parent) : QWidget(parent){
     checkDirectories();
+    getSecurityLogs("refresh");
     //TO DO:
     //Populate archive file name in combobox after backup
 }
 
 //Save system logs to evtx file
 void MainController::getSystemLogs(){
-    emit processingStatus2Qml("Processing data, please wait...");
+    if(saveType == "refresh"){
+        emit processingStatus2Qml("Processing data, please wait...");
+    }
     getSystemLogsProcess = new QProcess();
     QStringList args;
     args  << "Set-Location -Path " + docsFolder + "/Lumberjack/evtx/system/;" << "Remove-Item " + docsFolder + "/Lumberjack/evtx/system/system.evtx;" << "$log = Get-WmiObject -Class Win32_NTEventlogFile | Where-Object LogfileName -EQ 'system';"
@@ -19,7 +22,9 @@ void MainController::getSystemLogs(){
 
 //Save application logs to evtx file
 void MainController::getApplicationLogs(){
-    emit processingStatus2Qml("Processing data, please wait...");
+    if(saveType == "refresh"){
+        emit processingStatus2Qml("Processing data, please wait...");
+    }
     getApplicationLogsProcess = new QProcess();
     QStringList args;
     args  << "Set-Location -Path " + docsFolder + "/Lumberjack/evtx/application/;" << "Remove-Item " + docsFolder + "/Lumberjack/evtx/application/application.evtx;" << "$log = Get-WmiObject -Class Win32_NTEventlogFile | Where-Object LogfileName -EQ 'application';"
@@ -29,8 +34,11 @@ void MainController::getApplicationLogs(){
 }
 
 //Save secuity logs to evtx file
-void MainController::getSecurityLogs(){
-    emit processingStatus2Qml("Processing data, please wait...");
+void MainController::getSecurityLogs(QString sType){
+    saveType = sType;
+    if(saveType == "refresh"){
+        emit processingStatus2Qml("Processing data, please wait...");
+    }
     getSecurityLogsProcess = new QProcess();
     QStringList args;
     args  << "Set-Location -Path " + docsFolder + "/Lumberjack/evtx/security/;" << "Remove-Item " + docsFolder + "/Lumberjack/evtx/security/security.evtx;" << "$log = Get-WmiObject -Class Win32_NTEventlogFile | Where-Object LogfileName -EQ 'security';"
@@ -45,7 +53,9 @@ void MainController::getSecurityLogs(){
 void MainController::convertSecEvtxToJson(){
     //qDebug() << "IN CONVERT SEC EVTX TO JSON........";
     getSecurityLogsProcess->terminate();
-    emit processingStatus2Qml("Processing data, please wait...");
+    if(saveType == "refresh"){
+        emit processingStatus2Qml("Processing data, please wait...");
+    }
     convertSecEvtxToJsonProcess = new QProcess();
     QStringList args;
     args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
@@ -58,7 +68,9 @@ void MainController::convertSecEvtxToJson(){
 void MainController::convertAppEvtxToJson(){
     //qDebug() << "IN CONVERT App EVTX TO JSON........";
     getApplicationLogsProcess->terminate();
-    emit processingStatus2Qml("Processing data, please wait...");
+    if(saveType == "refresh"){
+        emit processingStatus2Qml("Processing data, please wait...");
+    }
     convertAppEvtxToJsonProcess = new QProcess();
     QStringList args;
     args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
@@ -70,7 +82,9 @@ void MainController::convertAppEvtxToJson(){
 //Convert system EVTX to JSON
 void MainController::convertSysEvtxToJson(){
     getSystemLogsProcess->terminate();
-    emit processingStatus2Qml("Processing data, please wait...");
+    if(saveType == "refresh"){
+        emit processingStatus2Qml("Processing data, please wait...");
+    }
     convertSysEvtxToJsonProcess = new QProcess();
     QStringList args;
     args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
@@ -81,7 +95,9 @@ void MainController::convertSysEvtxToJson(){
 
 //Parse JSON security data and retrieve desired values
 void MainController::getSecDataFromJson(){
-    emit processingStatus2Qml("Processing data, please wait...");
+    if(saveType == "refresh"){
+        emit processingStatus2Qml("Processing data, please wait...");
+    }
     QFile file(docsFolder + "/Lumberjack/json/security/security.json");
     if(!file.open(QIODevice::ReadOnly)){
     //qDebug() << "Sec file not open.......";
@@ -101,7 +117,10 @@ void MainController::getSecDataFromJson(){
         QString eventId = obdata["EventID"].toString();
         result += "Event ID: " + eventId + "\n";
     }
-    emit securityEventCount2Qml(QString::number(numOfSecEvents));
+    if(saveType == "refresh"){
+        emit securityEventCount2Qml(QString::number(numOfSecEvents));
+    }
+
     numOfSecEvents = 0;  
     evtxProcessingDoneRelay(1);
     convertSecEvtxToJsonProcess->terminate();
@@ -111,7 +130,9 @@ void MainController::getSecDataFromJson(){
 
 //Parse JSON application data and retrieve desired values
 void MainController::getAppDataFromJson(){
-    emit processingStatus2Qml("Processing data, please wait...");
+    if(saveType == "refresh"){
+        emit processingStatus2Qml("Processing data, please wait...");
+    }
     QFile file(docsFolder + "/Lumberjack/json/application/application.json");
     if(!file.open(QIODevice::ReadOnly)) {
     }
@@ -128,7 +149,9 @@ void MainController::getAppDataFromJson(){
         QJsonObject obdata = jsonObject.value("Event").toObject().value("System").toObject();
         QString eventId = obdata["EventID"].toString();
     }
-    emit appEventCount2Qml(QString::number(numbOfAppEvents));
+    if(saveType == "refresh"){
+        emit appEventCount2Qml(QString::number(numbOfAppEvents));
+    }
     numbOfAppEvents = 0;
     evtxProcessingDoneRelay(1);
     convertAppEvtxToJsonProcess->terminate();
@@ -138,7 +161,9 @@ void MainController::getAppDataFromJson(){
 
 //Parse JSON system data and retrieve desired values
 void MainController::getSysDataFromJson(){
-    emit processingStatus2Qml("Processing data, please wait...");
+    if(saveType == "refresh"){
+        emit processingStatus2Qml("Processing data, please wait...");
+    }
     QFile file(docsFolder + "/Lumberjack/json/system/system.json");
     if(!file.open(QIODevice::ReadOnly)){
         //error
@@ -156,12 +181,17 @@ void MainController::getSysDataFromJson(){
         QJsonObject obdata = jsonObject.value("Event").toObject().value("System").toObject();
         QString eventId = obdata["EventID"].toString();
     }
-    emit sysEventCount2Qml(QString::number(numbOfSysEvents));
+    if(saveType == "refresh"){
+        emit sysEventCount2Qml(QString::number(numbOfSysEvents));
+    }
     numbOfSysEvents = 0;
     evtxProcessingDoneRelay(1);
     convertSysEvtxToJsonProcess->terminate();
     sysJsonObjects.clear();
-    createArchive();
+
+    if(saveType == "backup"){
+        createArchive();
+    }
 }
 
 //Get saved flag data to populate the current flag list in QML
@@ -351,6 +381,9 @@ void MainController::dirConvertEachEvtx(QString convertType, QString savePath){
             connect(convertEachEvtxFileProcess3, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
             convertEachEvtxFileProcess3->start("powershell", args);
         }
+        else{
+            //error
+        }
     }
 }
 
@@ -453,7 +486,7 @@ void MainController::evtxProcessingDoneRelay(int n){
 
 //This will currently upadte the main screeen as well as save the audit log
 void MainController::updateCurrentLogSummary(){
-    getSecurityLogs();
+    getSecurityLogs("refresh");
 }
 
 //Save the time for the backup to run
@@ -713,13 +746,10 @@ void MainController::updateFlagList(QStringList newFlagList, QStringList removeF
     }
 }
 
-QVariant MainController::createTable(){
-
-    //tableModel = new TableModel();
-
-    //TableModel tableModel;
-    //tableModel = new TableModel();
-    //emit sendTableModelToQml(tableModel);
-   // return QVariant();
-
+void MainController::createBackup(){
+    getSecurityLogs("backup");
 }
+
+
+
+

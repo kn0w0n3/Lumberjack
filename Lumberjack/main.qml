@@ -20,7 +20,7 @@ Window {
         id: mainWin
         width: 1280
         height: 720
-        visible: true
+        visible: false
         color: "#000000"
         //anchors.fill: parent
 
@@ -361,7 +361,7 @@ Window {
                 checkBox_6.checked = Qt.Checked
             }
             if(dayX === "7"){
-                checkBox_7.checked = Qt.Checked
+                checkBox_0.checked = Qt.Checked
             }
         }
         onSavedClearLogDataToQML:{
@@ -446,14 +446,14 @@ Window {
 
     Timer {
         id: updateLogSummaryTimer
-        interval: 1800000
+        interval: 1000
         repeat: true
         running: true
         property var locale: Qt.locale()
         property date currentDate: new Date()
         property string dateString
         onTriggered:{
-            mainController.updateCurrentLogSummary()
+            //mainController.updateCurrentLogSummary()
             //locale: Qt.locale("en_US");
             //QDateTime date = QDateTime::currentDateTime();
             //QString dateString = locale.toString(date);
@@ -467,13 +467,59 @@ Window {
         interval: 1000
         repeat: true
         running: true
+        property var locale: Qt.locale()
+        property date currentDate: new Date()
+        property string dateString
+
         onTriggered:{
-            var currentTime =  Qt.formatTime(new Date(),"hh:mm ap")
-            var timeToCompare = control2.currentText + ":" + control3.currentText + " " + control4.currentText
-            //console.log("Current time: " + currentTime)
-            //console.log("Time to compare is: " + timeToCompare)
-            if(currentTime === timeToCompare){
-                console.log("THE TIME MATCHES............")
+            if(!switch1.checked){
+                return;
+            }
+            else if(switch1.checked){
+                if(switch1.checked){
+                    var currentTime =  Qt.formatTime(new Date(),"hh:mm ap")
+                    var timeToCompare = control2.currentText + ":" + control3.currentText + " " + control4.currentText
+                    console.log("Current time: " + currentTime)
+                    console.log("Time to compare is: " + timeToCompare)
+                    console.log("The day is: " + currentDate.getDay().toString())
+                    if(currentTime === timeToCompare){
+                        console.log("THE TIME MATCHES............")
+
+                        //makingBackup = true;
+                        switch1.checked = false
+                        console.log("Autobackup switch on = " + switch1.checked)
+                        var curDayOfWeek = currentDate.getDay().toString()
+                        console.log("Current day of the week = " + curDayOfWeek)
+
+                        console.log("Checkbox zero state = " + checkBox_0.checked)
+                        console.log("Checkbox sixstate = " + checkBox_6.checked)
+
+                        //0 = Sunday
+                        if(checkBox_1.checked && curDayOfWeek === "1"){
+                            mainController.createBackup()
+                        }
+                        else if(checkBox_2.checked && curDayOfWeek === "2"){
+                            mainController.createBackup()
+                        }
+                        else if(checkBox_3.checked && curDayOfWeek === "3"){
+                            mainController.createBackup()
+                        }
+                        else if(checkBox_4.checked && curDayOfWeek === "4"){
+                            mainController.createBackup()
+                        }
+                        else if(checkBox_5.checked && curDayOfWeek === "5"){
+                            mainController.createBackup()
+                        }
+                        else if(checkBox_6.checked && curDayOfWeek === "6"){
+                            console.log("Attempting to make a scheduled backup")
+                            mainController.createBackup()
+                        }
+                        else if(checkBox_0.checked && curDayOfWeek === "0"){
+                            console.log("Attempting to make a scheduled backup")
+                            mainController.createBackup()
+                        }
+                    }
+                }
             }
         }
     }
@@ -1664,7 +1710,7 @@ Window {
         y: 0
         width: 1280
         height: 720
-        visible: false
+        visible: true
         color: "#000000"
         border.color: "#000000"
         Component.onCompleted: {
@@ -1821,7 +1867,7 @@ Window {
             }
 
             CheckBox {
-                id: checkBox_7
+                id: checkBox_0
                 x: 420
                 y: 455
                 height: 14
@@ -1976,7 +2022,7 @@ Window {
                     daysList.push("6")
                     //mainController.saveSchedulerDayData("6")
                 }
-                if(checkBox_7.checkState.toString() === "2"){
+                if(checkBox_0.checkState.toString() === "2"){
                     daysList.push("7")
                     //mainController.saveSchedulerDayData("7")
                 }
@@ -2453,16 +2499,35 @@ Window {
             height: 270
             color: "#000000"
             border.color: "#ffffff"
+
+            ScrollView {
+                id: settingsScrollView
+                x: 2
+                y: 2
+                width: 622
+                height: 266
+
+                TextArea {
+                    id: sw_TxtArea
+                    x: -7
+                    y: -3
+                    color: "#ffffff"
+                    text: ""
+                    font.pointSize: 11
+                    placeholderText: qsTr("")
+                    background: Rectangle {color: "black"}
+                }
+            }
         }
 
         Button {
-            id: saveSettingsBtn1
+            id: liveBackupBtn
             x: 660
             y: 549
             width: 124
             height: 25
             visible: true
-            text: qsTr("Start Live Scan")
+            text: qsTr("Start Live Backup")
             layer.enabled: true
             layer.effect: DropShadow {
                 width: 100
@@ -2480,6 +2545,14 @@ Window {
             background: Rectangle {
                 color: "#161e20"
                 radius: 50
+            }
+            onClicked: {
+                console.log("Attempting to make a backup....")
+                //var date = Qt.currentDate.toLocaleDateString(locale, Locale.ShortFormat);
+                var time = Qt.formatTime(new Date(),"hh:mm:ss");
+                sw_TxtArea.text += "Starting backup @ " + time + "\n";
+
+                mainController.createBackup();
             }
         }
     }
