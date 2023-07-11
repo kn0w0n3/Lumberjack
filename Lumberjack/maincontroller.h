@@ -62,7 +62,8 @@ signals:
     void flagsToAdd(QString i_AddFlag);
     void runOnStartSavedData(QString rosChoice);
     void refreshSummaryDavedData(QString rsChoice);
-
+    void addLogFileToComboBox(QString logFileName);
+    void liveBkupStatsDoneToQml(QString liveBackupStatus);
 
 public slots:
     void getSystemLogs();
@@ -100,7 +101,7 @@ public slots:
     void popSchdlerBkupData();
     void getArchivedLogsList();
     void evtxCmdFolderExistsResponse();
-    void createArchive();
+    void createArchive(QString);
     void moveAuditLogToReviewedFolder(QString);
     void updateMovedLogsStatus();
     void updateFlagList(QStringList, QStringList);

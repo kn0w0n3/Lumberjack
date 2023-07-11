@@ -187,7 +187,7 @@ void MainController::getSysDataFromJson(){
     sysJsonObjects.clear();
 
     if(saveType == "backup"){
-        createArchive();
+        createArchive("live");
     }
 }
 
@@ -657,7 +657,7 @@ void MainController::evtxCmdFolderExistsResponse(){
 }
 
 //Create an archive file containing the the date and time in the file name. Combine system, security, application, json files into one file.
-void MainController::createArchive(){
+void MainController::createArchive(QString backupType){
     qDebug() << "In Create Archive...........";
     QString currentDateTime = QDateTime::currentDateTime().toString("MM-dd-yyyy_h-mm-ss-ap");
     QFile secJsonFile(docsFolder + "/Lumberjack/json/security/security.json");
@@ -696,6 +696,11 @@ void MainController::createArchive(){
             QTextStream out(&archiveFile);
             out << combineAllreports;
             archiveFile.close();
+            emit addLogFileToComboBox("audit_" + currentDateTime + ".json");
+
+            if(backupType == "live"){
+            emit liveBkupStatsDoneToQml("Live backup completed @ " +  QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
+            }
     }
     else{
             //error
@@ -740,6 +745,7 @@ void MainController::createBackup(){
     getSecurityLogs("backup");
 }
 
+//Save run at start data to file
 void MainController::saveRunAtStartData(QString rasChoice){
     QFile runAtStartFile("C:/Lumberjack/settings/runonstart/runonstart.txt");
     if (runAtStartFile.open(QIODevice::WriteOnly)) {
@@ -749,6 +755,7 @@ void MainController::saveRunAtStartData(QString rasChoice){
     runAtStartFile.close();
 }
 
+//Populate run at start choices in QML
 void MainController::populateRunAtStartData(){
     QFile runAtStartFile("C:/Lumberjack/settings/runonstart/runonstart.txt");
     if(runAtStartFile.open(QIODevice::ReadOnly)) {
@@ -761,6 +768,7 @@ void MainController::populateRunAtStartData(){
     runAtStartFile.close();
 }
 
+//Save the refresh summary data to file
 void MainController::saveRefreshSummaryData(QString rsChoice){
     QFile refreshSummaryFile("C:/Lumberjack/settings/refreshsummary/refreshsummary.txt");
     if (refreshSummaryFile.open(QIODevice::WriteOnly)) {
@@ -770,6 +778,7 @@ void MainController::saveRefreshSummaryData(QString rsChoice){
     refreshSummaryFile.close();
 }
 
+//Populate the refresh summary data in QML
 void MainController::populateRefreshSummaryData(){
     QFile refreshSummaryFile("C:/Lumberjack/settings/refreshsummary/refreshsummary.txt");
     if(refreshSummaryFile.open(QIODevice::ReadOnly)) {

@@ -20,7 +20,7 @@ Window {
         id: mainWin
         width: 1280
         height: 720
-        visible: true
+        visible: false
         color: "#000000"
         //anchors.fill: parent
 
@@ -169,7 +169,7 @@ Window {
                 id: informationLabel
                 x: 19
                 y: 164
-                width: 142
+                width: 90
                 height: 38
                 color: "#ffffff"
                 text: qsTr("System:")
@@ -405,6 +405,12 @@ Window {
         }
         onRefreshSummaryDavedData:{
 
+        }
+        onAddLogFileToComboBox:{
+            model.append({text: logFileName})
+        }
+        onLiveBkupStatsDoneToQml:{
+            sw_TxtArea.text += liveBackupStatus + "\n"
         }
 
 
@@ -831,7 +837,7 @@ Window {
                 }
                 tableModelz.getSelectedData(control.currentText)
                 tableModelz.insertRows(1,0,tableModel.index(0,0))
-                tableModelz.setSpan(1,0,1,4);
+                //tableModelz.setSpan(1,0,1,4);
             }
         }
 
@@ -2333,7 +2339,7 @@ Window {
         y: 0
         width: 1280
         height: 720
-        visible: false
+        visible: true
         color: "#000000"
         border.color: "#000000"
         Image {
@@ -2544,7 +2550,7 @@ Window {
                     y: -3
                     color: "#ffffff"
                     text: ""
-                    font.pointSize: 11
+                    font.pointSize: 10
                     placeholderText: qsTr("")
                     background: Rectangle {color: "black"}
                 }
@@ -2581,7 +2587,7 @@ Window {
                 console.log("Attempting to make a backup....")
                 //var date = Qt.currentDate.toLocaleDateString(locale, Locale.ShortFormat);
                 var time = Qt.formatTime(new Date(),"hh:mm:ss");
-                sw_TxtArea.text += "Starting backup @ " + time + "\n";
+                sw_TxtArea.text += "Starting live backup @ " + time + "\n";
 
                 mainController.createBackup();
             }
