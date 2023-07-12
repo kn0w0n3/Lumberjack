@@ -44,10 +44,11 @@ public slots:
 
 private:
     QVector<QVector<QString>> table;
+    //QList<QList<QVariant>> m_data;
     QStringList eventEntryList;
     QStringList changeFileList;
     int rowCounter = 0;
-    //QList<QList<QVariant>> m_data;
+
     QString selectedFile = "";
 
     bool sysHeaderSet = false;

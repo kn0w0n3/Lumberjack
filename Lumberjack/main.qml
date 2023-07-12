@@ -20,7 +20,7 @@ Window {
         id: mainWin
         width: 1280
         height: 720
-        visible: false
+        visible: true
         color: "#000000"
         //anchors.fill: parent
 
@@ -407,6 +407,7 @@ Window {
 
         }
         onAddLogFileToComboBox:{
+            console.log("Attempting to add log text to combobox....")
             model.append({text: logFileName})
         }
         onLiveBkupStatsDoneToQml:{
@@ -515,27 +516,27 @@ Window {
 
                         //0 = Sunday
                         if(checkBox_1.checked && curDayOfWeek === "1"){
-                            mainController.createBackup()
+                            mainController.createBackup("scheduled")
                         }
                         else if(checkBox_2.checked && curDayOfWeek === "2"){
-                            mainController.createBackup()
+                            mainController.createBackup("scheduled")
                         }
                         else if(checkBox_3.checked && curDayOfWeek === "3"){
-                            mainController.createBackup()
+                            mainController.createBackup("scheduled")
                         }
                         else if(checkBox_4.checked && curDayOfWeek === "4"){
-                            mainController.createBackup()
+                            mainController.createBackup("scheduled")
                         }
                         else if(checkBox_5.checked && curDayOfWeek === "5"){
-                            mainController.createBackup()
+                            mainController.createBackup("scheduled")
                         }
                         else if(checkBox_6.checked && curDayOfWeek === "6"){
                             console.log("Attempting to make a scheduled backup")
-                            mainController.createBackup()
+                            mainController.createBackup("scheduled")
                         }
                         else if(checkBox_0.checked && curDayOfWeek === "0"){
                             console.log("Attempting to make a scheduled backup")
-                            mainController.createBackup()
+                            mainController.createBackup("scheduled")
                         }
                     }
                 }
@@ -2339,7 +2340,7 @@ Window {
         y: 0
         width: 1280
         height: 720
-        visible: true
+        visible: false
         color: "#000000"
         border.color: "#000000"
         Image {
@@ -2589,7 +2590,7 @@ Window {
                 var time = Qt.formatTime(new Date(),"hh:mm:ss");
                 sw_TxtArea.text += "Starting live backup @ " + time + "\n";
 
-                mainController.createBackup();
+                mainController.createBackup("live");
             }
         }
         Component.onCompleted: {

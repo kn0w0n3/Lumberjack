@@ -71,7 +71,11 @@ bool TableModel::insertRows(int position, int rows, const QModelIndex &parent){
       QString computerName = obdata["Computer"].toString();
       QString channel_ = obdata["Channel"].toString();
       QString timeCreated = obdata2["@SystemTime"].toString();
-      ///qDebug() << "Event ID is:" + eventId;
+
+      //if(channel_.isEmpty() && computerName.isEmpty() && timeCreated.isEmpty() && eventId.isEmpty()){
+          //break;
+          //qDebug() << "EMPTY CHANNEL<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+     //}
 
       if(rowCounter == 1 && mainHeaderSet == false){
             mainHeaderSet = true;
@@ -96,14 +100,27 @@ bool TableModel::insertRows(int position, int rows, const QModelIndex &parent){
             table.append({"", "", "", ""});
             table.append({eventId, computerName, channel_, timeCreated});
       }
-      else{
+/*
+      else if(appHeaderSet == true  && flagsHeaderSet == false){
+            qDebug() << "In set Flags header.....";
+            flagsHeaderSet  = true;
+            table.append({"", "", "", ""});
             table.append({eventId, computerName, channel_, timeCreated});
-            //table
       }
+*/
+      else{
+            //if(!channel_.isEmpty()){
+            table.append({eventId, computerName, channel_, timeCreated});
+           // }
+           // else{
+                //Do nothing
+           //}
+        }
     }
     secHeaderSet = false;
     sysHeaderSet  = false;
     appHeaderSet = false;
+    flagsHeaderSet = false;
     endInsertRows();
     rowCounter = 0;
     return true;

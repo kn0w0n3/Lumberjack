@@ -68,7 +68,7 @@ signals:
 public slots:
     void getSystemLogs();
     void getApplicationLogs();
-    void getSecurityLogs(QString);
+    void getSecurityLogs(QString, QString);
 
     void convertSecEvtxToJson();
     void convertAppEvtxToJson();
@@ -105,11 +105,12 @@ public slots:
     void moveAuditLogToReviewedFolder(QString);
     void updateMovedLogsStatus();
     void updateFlagList(QStringList, QStringList);
-    void createBackup();
+    void createBackup(QString);
     void saveRunAtStartData(QString);
     void populateRunAtStartData();
     void saveRefreshSummaryData(QString);
     void populateRefreshSummaryData();
+    void parseFlags(QString, QString);
 
 private:
     //QProcess getWinLogs;
@@ -139,6 +140,7 @@ private:
     QString result = "";
     QString combineAllreports = "";
     QString saveType = "";
+    QString _backupType = "";
 
     //String lists
     QStringList secJsonObjects;
@@ -147,6 +149,18 @@ private:
     QStringList flagList;
     QStringList listOfLogs;
     QStringList listOfFilesToConvert;
+    QStringList flagParseList;
+    QStringList logsToCompareToFlags;
+
+    QByteArray tArray_G;
+    QJsonDocument json_doc_G;
+    QJsonObject jsonObject_G;
+    QJsonObject obdata_G;
+    QJsonObject obdata2_G;
+    QString eventId_G = obdata_G["EventID"].toString();
+    //QString computerName = obdata["Computer"].toString();
+    QString channel_G = obdata_G["Channel"].toString();
+    //QString timeCreated = obdata2["@SystemTime"].toString();
 
     //TableModel *tableModel;
 

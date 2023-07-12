@@ -2,9 +2,7 @@
 
 MainController::MainController(QWidget *parent) : QWidget(parent){
     checkDirectories();
-    getSecurityLogs("refresh");
-    //TO DO:
-    //Populate archive file name in combobox after backup
+    //getSecurityLogs("refresh", "");
 }
 
 //Save system logs to evtx file
@@ -34,8 +32,9 @@ void MainController::getApplicationLogs(){
 }
 
 //Save secuity logs to evtx file
-void MainController::getSecurityLogs(QString sType){
+void MainController::getSecurityLogs(QString sType, QString bType){
     saveType = sType;
+    _backupType = bType;
     if(saveType == "refresh"){
         emit processingStatus2Qml("Processing data, please wait...");
     }
@@ -132,6 +131,7 @@ void MainController::getAppDataFromJson(){
     }
     QFile file(docsFolder + "/Lumberjack/json/application/application.json");
     if(!file.open(QIODevice::ReadOnly)) {
+        //Error
     }
     QTextStream in(&file);
     while (!in.atEnd()){
@@ -481,10 +481,6 @@ void MainController::evtxProcessingDoneRelay(int n){
     }
 }
 
-void MainController::updateCurrentLogSummary(){
-    getSecurityLogs("refresh");
-}
-
 //Save the time for the backup to run
 void MainController::saveSchedulerTimeData(QString t_Hour, QString t_Minute, QString t_Ampm){
     QString hourFilename = "C:/Lumberjack/settings/timetorun/schedulerHour.txt";
@@ -696,11 +692,7 @@ void MainController::createArchive(QString backupType){
             QTextStream out(&archiveFile);
             out << combineAllreports;
             archiveFile.close();
-            emit addLogFileToComboBox("audit_" + currentDateTime + ".json");
-
-            if(backupType == "live"){
-            emit liveBkupStatsDoneToQml("Live backup completed @ " +  QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
-            }
+            parseFlags(currentDateTime, backupType);
     }
     else{
             //error
@@ -741,8 +733,12 @@ void MainController::updateFlagList(QStringList newFlagList, QStringList removeF
     }
 }
 
-void MainController::createBackup(){
-    getSecurityLogs("backup");
+void MainController::updateCurrentLogSummary(){
+    getSecurityLogs("refresh", "");
+}
+
+void MainController::createBackup(QString backupType){
+    getSecurityLogs("backup", backupType);
 }
 
 //Save run at start data to file
@@ -780,7 +776,7 @@ void MainController::saveRefreshSummaryData(QString rsChoice){
 
 //Populate the refresh summary data in QML
 void MainController::populateRefreshSummaryData(){
-    QFile refreshSummaryFile("C:/Lumberjack/settings/refreshsummary/refreshsummary.txt");
+    QFile refreshSummaryFile("C:/Lumberjack/settings/refreshsummary/refreshsummary.txt"); 
     if(refreshSummaryFile.open(QIODevice::ReadOnly)) {
             QTextStream in(&refreshSummaryFile);
             while (!in.atEnd()){
@@ -791,6 +787,57 @@ void MainController::populateRefreshSummaryData(){
     refreshSummaryFile.close();
 }
 
+//Compare flags to event IDs in the archive log file. Add matches to the end of the file.
+void MainController::parseFlags(QString fileName, QString bType){
+    qDebug() << "In parse flags";
+    QFile currentFlagsFile("C:/Lumberjack/flags/flags.txt");
+    QFile archiveFile("C:/Lumberjack/audit/archived_reports/audit_" + fileName + ".json");
 
+    //Get the list of flags
+    if (currentFlagsFile.open(QIODevice::ReadOnly)) {
+            QTextStream in(&currentFlagsFile);
+            while(!in.atEnd()){
+                flagParseList << in.readLine().trimmed();
+            }
+            currentFlagsFile.close();
+    }
+    else{
+            qDebug() << "Flag file not open...";
+    }
 
+    //Get JSON archive logs
+    if (archiveFile.open(QIODevice::ReadOnly)) {
+            qDebug() << "Getting logs to compare.....";
+            QTextStream in(&archiveFile);
+            while (!in.atEnd()){
+                logsToCompareToFlags << in.readLine().trimmed();
+            }
+            archiveFile.close();
+    }else{
+            qDebug() << "Archive file not open...";
+    }
 
+    //compare the flags to event IDs from the archive logs
+    foreach (const QString &logEntry, logsToCompareToFlags) {
+            QByteArray tArray_G = logEntry.trimmed().toLocal8Bit();
+            QJsonDocument json_doc_G = QJsonDocument::fromJson(tArray_G);
+            QJsonObject jsonObject_G = json_doc_G.object();
+            QJsonObject obdata_G = jsonObject_G.value("Event").toObject().value("System").toObject();
+            QString eventId_G = obdata_G["EventID"].toString().trimmed();
+            foreach (const QString &flag, flagParseList) {
+            if(flag == eventId_G){
+
+                if (archiveFile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
+                    QTextStream out(&archiveFile);
+                    out << logEntry + "\n";
+                }
+                archiveFile.close();
+            }
+        }
+    }
+    qDebug() << "Emitting addLogFileToComboBox";
+    emit addLogFileToComboBox("audit_" + fileName + ".json");
+    if(bType == "live"){
+            emit liveBkupStatsDoneToQml("Live backup completed @ " +  QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
+    }
+}
