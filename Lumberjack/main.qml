@@ -31,7 +31,7 @@ Window {
             width: 1280
             height: 720
             visible: true
-            source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/bg.png"
+            source: "file:C:/Lumberjack/images/bg.png"
             fillMode: Image.PreserveAspectFit
             //anchors.fill: parent
 
@@ -42,7 +42,7 @@ Window {
                 width: 119
                 height: 28
                 visible: false
-                source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/logo2.png"
+                source: "file:C:/Lumberjack/images/logo2.png"
                 fillMode: Image.PreserveAspectFit
             }
 
@@ -263,7 +263,7 @@ Window {
         }
 
         Text {
-            id: sysEventCountTxt1
+            id: flagsEventCount
             x: 725
             y: 370
             width: 110
@@ -403,15 +403,23 @@ Window {
                 rosSwitch.text = "<font color=\"white\">Off</font>"
             }
         }
-        onRefreshSummaryDavedData:{
-
-        }
         onAddLogFileToComboBox:{
             console.log("Attempting to add log text to combobox....")
             model.append({text: logFileName})
         }
         onLiveBkupStatsDoneToQml:{
             sw_TxtArea.text += liveBackupStatus + "\n"
+        }
+        onFlagCount:{
+            console.log("Received flag count")
+            flagsEventCount.text = _FlagCount
+        }
+        onSettingsWinStatMesg:{
+            sw_TxtArea.text += sw_StatMsg + "\n"
+        }
+        onSavedRefreshDataToQml:{
+            console.log("Refresh signal received")
+            control5.currentIndex = refreshData_
         }
 
 
@@ -2399,6 +2407,8 @@ Window {
                 else if(!rosSwitch.checked){
                     mainController.saveRunAtStartData("false")
                 }
+                var comboboxText = control5.currentIndex
+                mainController.saveRefreshSummaryData(comboboxText)
             }
         }
 
@@ -2421,6 +2431,9 @@ Window {
             onToggled: {
                 if(checked){
                     rosSwitch.text= qsTr("<font color=\"white\">On</font>")
+                    mainController.runOnStartRegEdit()
+                    //https://stackoverflow.com/questions/9534415/run-application-on-startup
+
                 }
                 else{
                     rosSwitch.text= qsTr("<font color=\"white\">Off</font>")
@@ -2487,7 +2500,7 @@ Window {
                     font: control5.font
                 }
             }
-            model: ["Select Time", "Never", "Every 1 hours", "Every 2 hours", "Every 3 hours", "Every 4 hours", "Every 5 hours", "Every 6 hours", "Every 7 hours", "Every 8 hours", "Every 9 hours", "Every 10 hours", "Every 11 hours", "Every 12 hours"]
+            model: ["Select", "Never", "Every hour", "Every 2 hours", "Every 3 hours", "Every 4 hours", "Every 5 hours", "Every 6 hours", "Every 7 hours", "Every 8 hours", "Every 9 hours", "Every 10 hours", "Every 11 hours", "Every 12 hours"]
             popup: Popup {
                 y: control5.height - 1
                 width: control5.width
@@ -2594,7 +2607,9 @@ Window {
             }
         }
         Component.onCompleted: {
+            console.log("Settings win component complete")
            mainController.populateRunAtStartData()
+           mainController.populateRefreshSummaryData()
         }
     }
 

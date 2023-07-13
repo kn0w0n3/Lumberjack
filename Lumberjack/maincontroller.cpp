@@ -2,7 +2,7 @@
 
 MainController::MainController(QWidget *parent) : QWidget(parent){
     checkDirectories();
-    //getSecurityLogs("refresh", "");
+    getSecurityLogs("refresh", "");
 }
 
 //Save system logs to evtx file
@@ -188,6 +188,9 @@ void MainController::getSysDataFromJson(){
 
     if(saveType == "backup"){
         createArchive("live");
+    }
+    else if(saveType == "refresh"){
+        createArchive("updateFlags");
     }
 }
 
@@ -753,6 +756,7 @@ void MainController::saveRunAtStartData(QString rasChoice){
 
 //Populate run at start choices in QML
 void MainController::populateRunAtStartData(){
+    qDebug() << "In populate run at start data";
     QFile runAtStartFile("C:/Lumberjack/settings/runonstart/runonstart.txt");
     if(runAtStartFile.open(QIODevice::ReadOnly)) {
             QTextStream in(&runAtStartFile);
@@ -772,17 +776,27 @@ void MainController::saveRefreshSummaryData(QString rsChoice){
             stream << rsChoice;
     }
     refreshSummaryFile.close();
+    QString currentDateTime = QDateTime::currentDateTime().toString("MM-dd-yyyy_h-mm-ss-ap");
+    emit settingsWinStatMesg("Refresh data saved @ " + currentDateTime);
 }
 
 //Populate the refresh summary data in QML
 void MainController::populateRefreshSummaryData(){
+    qDebug() << "In populate resfresh data";
     QFile refreshSummaryFile("C:/Lumberjack/settings/refreshsummary/refreshsummary.txt"); 
     if(refreshSummaryFile.open(QIODevice::ReadOnly)) {
+            qDebug() << "In populate resfresh data file open";
             QTextStream in(&refreshSummaryFile);
             while (!in.atEnd()){
+
             QString temp = in.readAll().trimmed();
-            //emit savedAutoBackupDataToQML(temp);
+            qDebug() << "The save refrsh data is: " + temp;
+            qDebug() << "Emitting populate resfresh data";
+            emit savedRefreshDataToQml(temp);
             }
+    }
+    else{
+            qDebug() << "The file is not open";
     }
     refreshSummaryFile.close();
 }
@@ -825,19 +839,43 @@ void MainController::parseFlags(QString fileName, QString bType){
             QJsonObject obdata_G = jsonObject_G.value("Event").toObject().value("System").toObject();
             QString eventId_G = obdata_G["EventID"].toString().trimmed();
             foreach (const QString &flag, flagParseList) {
-            if(flag == eventId_G){
+                if(flag == eventId_G){
+                if(bType == "updateFlags"){
+                    qDebug() << "Save type is: " + saveType;
+                    flagCounter++;
+                    emit flagCount(QString::number(flagCounter));
 
-                if (archiveFile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
-                    QTextStream out(&archiveFile);
-                    out << logEntry + "\n";
+                }else{
+
+                    if (archiveFile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
+                        QTextStream out(&archiveFile);
+                        out << logEntry + "\n";
+                    }
                 }
                 archiveFile.close();
+                }
             }
-        }
     }
-    qDebug() << "Emitting addLogFileToComboBox";
-    emit addLogFileToComboBox("audit_" + fileName + ".json");
+
+    if(bType != "updateFlags"){
+            qDebug() << "Emitting addLogFileToComboBox";
+            emit addLogFileToComboBox("audit_" + fileName + ".json");
+    }
+
     if(bType == "live"){
             emit liveBkupStatsDoneToQml("Live backup completed @ " +  QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
     }
+    flagCounter = 0;
 }
+
+//Add program to startup
+void MainController::runOnStartRegEdit(){
+    qDebug() << "In regedit";
+    QSettings settings("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
+    settings.setValue("Lumberjack.exe", QCoreApplication::applicationFilePath().replace('/', '\\'));
+    settings.sync();
+    qDebug() << settings.status();
+
+    //or settings.remove("name");
+}
+

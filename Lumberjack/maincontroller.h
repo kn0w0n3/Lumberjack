@@ -25,6 +25,8 @@
 #include <QFileDialog>
 #include <QDate>
 #include <QStandardPaths>
+#include <QSettings>
+#include <QCoreApplication>
 //#include "tablemodel.h"
 
 
@@ -41,8 +43,6 @@ signals:
     void processingStatus2Qml(QString processingStatus);
     void dataToLogViewer(QString logData);
     void populateFlagDataToQml(QString eventIdFlag);
-
-    //File info
     void fileNameToQml(QString fileName);
     void filePathToQml(QString filePath);
     void dirPathToQml(QString dirPath);
@@ -64,6 +64,9 @@ signals:
     void refreshSummaryDavedData(QString rsChoice);
     void addLogFileToComboBox(QString logFileName);
     void liveBkupStatsDoneToQml(QString liveBackupStatus);
+    void flagCount(QString _FlagCount);
+    void settingsWinStatMesg(QString sw_StatMsg);
+    void savedRefreshDataToQml(QString refreshData_);
 
 public slots:
     void getSystemLogs();
@@ -91,14 +94,19 @@ public slots:
     void checkDirectories();
     void evtxProcessingDoneRelay(int);
     void updateCurrentLogSummary();
+
     void saveSchedulerTimeData(QString, QString, QString);
     void populateSchedulerTimeData();
+
     void saveSchedulerDayData(QStringList);
     void populateShedulerDaysData();
+
     void saveSchdlerClrLogData(QString);
     void popSchdlerClrLogData();
+
     void saveSchdlerBkupData(QString);
     void popSchdlerBkupData();
+
     void getArchivedLogsList();
     void evtxCmdFolderExistsResponse();
     void createArchive(QString);
@@ -106,11 +114,17 @@ public slots:
     void updateMovedLogsStatus();
     void updateFlagList(QStringList, QStringList);
     void createBackup(QString);
+
     void saveRunAtStartData(QString);
     void populateRunAtStartData();
+
     void saveRefreshSummaryData(QString);
     void populateRefreshSummaryData();
+
     void parseFlags(QString, QString);
+
+    void runOnStartRegEdit();
+
 
 private:
     //QProcess getWinLogs;
@@ -167,7 +181,8 @@ private:
     int numOfSecEvents = 0;
     int numbOfAppEvents = 0;
     int numbOfSysEvents = 0;
-    int processingCount = 0;   
+    int processingCount = 0;
+    int flagCounter = 0;
 };
 
 #endif // MAINCONTROLLER_H
