@@ -9,6 +9,8 @@ MainController::MainController(QWidget *parent) : QWidget(parent){
 void MainController::getSystemLogs(){
     if(saveType == "refresh"){
         emit processingStatus2Qml("Processing data, please wait...");
+        qDebug() << "The refresh time being saved is: " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap");
+        saveRefreshedTime(QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
     }
     getSystemLogsProcess = new QProcess();
     QStringList args;
@@ -841,7 +843,7 @@ void MainController::parseFlags(QString fileName, QString bType){
             foreach (const QString &flag, flagParseList) {
                 if(flag == eventId_G){
                 if(bType == "updateFlags"){
-                    qDebug() << "Save type is: " + saveType;
+                    //qDebug() << "Save type is: " + saveType;
                     flagCounter++;
                     emit flagCount(QString::number(flagCounter));
 
@@ -877,5 +879,21 @@ void MainController::runOnStartRegEdit(){
     qDebug() << settings.status();
 
     //or settings.remove("name");
+}
+
+void MainController::saveRefreshedTime(QString curTime){
+    QFile lastRefreshTimeFile("C:/Lumberjack/settings/refreshsummary/lastrefreshtime.txt");
+    if (lastRefreshTimeFile.open(QIODevice::WriteOnly)) {
+            QTextStream stream(&lastRefreshTimeFile);
+            stream << curTime;
+    }
+    lastRefreshTimeFile.close();
+    //QString currentDateTime = QDateTime::currentDateTime().toString("MM-dd-yyyy_h-mm-ss-ap");
+    //emit settingsWinStatMesg("Refresh data saved @ " + currentDateTime);
+
+}
+
+void MainController::getRefreshedTime(){
+
 }
 

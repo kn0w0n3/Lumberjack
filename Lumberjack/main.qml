@@ -274,10 +274,6 @@ Window {
         }
     }
 
-    //Connections {
-        //target: tableModelz
-    //}
-
     Connections {
         target: mainController
 
@@ -341,7 +337,6 @@ Window {
             }
         }
         onSavedDaysDataToQml:{
-            console.log("IN QML DYS DATA SLOT")
             if(dayX === "1"){
                 checkBox_1.checkState = Qt.Checked
             }
@@ -411,17 +406,16 @@ Window {
             sw_TxtArea.text += liveBackupStatus + "\n"
         }
         onFlagCount:{
-            console.log("Received flag count")
+            //console.log("Received flag count")
             flagsEventCount.text = _FlagCount
         }
         onSettingsWinStatMesg:{
             sw_TxtArea.text += sw_StatMsg + "\n"
         }
         onSavedRefreshDataToQml:{
-            console.log("Refresh signal received")
+            //console.log("Refresh signal received")
             control5.currentIndex = refreshData_
         }
-
 
         //function onSecurityEventCount2Qml(secEventCountX) {
         //secEventCountTxt.text = 11;
@@ -457,22 +451,6 @@ Window {
     }
 
     Timer {
-        id: scheduleDateTimer
-        interval: 1000
-        repeat: true
-        running: true
-        property var locale: Qt.locale()
-        property date currentDate: new Date()
-        property string dateString
-        onTriggered:{
-            var curDayOfTheWeek  = currentDate.getDay().toString()
-            //console.log("Current day of the week is: " + curDayOfTheWeek)
-            //curDateTxt.text = currentDate.toLocaleDateString(locale, Locale.ShortFormat);
-        }
-    }
-
-
-    Timer {
         id: updateLogSummaryTimer
         interval: 1000
         repeat: true
@@ -481,6 +459,16 @@ Window {
         property date currentDate: new Date()
         property string dateString
         onTriggered:{
+            //var refreshInterval = control5.currentIndex
+            //var curTime = Qt.formatTime(new Date(),"hh:mm:ss")
+            //console.log(refreshInterval)
+            //console.log(curTime)
+            //var lastRefreshTime = <get from file>
+            //get the difference between current time and the last refrsh curTime
+            //check to see if the difference is greater than the refresh interval time
+
+
+            //var lastTimeUpdated =
             //mainController.updateCurrentLogSummary()
             //locale: Qt.locale("en_US");
             //QDateTime date = QDateTime::currentDateTime();
@@ -504,7 +492,7 @@ Window {
                 return;
             }
             else if(switch1.checked){
-                if(switch1.checked){
+                //if(switch1.checked){
                     var currentTime =  Qt.formatTime(new Date(),"hh:mm ap")
                     var timeToCompare = control2.currentText + ":" + control3.currentText + " " + control4.currentText
                     console.log("Current time: " + currentTime)
@@ -547,7 +535,7 @@ Window {
                             mainController.createBackup("scheduled")
                         }
                     }
-                }
+              //}
             }
         }
     }
@@ -571,8 +559,19 @@ Window {
             y: 0
             width: 1280
             height: 720
-            source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/bg.png"
+            source: "file:C:/Lumberjack/images/bg.png"
             fillMode: Image.PreserveAspectFit
+
+            Rectangle {
+                id: rectangle3
+                x: 128
+                y: 69
+                width: 1083
+                height: 494
+                visible: true
+                color: "#000000"
+                border.color: "#ffffff"
+            }
         }
 
         Rectangle {
@@ -590,10 +589,10 @@ Window {
                 x: 120
                 y: 71
                 //width: 1020
-                height: 483
+                height: 480
                 //rightMargin: 100
                 anchors.fill: parent
-                anchors.topMargin: 8
+                anchors.topMargin: 5
                 columnSpacing: 1
                 rowSpacing: 1
                 clip: true
@@ -667,7 +666,7 @@ Window {
 
         ComboBox {
             id: control
-            x: 133
+            x: 128
             y: 43
             width: 200
             height: 21
@@ -812,27 +811,7 @@ Window {
             }
             palette.buttonText: "#ffffff"
             onClicked: {
-                /*
-                //Load the selected log file
-                //tableModel.loadData(control.currentText.trim())
-                console.log(control.currentText.trim())
-                //tableModelz.loadData(control.currentText.trim())
-                //mainController.createTable()
-                //someObject = {"listEntry": mainController.createTable()}
-                console.log("Text Data changed in drop down ");
-                //Remove rows from table view and add new rows of data
-                console.log("The row count is: " + tableModelz.rowCount());
-                var numRows = tableModelz.rowCount();
-                var counter = 0;
-                var rowCounter = numRows -1;
-                //tableModelz.removeRows(rowCounter,0,tableModel.index(0,0))
 
-                while(counter !== rowCounter){
-                    tableModelz.removeRows(rowCounter,0,tableModel.index(0,0))
-                    counter++;
-                    rowCounter--;
-                }
-                */
                 console.log("The row count is: " + tableModelz.rowCount());
                 var numRows = tableModelz.rowCount();
                 var counter = 0;
@@ -951,7 +930,7 @@ Window {
             y: 0
             width: 1280
             height: 720
-            source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/bg.png"
+            source: "file:C:/Lumberjack/images/bg.png"
             fillMode: Image.PreserveAspectFit
 
             Text {

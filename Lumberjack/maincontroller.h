@@ -124,6 +124,8 @@ public slots:
     void parseFlags(QString, QString);
 
     void runOnStartRegEdit();
+    void saveRefreshedTime(QString);
+    void getRefreshedTime();
 
 
 private:
