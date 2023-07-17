@@ -7,10 +7,8 @@
 #include <QDebug>
 #include <QFile>
 #include <QTextStream>
-//#include <QByteArray>
 #include <QDomDocument>
 #include <QXmlStreamReader>
-
 #include <QJsonDocument>
 #include <QJsonParseError>
 #include <QJsonObject>
@@ -27,8 +25,6 @@
 #include <QStandardPaths>
 #include <QSettings>
 #include <QCoreApplication>
-//#include "tablemodel.h"
-
 
 class MainController:  public QWidget{
     Q_OBJECT
@@ -128,7 +124,6 @@ public slots:
     void saveRefreshedTimeWd(QString);
     void compareRefreshedTime(QString);
 
-
 private:
     //QProcess getWinLogs;
     QProcess *getSystemLogsProcess;
@@ -183,8 +178,6 @@ private:
     QString refrshIntervalX = "";
     QString timeDiff = "";
     bool refreshInProgress = false;
-
-    //TableModel *tableModel;
 
     int numOfSecEvents = 0;
     int numbOfAppEvents = 0;

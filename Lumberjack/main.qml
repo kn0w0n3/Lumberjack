@@ -582,8 +582,6 @@ Window {
                 rowSpacing: 1
                 clip: true
 
-
-
                 //horizontalScrollBarPolicy: Qt.ScrollBarAsNeeded
                 //verticalScrollBarPolicy: Qt.ScrollBarAsNeeded
                 ScrollBar.horizontal: ScrollBar {
@@ -1484,10 +1482,6 @@ Window {
                 font.pixelSize: 17
             }
         }
-
-
-
-
 
         Rectangle {
             id: currentFlags
@@ -2734,8 +2728,6 @@ Window {
         //anchors.bottom: parent.bottom
     }
 
-
-
     Image {
         id: homeBtn
         x: 5
@@ -2924,6 +2916,4 @@ Window {
         //anchors.bottom: parent.bottom
         //anchors.rightMargin: 135
     }
-
-
 }

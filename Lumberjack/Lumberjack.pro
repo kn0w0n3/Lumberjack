@@ -32,9 +32,3 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     maincontroller.h \
     tablemodel.h
-
-#win32:CONFIG(release, debug|release): LIBS += -L$$PWD/Aspose.Words.Cpp/lib/x64/release/ -lAspose.Words.Cpp_vc14x64
-#else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/Aspose.Words.Cpp/lib/x64/debug/ -lAspose.Words.Cpp_vc14x64
-
-#INCLUDEPATH += $$PWD/Aspose.Words.Cpp/include/Aspose.Words.Cpp
-#DEPENDPATH += $$PWD/Aspose.Words.Cpp/include/Aspose.Words.Cpp
