@@ -130,8 +130,6 @@ Window {
             border.color: "#ffffff"
             //anchors.verticalCenter: parent.v
 
-
-
             Text {
                 id: errorLabel
                 x: 19
@@ -452,29 +450,21 @@ Window {
 
     Timer {
         id: updateLogSummaryTimer
-        interval: 1000
+        interval: 20000
         repeat: true
         running: true
         property var locale: Qt.locale()
         property date currentDate: new Date()
         property string dateString
         onTriggered:{
-            //var refreshInterval = control5.currentIndex
-            //var curTime = Qt.formatTime(new Date(),"hh:mm:ss")
-            //console.log(refreshInterval)
-            //console.log(curTime)
-            //var lastRefreshTime = <get from file>
-            //get the difference between current time and the last refrsh curTime
-            //check to see if the difference is greater than the refresh interval time
-
-
-            //var lastTimeUpdated =
-            //mainController.updateCurrentLogSummary()
-            //locale: Qt.locale("en_US");
-            //QDateTime date = QDateTime::currentDateTime();
-            //QString dateString = locale.toString(date);
-            //console.log(date);
-            //curDateTxt.text = currentDate.toLocaleDateString(locale, Locale.ShortFormat);
+            var refreshInterval = control5.currentIndex
+            var curTime = Qt.formatTime(new Date(),"hh:mm:ss a")
+            var currentDate_  = currentDate.toLocaleDateString(locale, "dd.MM.yyyy");
+            //console.log("Refresh interval is: " + refreshInterval)
+            //console.log("Current time is:" + curTime)
+            //console.log("Current date is: " + currentDate_)
+            mainController.compareRefreshedTime(curTime + " " + currentDate_)
+            //console.log("Current date + time is: " + curTime + " " + currentDate_)
         }
     }
 
@@ -492,57 +482,52 @@ Window {
                 return;
             }
             else if(switch1.checked){
-                //if(switch1.checked){
-                    var currentTime =  Qt.formatTime(new Date(),"hh:mm ap")
-                    var timeToCompare = control2.currentText + ":" + control3.currentText + " " + control4.currentText
-                    console.log("Current time: " + currentTime)
-                    console.log("Time to compare is: " + timeToCompare)
-                    console.log("The day is: " + currentDate.getDay().toString())
-                    if(currentTime === timeToCompare){
-                        console.log("THE TIME MATCHES............")
 
-                        //makingBackup = true;
-                        switch1.checked = false
-                        console.log("Autobackup switch on = " + switch1.checked)
-                        var curDayOfWeek = currentDate.getDay().toString()
-                        console.log("Current day of the week = " + curDayOfWeek)
+                var currentTime =  Qt.formatTime(new Date(),"hh:mm ap")
+                var timeToCompare = control2.currentText + ":" + control3.currentText + " " + control4.currentText
+                console.log("Current time: " + currentTime)
+                console.log("Time to compare is: " + timeToCompare)
+                console.log("The day is: " + currentDate.getDay().toString())
+                if(currentTime === timeToCompare){
+                    console.log("THE TIME MATCHES............")
 
-                        console.log("Checkbox zero state = " + checkBox_0.checked)
-                        console.log("Checkbox sixstate = " + checkBox_6.checked)
+                    //makingBackup = true;
+                    switch1.checked = false
+                    console.log("Autobackup switch on = " + switch1.checked)
+                    var curDayOfWeek = currentDate.getDay().toString()
+                    console.log("Current day of the week = " + curDayOfWeek)
 
-                        //0 = Sunday
-                        if(checkBox_1.checked && curDayOfWeek === "1"){
-                            mainController.createBackup("scheduled")
-                        }
-                        else if(checkBox_2.checked && curDayOfWeek === "2"){
-                            mainController.createBackup("scheduled")
-                        }
-                        else if(checkBox_3.checked && curDayOfWeek === "3"){
-                            mainController.createBackup("scheduled")
-                        }
-                        else if(checkBox_4.checked && curDayOfWeek === "4"){
-                            mainController.createBackup("scheduled")
-                        }
-                        else if(checkBox_5.checked && curDayOfWeek === "5"){
-                            mainController.createBackup("scheduled")
-                        }
-                        else if(checkBox_6.checked && curDayOfWeek === "6"){
-                            console.log("Attempting to make a scheduled backup")
-                            mainController.createBackup("scheduled")
-                        }
-                        else if(checkBox_0.checked && curDayOfWeek === "0"){
-                            console.log("Attempting to make a scheduled backup")
-                            mainController.createBackup("scheduled")
-                        }
+                    console.log("Checkbox zero state = " + checkBox_0.checked)
+                    console.log("Checkbox sixstate = " + checkBox_6.checked)
+
+                    //0 = Sunday
+                    if(checkBox_1.checked && curDayOfWeek === "1"){
+                        mainController.createBackup("scheduled")
                     }
-              //}
+                    else if(checkBox_2.checked && curDayOfWeek === "2"){
+                        mainController.createBackup("scheduled")
+                    }
+                    else if(checkBox_3.checked && curDayOfWeek === "3"){
+                        mainController.createBackup("scheduled")
+                    }
+                    else if(checkBox_4.checked && curDayOfWeek === "4"){
+                        mainController.createBackup("scheduled")
+                    }
+                    else if(checkBox_5.checked && curDayOfWeek === "5"){
+                        mainController.createBackup("scheduled")
+                    }
+                    else if(checkBox_6.checked && curDayOfWeek === "6"){
+                        console.log("Attempting to make a scheduled backup")
+                        mainController.createBackup("scheduled")
+                    }
+                    else if(checkBox_0.checked && curDayOfWeek === "0"){
+                        console.log("Attempting to make a scheduled backup")
+                        mainController.createBackup("scheduled")
+                    }
+                }
             }
         }
     }
-
-    //Main Controller Connections
-
-
 
     Rectangle {
         id: logViewerWin

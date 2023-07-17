@@ -61,7 +61,7 @@ signals:
     void flagsToRemove(QString i_flag);
     void flagsToAdd(QString i_AddFlag);
     void runOnStartSavedData(QString rosChoice);
-    void refreshSummaryDavedData(QString rsChoice);
+    void refreshSummarySavedData(QString rsChoice);
     void addLogFileToComboBox(QString logFileName);
     void liveBkupStatsDoneToQml(QString liveBackupStatus);
     void flagCount(QString _FlagCount);
@@ -125,7 +125,8 @@ public slots:
 
     void runOnStartRegEdit();
     void saveRefreshedTime(QString);
-    void getRefreshedTime();
+    void saveRefreshedTimeWd(QString);
+    void compareRefreshedTime(QString);
 
 
 private:
@@ -177,6 +178,11 @@ private:
     //QString computerName = obdata["Computer"].toString();
     QString channel_G = obdata_G["Channel"].toString();
     //QString timeCreated = obdata2["@SystemTime"].toString();
+    QString lastRefreshTime = "";
+    QString lastRefreshedTime_WD = "";
+    QString refrshIntervalX = "";
+    QString timeDiff = "";
+    bool refreshInProgress = false;
 
     //TableModel *tableModel;
 

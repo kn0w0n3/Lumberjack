@@ -3,14 +3,17 @@
 MainController::MainController(QWidget *parent) : QWidget(parent){
     checkDirectories();
     getSecurityLogs("refresh", "");
+    refreshInProgress = true;
+    qDebug() << "Refresh in progress = true";
 }
 
 //Save system logs to evtx file
 void MainController::getSystemLogs(){
     if(saveType == "refresh"){
         emit processingStatus2Qml("Processing data, please wait...");
-        qDebug() << "The refresh time being saved is: " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap");
-        saveRefreshedTime(QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
+        qDebug() << "The refresh time being saved is: " + QDateTime::currentDateTime().toString("h:mm:ss ap");
+        saveRefreshedTime(QDateTime::currentDateTime().toString("h:mm:ss ap"));
+        saveRefreshedTimeWd(QDateTime::currentDateTime().toString("h:mm:ss ap dd.MM.yyyy"));
     }
     getSystemLogsProcess = new QProcess();
     QStringList args;
@@ -442,33 +445,15 @@ void MainController::checkDirectories(){
     QDir jsonSecDir(docsFolder + "/Lumberjack/json/security");
 
     //Check if directories exist. If not, create them
-    if(!lumberjackDir.exists()){
-        QDir().mkdir(docsFolder + "/Lumberjack");
-    }
-    if(!evtxDir.exists()){
-        QDir().mkdir(docsFolder + "/Lumberjack/evtx");
-    }
-    if(!evtxSysDir.exists()){
-        QDir().mkdir(docsFolder + "/Lumberjack/evtx/system");
-    }
-    if(!evtxAppDir.exists()){
-        QDir().mkdir(docsFolder + "/Lumberjack/evtx/application");
-    }
-    if(!evtxSecDir.exists()){
-        QDir().mkdir(docsFolder + "/Lumberjack/evtx/security");
-    }
-    if(!jsonDir.exists()){
-        QDir().mkdir(docsFolder + "/Lumberjack/json");
-    }
-    if(!jsonSysDir.exists()){
-        QDir().mkdir(docsFolder + "/Lumberjack/json/system");
-    }
-    if(!jsonAppDir.exists()){
-        QDir().mkdir(docsFolder + "/Lumberjack/json/application");
-    }
-    if(!jsonSecDir.exists()){
-        QDir().mkdir(docsFolder + "/Lumberjack/json/security");
-    }
+    if(!lumberjackDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack");}
+    if(!evtxDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/evtx");}
+    if(!evtxSysDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/evtx/system");}
+    if(!evtxAppDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/evtx/application");}
+    if(!evtxSecDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/evtx/security");}
+    if(!jsonDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/json");}
+    if(!jsonSysDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/json/system");}
+    if(!jsonAppDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/json/application");}
+    if(!jsonSecDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/json/security");}
 
     //Check if the EvtxeCmd folder exists in the Documents\EvtxConverter folder
     QStringList args;
@@ -739,7 +724,7 @@ void MainController::updateFlagList(QStringList newFlagList, QStringList removeF
 }
 
 void MainController::updateCurrentLogSummary(){
-    getSecurityLogs("refresh", "");
+    getSecurityLogs("refresh", "updateFlags");
 }
 
 void MainController::createBackup(QString backupType){
@@ -858,12 +843,14 @@ void MainController::parseFlags(QString fileName, QString bType){
                 }
             }
     }
-
     if(bType != "updateFlags"){
             qDebug() << "Emitting addLogFileToComboBox";
             emit addLogFileToComboBox("audit_" + fileName + ".json");
     }
-
+    if(bType == "updateFlags"){
+            refreshInProgress = false;
+            qDebug() << "Refresh in progress = false";
+    }
     if(bType == "live"){
             emit liveBkupStatsDoneToQml("Live backup completed @ " +  QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
     }
@@ -881,6 +868,7 @@ void MainController::runOnStartRegEdit(){
     //or settings.remove("name");
 }
 
+//Save the time of refresh
 void MainController::saveRefreshedTime(QString curTime){
     QFile lastRefreshTimeFile("C:/Lumberjack/settings/refreshsummary/lastrefreshtime.txt");
     if (lastRefreshTimeFile.open(QIODevice::WriteOnly)) {
@@ -890,10 +878,116 @@ void MainController::saveRefreshedTime(QString curTime){
     lastRefreshTimeFile.close();
     //QString currentDateTime = QDateTime::currentDateTime().toString("MM-dd-yyyy_h-mm-ss-ap");
     //emit settingsWinStatMesg("Refresh data saved @ " + currentDateTime);
-
 }
 
-void MainController::getRefreshedTime(){
+void MainController::saveRefreshedTimeWd(QString curTimeWd){
+    QFile lastRefreshTimeFileWd("C:/Lumberjack/settings/refreshsummary/lastrefreshtimewd.txt");
+    if (lastRefreshTimeFileWd.open(QIODevice::WriteOnly)) {
+            QTextStream stream(&lastRefreshTimeFileWd);
+            stream << curTimeWd;
+    }
+    lastRefreshTimeFileWd.close();
+}
 
+//compare refresh time
+void MainController::compareRefreshedTime(QString currentTime){
+    qDebug() << "In COMPARE refreshed time.........";
+    QFile lastRefreshSummaryFile("C:/Lumberjack/settings/refreshsummary/lastrefreshtimewd.txt");
+    if(lastRefreshSummaryFile.open(QIODevice::ReadOnly)) {
+            QTextStream in(&lastRefreshSummaryFile);
+            while (!in.atEnd()){
+                lastRefreshedTime_WD = in.readAll().trimmed();
+                qDebug() << "Last refresh WD: " + lastRefreshedTime_WD;
+            }            
+    }
+    lastRefreshSummaryFile.close();
+    //return lastRefreshTime;
+    QString start = lastRefreshedTime_WD;
+    QString end = currentTime;
+    timeDiff = QString("%1").arg(QDateTime().fromString(start, "h:m:s ap dd.MM.yyyy").secsTo(QDateTime().fromString(end, "h:m:s ap dd.MM.yyyy")));
+    qDebug() << "The time difference is: " + timeDiff;
+
+
+    QFile refreshIntervalFile("C:/Lumberjack/settings/refreshsummary/refreshsummary.txt");
+    if(refreshIntervalFile.open(QIODevice::ReadOnly)) {
+            QTextStream in(&refreshIntervalFile);
+            while (!in.atEnd()){
+                refrshIntervalX = in.readAll().trimmed();
+                qDebug() << "Refresh Interval is: " + refrshIntervalX;
+            }
+    }
+    refreshIntervalFile.close();
+
+    if(refrshIntervalX == ""){
+
+    }
+    else if(refrshIntervalX == "0"){
+
+    }
+    else if(refrshIntervalX == "1"){
+
+    }
+    // 1 hour
+    else if(refrshIntervalX == "2" && timeDiff.toInt() >= 3600 && timeDiff.toInt() < 3720 && refreshInProgress == false){
+                qDebug() << "Strating refreshed from selected interval - every hour";
+                refreshInProgress = true;
+                updateCurrentLogSummary();
+
+    }
+    // 2 hours
+    else if(refrshIntervalX == "3" && timeDiff.toInt() >= 7200 && timeDiff.toInt() < 7320 && refreshInProgress == false){
+               refreshInProgress = true;
+                updateCurrentLogSummary();
+    }
+    // 3 hours
+    else if(refrshIntervalX == "4" && timeDiff.toInt() >= 10800 && timeDiff.toInt() < 10920 && refreshInProgress == false){
+                refreshInProgress = true;
+                updateCurrentLogSummary();
+    }
+    // 4 hours
+    else if(refrshIntervalX == "5" && timeDiff.toInt() >= 1440 && timeDiff.toInt() < 1560 && refreshInProgress == false){
+                refreshInProgress = true;
+                updateCurrentLogSummary();
+    }
+    // 5 hours
+    else if(refrshIntervalX == "6" && timeDiff.toInt() >= 18000 && timeDiff.toInt() < 18120 && refreshInProgress == false){
+                refreshInProgress = true;
+                updateCurrentLogSummary();
+    }
+    // 6 hours
+    else if(refrshIntervalX == "7" && timeDiff.toInt() >= 21600 && timeDiff.toInt() < 21720 && refreshInProgress == false){
+                refreshInProgress = true;
+                updateCurrentLogSummary();
+    }
+    // 7 hours
+    else if(refrshIntervalX == "8" && timeDiff.toInt() >= 25200 && timeDiff.toInt() < 25320 && refreshInProgress == false){
+                refreshInProgress = true;
+                updateCurrentLogSummary();
+    }
+    // 8 hours
+    else if(refrshIntervalX == "9" && timeDiff.toInt() >= 28800 && timeDiff.toInt() < 28920 && refreshInProgress == false){
+                refreshInProgress = true;
+                updateCurrentLogSummary();
+    }
+    // 9 hours
+    else if(refrshIntervalX == "10" && timeDiff.toInt() >= 32400 && timeDiff.toInt() < 32520 && refreshInProgress == false){
+                refreshInProgress = true;
+                updateCurrentLogSummary();
+    }
+    // 10 hours
+    else if(refrshIntervalX == "11" && timeDiff.toInt() >= 36000 && timeDiff.toInt() < 36120 && refreshInProgress == false){
+                refreshInProgress = true;
+                updateCurrentLogSummary();
+    }
+    // 11 hours
+    else if(refrshIntervalX == "12" && timeDiff.toInt() >= 39600 && timeDiff.toInt() < 39720 && refreshInProgress == false){
+                refreshInProgress = true;
+                updateCurrentLogSummary();
+    }
+    // 12 hours
+    else if(refrshIntervalX == "13" && timeDiff.toInt() >= 43200 && timeDiff.toInt() < 43320 && refreshInProgress == false){
+                refreshInProgress = true;
+                updateCurrentLogSummary();
+    }
 }
 
