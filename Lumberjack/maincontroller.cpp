@@ -91,7 +91,7 @@ void MainController::convertSysEvtxToJson(){
     QStringList args;
     args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
          << "./EvtxECmd.exe -f "  + docsFolder + "/Lumberjack/evtx/system/system.evtx --json " + docsFolder + "/Lumberjack/json/system/ --fj --jsonf system.json";
-    connect(convertSysEvtxToJsonProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{getSysDataFromJson();});
+    connect(convertSysEvtxToJsonProcess, (void(QProcess::*)(int))&QProcess::finished, this, &MainController::getSysDataFromJson);
     convertSysEvtxToJsonProcess->start("powershell", args);
 }
 
@@ -100,6 +100,13 @@ void MainController::getSecDataFromJson(){
     if(saveType == "refresh"){
         emit processingStatus2Qml("Processing data, please wait...");
     }
+
+    fileOpsThread = new FileOpsThread();
+    connect(fileOpsThread, &FileOpsThread::finished, this, &MainController::getSecDataJsonStatus);
+    connect(fileOpsThread, &FileOpsThread::secEventNum2MainContrler, this, &MainController::setNumberOfSecEvents);
+    fileOpsThread->setSaveType(saveType);
+    fileOpsThread->start();
+    /*
     QFile file(docsFolder + "/Lumberjack/json/security/security.json");
     if(!file.open(QIODevice::ReadOnly)){
     //qDebug() << "Sec file not open.......";
@@ -127,6 +134,19 @@ void MainController::getSecDataFromJson(){
     convertSecEvtxToJsonProcess->terminate();
     secJsonObjects.clear();
     getApplicationLogs();
+*/
+}
+
+void MainController::getSecDataJsonStatus(){
+    qDebug() << "In get SEC data JSON Status..........";
+    qDebug() << "Terminating evtx to json conversion process......";
+    qDebug() << "Terminating file ops thread since it ahould be finished......";
+    qDebug() << "Calling Get Application Logs......";
+    convertSecEvtxToJsonProcess->terminate();
+    evtxProcessingDoneRelay(1);
+    fileOpsThread->terminate();
+    getApplicationLogs();
+
 }
 
 //Parse JSON application data and retrieve desired values
@@ -642,6 +662,7 @@ void MainController::evtxCmdFolderExistsResponse(){
     }
 }
 
+//Put on thread? This causes the GUI to lock
 //Create an archive file containing the the date and time in the file name. Combine system, security, application, json files into one file.
 void MainController::createArchive(QString backupType){
     qDebug() << "In Create Archive...........";
@@ -847,6 +868,11 @@ void MainController::parseFlags(QString fileName, QString bType){
             qDebug() << "Emitting addLogFileToComboBox";
             emit addLogFileToComboBox("audit_" + fileName + ".json");
     }
+    if(bType != "updateFlags" && bType != "live"){
+            qDebug() << "Clearing logs after scheduled backup.......";
+            //TODO: Check clear backup logs switch status before clearing
+            //clearEventLogs();
+    }
     if(bType == "updateFlags"){
             refreshInProgress = false;
             qDebug() << "Refresh in progress = false";
@@ -864,7 +890,6 @@ void MainController::runOnStartRegEdit(){
     settings.setValue("Lumberjack.exe", QCoreApplication::applicationFilePath().replace('/', '\\'));
     settings.sync();
     qDebug() << settings.status();
-
     //or settings.remove("name");
 }
 
@@ -932,7 +957,6 @@ void MainController::compareRefreshedTime(QString currentTime){
                 qDebug() << "Strating refreshed from selected interval - every hour";
                 refreshInProgress = true;
                 updateCurrentLogSummary();
-
     }
     // 2 hours
     else if(refrshIntervalX == "3" && timeDiff.toInt() >= 7200 && timeDiff.toInt() < 7320 && refreshInProgress == false){
@@ -991,3 +1015,18 @@ void MainController::compareRefreshedTime(QString currentTime){
     }
 }
 
+void MainController::clearEventLogs(){
+    clearLogsProcess = new QProcess();
+    QStringList args;
+    args  << "Clear-EventLog -LogName application, system, security";
+    connect(clearLogsProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{clearLogsStatus();});
+    clearLogsProcess->start("powershell", args);
+}
+
+void MainController::clearLogsStatus(){
+    qDebug() << "Clear logs finished........";
+}
+
+void MainController::setNumberOfSecEvents(QString NOSE){
+    emit securityEventCount2Qml(NOSE);
+}

@@ -25,6 +25,7 @@
 #include <QStandardPaths>
 #include <QSettings>
 #include <QCoreApplication>
+#include "fileopsthread.h"
 
 class MainController:  public QWidget{
     Q_OBJECT
@@ -74,6 +75,8 @@ public slots:
     void convertSysEvtxToJson();
 
     void getSecDataFromJson();
+    void getSecDataJsonStatus();
+
     void getAppDataFromJson();
     void getSysDataFromJson();
 
@@ -123,6 +126,9 @@ public slots:
     void saveRefreshedTime(QString);
     void saveRefreshedTimeWd(QString);
     void compareRefreshedTime(QString);
+    void clearEventLogs();
+    void clearLogsStatus();
+    void setNumberOfSecEvents(QString);
 
 private:
     //QProcess getWinLogs;
@@ -140,6 +146,7 @@ private:
     QProcess moveEvtxeCmdToDocsProcess;
     QProcess *moveAuditLogToReviewedProcesss;
     QProcess *convertEachEvtxFileProcess4;
+    QProcess *clearLogsProcess;
 
     QString LogInfoText;
     QString evtxType = "";
@@ -178,6 +185,8 @@ private:
     QString refrshIntervalX = "";
     QString timeDiff = "";
     bool refreshInProgress = false;
+
+    FileOpsThread *fileOpsThread;
 
     int numOfSecEvents = 0;
     int numbOfAppEvents = 0;

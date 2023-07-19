@@ -4,6 +4,8 @@ QT += xml
 QT += core
 
 SOURCES += \
+        archivecreatorthread.cpp \
+        fileopsthread.cpp \
         main.cpp \
         maincontroller.cpp \
         tablemodel.cpp
@@ -30,5 +32,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    archivecreatorthread.h \
+    fileopsthread.h \
     maincontroller.h \
     tablemodel.h

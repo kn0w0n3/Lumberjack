@@ -1420,7 +1420,7 @@ Window {
             y: 0
             width: 1280
             height: 720
-            source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/bg.png"
+            source: "file:C:/Lumberjack/images/bg.png"
             fillMode: Image.PreserveAspectFit
 
             Rectangle {
@@ -1712,7 +1712,7 @@ Window {
             y: 0
             width: 1280
             height: 720
-            source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/bg.png"
+            source: "file:C:/Lumberjack/images/bg.png"
             fillMode: Image.PreserveAspectFit
 
             Text {
@@ -2315,7 +2315,7 @@ Window {
             y: 0
             width: 1280
             height: 720
-            source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/bg.png"
+            source: "file:C:/Lumberjack/images/bg.png"
             layer.enabled: true
             fillMode: Image.PreserveAspectFit
 
@@ -2333,8 +2333,8 @@ Window {
 
         Button {
             id: saveSettingsBtn
-            x: 577
-            y: 618
+            x: 660
+            y: 614
             width: 127
             height: 25
             visible: true
@@ -2564,10 +2564,41 @@ Window {
                 mainController.createBackup("live");
             }
         }
+
+        Button {
+            id: clearLogsBtn
+            x: 472
+            y: 614
+            width: 127
+            height: 25
+            visible: true
+            text: qsTr("Clear Event Logs")
+            layer.enabled: true
+            hoverEnabled: false
+            background: Rectangle {
+                color: "#161e20"
+                radius: 50
+            }
+            layer.effect: DropShadow {
+                width: 100
+                visible: true
+                color: "#ffffff"
+                radius: 8
+                transparentBorder: true
+                horizontalOffset: 2
+                verticalOffset: 2
+                spread: 0
+                samples: 17
+            }
+            palette.buttonText: "#ffffff"
+            onClicked: {
+                mainController.clearEventLogs()
+            }
+        }
         Component.onCompleted: {
             console.log("Settings win component complete")
-           mainController.populateRunAtStartData()
-           mainController.populateRefreshSummaryData()
+            mainController.populateRunAtStartData()
+            mainController.populateRefreshSummaryData()
         }
     }
 
@@ -2589,7 +2620,7 @@ Window {
         width: 40
         height: 40
         //source: "images/toolsBtn.png"
-        source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/toolsBtn.png"
+        source: "file:C:/Lumberjack/images/toolsBtn.png"
         fillMode: Image.PreserveAspectFit
 
         MouseArea {
@@ -2625,7 +2656,7 @@ Window {
         width: 50
         height: 12
         visible: false
-        source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/GopenMenuDots.png"
+        source: "file:C:/Lumberjack/images/GopenMenuDots.png"
         fillMode: Image.PreserveAspectFit
 
         MouseArea {
@@ -2735,7 +2766,7 @@ Window {
         width: 40
         height: 40
         visible: true
-        source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/homeBtnImg.png"
+        source: "file:C:/Lumberjack/images/homeBtnImg.png"
         clip: false
         //source: "qrc:/images/homeBtnImg.png"
         z: 0
@@ -2774,7 +2805,7 @@ Window {
         y: 73
         width: 40
         height: 40
-        source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/searchBtn.png"
+        source: "file:C:/Lumberjack/images/searchBtn.png"
         fillMode: Image.PreserveAspectFit
         MouseArea {
             id: mouseAreaViewLogBtn
@@ -2808,7 +2839,7 @@ Window {
         y: 134
         width: 40
         height: 40
-        source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/convertBtn.png"
+        source: "file:C:/Lumberjack/images/convertBtn.png"
         fillMode: Image.PreserveAspectFit
         MouseArea {
             id: mouseAreaConvertEvtx
@@ -2842,7 +2873,7 @@ Window {
         y: 194
         width: 40
         height: 40
-        source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/flagBtn.png"
+        source: "file:C:/Lumberjack/images/flagBtn.png"
         fillMode: Image.PreserveAspectFit
         MouseArea {
             id: flagsBtnMouseArea
@@ -2876,7 +2907,7 @@ Window {
         y: 255
         width: 40
         height: 40
-        source: "file:C:/Users/Voldem0rt/Documents/Qt_Projects/Lumberjack/images/scheduleBtn.png"
+        source: "file:C:/Lumberjack/images/scheduleBtn.png"
         fillMode: Image.PreserveAspectFit
         MouseArea {
             id: mouseAreaScheduleBtn
