@@ -5,9 +5,9 @@ QT += core
 
 SOURCES += \
         archivecreatorthread.cpp \
-        fileopsthread.cpp \
         main.cpp \
         maincontroller.cpp \
+        seceventcounterthread.cpp \
         tablemodel.cpp
 
 resources.files = main.qml 
@@ -33,6 +33,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     archivecreatorthread.h \
-    fileopsthread.h \
     maincontroller.h \
+    seceventcounterthread.h \
     tablemodel.h

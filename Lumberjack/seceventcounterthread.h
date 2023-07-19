@@ -1,5 +1,6 @@
-#ifndef FILEOPSTHREAD_H
-#define FILEOPSTHREAD_H
+#ifndef SECEVENTCOUNTERTHREAD_H
+#define SECEVENTCOUNTERTHREAD_H
+
 #include <QThread>
 #include <QObject>
 #include <QFile>
@@ -14,16 +15,16 @@
 #include <QStringList>
 #include <QStandardPaths>
 
-class FileOpsThread : public QThread{
+class SecEventCounterThread : public QThread{
     Q_OBJECT
 
 public:
-    FileOpsThread(QThread *parent = 0);
+    SecEventCounterThread(QThread *parent = 0);
     void run();
     void setSaveType(QString);
 
 signals:
-   // void thread_evtxProcessingDoneRelay(int);
+         // void thread_evtxProcessingDoneRelay(int);
     void secEventNum2MainContrler(QString);
 
 public slots:
@@ -31,9 +32,10 @@ public slots:
 private:
     int numOfSecEvents = 0;
     QStringList secJsonObjects;
-    QString result = "";
+    //QString result = "";
     QString _saveType = "";
     QString docsFolder = "";
 };
 
-#endif // FILEOPSTHREAD_H
+
+#endif // SECEVENTCOUNTERTHREAD_H

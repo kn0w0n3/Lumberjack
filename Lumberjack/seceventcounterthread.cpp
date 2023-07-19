@@ -1,10 +1,10 @@
-#include "fileopsthread.h"
+#include "seceventcounterthread.h"
 
-FileOpsThread::FileOpsThread(QThread *parent) : QThread(parent){
+SecEventCounterThread::SecEventCounterThread(QThread *parent) : QThread(parent){
     docsFolder = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
 }
 
-void FileOpsThread::run(){
+void SecEventCounterThread::run(){
     qDebug() << "In file ops thread run()........";
     QFile file(docsFolder + "/Lumberjack/json/security/security.json");
     if(!file.open(QIODevice::ReadOnly)){
@@ -17,13 +17,13 @@ void FileOpsThread::run(){
     file.close();
     foreach(const QString &logEntry, secJsonObjects){
         numOfSecEvents++;
-        QString numToString = QString::number(numOfSecEvents);
-        QByteArray tArray = logEntry.trimmed().toLocal8Bit();
-        QJsonDocument json_doc = QJsonDocument::fromJson(tArray);
-        QJsonObject jsonObject = json_doc.object();
-        QJsonObject obdata = jsonObject.value("Event").toObject().value("System").toObject();
-        QString eventId = obdata["EventID"].toString();
-        result += "Event ID: " + eventId + "\n";
+        //QString numToString = QString::number(numOfSecEvents);
+        //QByteArray tArray = logEntry.trimmed().toLocal8Bit();
+        // QJsonDocument json_doc = QJsonDocument::fromJson(tArray);
+        //QJsonObject jsonObject = json_doc.object();
+        // QJsonObject obdata = jsonObject.value("Event").toObject().value("System").toObject();
+        //QString eventId = obdata["EventID"].toString();
+        //result += "Event ID: " + eventId + "\n";
     }
     if(_saveType == "refresh"){
         emit secEventNum2MainContrler(QString::number(numOfSecEvents));
@@ -32,6 +32,6 @@ void FileOpsThread::run(){
     secJsonObjects.clear();
 }
 
-void FileOpsThread::setSaveType(QString saveType_){
+void SecEventCounterThread::setSaveType(QString saveType_){
     _saveType = saveType_;
 }

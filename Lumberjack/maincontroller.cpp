@@ -101,11 +101,11 @@ void MainController::getSecDataFromJson(){
         emit processingStatus2Qml("Processing data, please wait...");
     }
 
-    fileOpsThread = new FileOpsThread();
-    connect(fileOpsThread, &FileOpsThread::finished, this, &MainController::getSecDataJsonStatus);
-    connect(fileOpsThread, &FileOpsThread::secEventNum2MainContrler, this, &MainController::setNumberOfSecEvents);
-    fileOpsThread->setSaveType(saveType);
-    fileOpsThread->start();
+    secEventCounterThread = new SecEventCounterThread();
+    connect(secEventCounterThread, &SecEventCounterThread::finished, this, &MainController::getSecDataJsonStatus);
+    connect(secEventCounterThread, &SecEventCounterThread::secEventNum2MainContrler, this, &MainController::setNumberOfSecEvents);
+    secEventCounterThread->setSaveType(saveType);
+    secEventCounterThread->start();
     /*
     QFile file(docsFolder + "/Lumberjack/json/security/security.json");
     if(!file.open(QIODevice::ReadOnly)){
@@ -144,7 +144,7 @@ void MainController::getSecDataJsonStatus(){
     qDebug() << "Calling Get Application Logs......";
     convertSecEvtxToJsonProcess->terminate();
     evtxProcessingDoneRelay(1);
-    fileOpsThread->terminate();
+    secEventCounterThread->terminate();
     getApplicationLogs();
 
 }
@@ -160,17 +160,18 @@ void MainController::getAppDataFromJson(){
     }
     QTextStream in(&file);
     while (!in.atEnd()){
+        numbOfAppEvents++;
         appJsonObjects << in.readLine();
     }
     file.close();
-    foreach(const QString &logEntry, appJsonObjects){
-        numbOfAppEvents++;
-        QByteArray tArray = logEntry.trimmed().toLocal8Bit();
-        QJsonDocument json_doc = QJsonDocument::fromJson(tArray);
-        QJsonObject jsonObject = json_doc.object();
-        QJsonObject obdata = jsonObject.value("Event").toObject().value("System").toObject();
-        QString eventId = obdata["EventID"].toString();
-    }
+    //foreach(const QString &logEntry, appJsonObjects){
+        //numbOfAppEvents++;
+        //QByteArray tArray = logEntry.trimmed().toLocal8Bit();
+        //QJsonDocument json_doc = QJsonDocument::fromJson(tArray);
+        //QJsonObject jsonObject = json_doc.object();
+        //QJsonObject obdata = jsonObject.value("Event").toObject().value("System").toObject();
+        //QString eventId = obdata["EventID"].toString();
+   // }
     if(saveType == "refresh"){
         emit appEventCount2Qml(QString::number(numbOfAppEvents));
     }
@@ -193,16 +194,17 @@ void MainController::getSysDataFromJson(){
     QTextStream in(&file);
     while (!in.atEnd()){
         sysJsonObjects << in.readLine();
+        numbOfSysEvents++;
     }
     file.close();
-    foreach(const QString &logEntry, sysJsonObjects){
-        numbOfSysEvents++;
-        QByteArray tArray = logEntry.trimmed().toLocal8Bit();
-        QJsonDocument json_doc = QJsonDocument::fromJson(tArray);
-        QJsonObject jsonObject = json_doc.object();
-        QJsonObject obdata = jsonObject.value("Event").toObject().value("System").toObject();
-        QString eventId = obdata["EventID"].toString();
-    }
+    //foreach(const QString &logEntry, sysJsonObjects){
+       // numbOfSysEvents++;
+        //QByteArray tArray = logEntry.trimmed().toLocal8Bit();
+       // QJsonDocument json_doc = QJsonDocument::fromJson(tArray);
+        //QJsonObject jsonObject = json_doc.object();
+       //QJsonObject obdata = jsonObject.value("Event").toObject().value("System").toObject();
+        //QString eventId = obdata["EventID"].toString();
+    //}
     if(saveType == "refresh"){
         emit sysEventCount2Qml(QString::number(numbOfSysEvents));
     }

@@ -25,7 +25,7 @@
 #include <QStandardPaths>
 #include <QSettings>
 #include <QCoreApplication>
-#include "fileopsthread.h"
+#include "seceventcounterthread.h"
 
 class MainController:  public QWidget{
     Q_OBJECT
@@ -186,7 +186,7 @@ private:
     QString timeDiff = "";
     bool refreshInProgress = false;
 
-    FileOpsThread *fileOpsThread;
+    SecEventCounterThread *secEventCounterThread;
 
     int numOfSecEvents = 0;
     int numbOfAppEvents = 0;
