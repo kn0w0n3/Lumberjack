@@ -22,10 +22,14 @@ public:
     void run();
 
 signals:
+    void archiveCreationStatus(QString);
 
 public slots:
+    //void setBackupType();
 
 private:
+    QString docsFolder = "";
+    QString combineAllreports = "";
 
 };
 

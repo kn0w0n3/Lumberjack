@@ -26,6 +26,7 @@
 #include <QSettings>
 #include <QCoreApplication>
 #include "seceventcounterthread.h"
+#include "archivecreatorthread.h"
 
 class MainController:  public QWidget{
     Q_OBJECT
@@ -129,6 +130,7 @@ public slots:
     void clearEventLogs();
     void clearLogsStatus();
     void setNumberOfSecEvents(QString);
+    void createArchiveStatus(QString);
 
 private:
     //QProcess getWinLogs;
@@ -187,6 +189,7 @@ private:
     bool refreshInProgress = false;
 
     SecEventCounterThread *secEventCounterThread;
+    ArchiveCreatorThread *archiveCreatorThread;
 
     int numOfSecEvents = 0;
     int numbOfAppEvents = 0;

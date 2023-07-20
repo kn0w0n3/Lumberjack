@@ -2,9 +2,9 @@
 
 MainController::MainController(QWidget *parent) : QWidget(parent){
     checkDirectories();
-    getSecurityLogs("refresh", "");
+    getSecurityLogs("refresh", "updateFlags");
     refreshInProgress = true;
-    qDebug() << "Refresh in progress = true";
+    //qDebug() << "Refresh in progress = true";
 }
 
 //Save system logs to evtx file
@@ -38,6 +38,7 @@ void MainController::getApplicationLogs(){
 
 //Save secuity logs to evtx file
 void MainController::getSecurityLogs(QString sType, QString bType){
+    qDebug() << "IN GET SECURITY LOGS";
     saveType = sType;
     _backupType = bType;
     if(saveType == "refresh"){
@@ -100,41 +101,11 @@ void MainController::getSecDataFromJson(){
     if(saveType == "refresh"){
         emit processingStatus2Qml("Processing data, please wait...");
     }
-
     secEventCounterThread = new SecEventCounterThread();
     connect(secEventCounterThread, &SecEventCounterThread::finished, this, &MainController::getSecDataJsonStatus);
     connect(secEventCounterThread, &SecEventCounterThread::secEventNum2MainContrler, this, &MainController::setNumberOfSecEvents);
     secEventCounterThread->setSaveType(saveType);
     secEventCounterThread->start();
-    /*
-    QFile file(docsFolder + "/Lumberjack/json/security/security.json");
-    if(!file.open(QIODevice::ReadOnly)){
-    //qDebug() << "Sec file not open.......";
-    }
-    QTextStream in(&file);
-    while (!in.atEnd()){
-        secJsonObjects << in.readLine();
-    }
-    file.close();
-    foreach(const QString &logEntry, secJsonObjects){
-        numOfSecEvents++;
-        QString numToString = QString::number(numOfSecEvents);
-        QByteArray tArray = logEntry.trimmed().toLocal8Bit();
-        QJsonDocument json_doc = QJsonDocument::fromJson(tArray);
-        QJsonObject jsonObject = json_doc.object();
-        QJsonObject obdata = jsonObject.value("Event").toObject().value("System").toObject();
-        QString eventId = obdata["EventID"].toString();
-        result += "Event ID: " + eventId + "\n";
-    }
-    if(saveType == "refresh"){
-        emit securityEventCount2Qml(QString::number(numOfSecEvents));
-    }
-    numOfSecEvents = 0;  
-    evtxProcessingDoneRelay(1);
-    convertSecEvtxToJsonProcess->terminate();
-    secJsonObjects.clear();
-    getApplicationLogs();
-*/
 }
 
 void MainController::getSecDataJsonStatus(){
@@ -146,7 +117,6 @@ void MainController::getSecDataJsonStatus(){
     evtxProcessingDoneRelay(1);
     secEventCounterThread->terminate();
     getApplicationLogs();
-
 }
 
 //Parse JSON application data and retrieve desired values
@@ -219,6 +189,7 @@ void MainController::getSysDataFromJson(){
     else if(saveType == "refresh"){
         createArchive("updateFlags");
     }
+    qDebug() << "THIS SHOULD BE THEN END OF UPDATE REFRESH";
 }
 
 //Get saved flag data to populate the current flag list in QML
@@ -487,6 +458,7 @@ void MainController::checkDirectories(){
 //Send message to QML when EVTX files have been saved, converted, and parsed
 void MainController::evtxProcessingDoneRelay(int n){
     processingCount += n;
+    qDebug() << "Processing Count is: " +QString::number(processingCount);
     if(processingCount == 3){
         emit processingStatus2Qml("Summary " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
         processingCount = 0;
@@ -667,49 +639,10 @@ void MainController::evtxCmdFolderExistsResponse(){
 //Put on thread? This causes the GUI to lock
 //Create an archive file containing the the date and time in the file name. Combine system, security, application, json files into one file.
 void MainController::createArchive(QString backupType){
-    qDebug() << "In Create Archive...........";
-    QString currentDateTime = QDateTime::currentDateTime().toString("MM-dd-yyyy_h-mm-ss-ap");
-    QFile secJsonFile(docsFolder + "/Lumberjack/json/security/security.json");
-    QFile sysJsonFile(docsFolder + "/Lumberjack/json/system/system.json");
-    QFile appJsonFile(docsFolder + "/Lumberjack/json/application/application.json");
-    QFile archiveFile("C:/Lumberjack/audit/archived_reports/audit_" + currentDateTime + ".json");
-
-    if(secJsonFile.open(QIODevice::ReadOnly)) {
-            qDebug() << "In Sec JSON file...........";
-            QTextStream in(&secJsonFile);
-            while (!in.atEnd()){
-            combineAllreports = in.readAll().trimmed() + "\n";
-            //qDebug() << "Combined reports is: " + combineAllreports;
-            }
-            secJsonFile.close();
-
-            if(sysJsonFile.open(QIODevice::ReadOnly)) {
-            qDebug() << "In Sys JSON file...........";
-            QTextStream in(&sysJsonFile);
-            while (!in.atEnd()){
-                combineAllreports += in.readAll().trimmed() + "\n";
-            }
-            sysJsonFile.close();
-            }
-            if(appJsonFile.open(QIODevice::ReadOnly)) {
-            qDebug() << "In App JSON file...........";
-            QTextStream in(&appJsonFile);
-            while (!in.atEnd()){
-                combineAllreports += in.readAll().trimmed();
-            }
-            appJsonFile.close();
-            }
-    }
-    if(archiveFile.open(QIODevice::WriteOnly | QIODevice::Append)) {
-            qDebug() << "In write archive file...........";
-            QTextStream out(&archiveFile);
-            out << combineAllreports;
-            archiveFile.close();
-            parseFlags(currentDateTime, backupType);
-    }
-    else{
-            //error
-    }
+    _backupType = backupType;
+    archiveCreatorThread = new ArchiveCreatorThread();
+    connect(archiveCreatorThread, &ArchiveCreatorThread::archiveCreationStatus, this, &MainController::createArchiveStatus);
+    archiveCreatorThread->start();
 }
 
 //BUG:Spaces in file names causes file to not be moved
@@ -1029,6 +962,14 @@ void MainController::clearLogsStatus(){
     qDebug() << "Clear logs finished........";
 }
 
+//Send the number of sec events to QML
 void MainController::setNumberOfSecEvents(QString NOSE){
     emit securityEventCount2Qml(NOSE);
+}
+
+//Parse flags after archive thread is done processing
+void MainController::createArchiveStatus(QString timeFromArchive){
+    qDebug() << "IN CREATE ARCHIVE STATUS";
+    parseFlags(timeFromArchive, _backupType);
+    archiveCreatorThread->terminate();
 }

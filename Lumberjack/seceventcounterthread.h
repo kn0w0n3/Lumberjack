@@ -24,7 +24,7 @@ public:
     void setSaveType(QString);
 
 signals:
-         // void thread_evtxProcessingDoneRelay(int);
+    //void thread_evtxProcessingDoneRelay(int);
     void secEventNum2MainContrler(QString);
 
 public slots:

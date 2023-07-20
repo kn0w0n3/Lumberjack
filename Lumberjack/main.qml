@@ -463,7 +463,7 @@ Window {
             //console.log("Refresh interval is: " + refreshInterval)
             //console.log("Current time is:" + curTime)
             //console.log("Current date is: " + currentDate_)
-            mainController.compareRefreshedTime(curTime + " " + currentDate_)
+            //mainController.compareRefreshedTime(curTime + " " + currentDate_)
             //console.log("Current date + time is: " + curTime + " " + currentDate_)
         }
     }

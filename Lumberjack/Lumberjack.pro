@@ -7,6 +7,7 @@ SOURCES += \
         archivecreatorthread.cpp \
         main.cpp \
         maincontroller.cpp \
+        parseflagsthread.cpp \
         seceventcounterthread.cpp \
         tablemodel.cpp
 
@@ -34,5 +35,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     archivecreatorthread.h \
     maincontroller.h \
+    parseflagsthread.h \
     seceventcounterthread.h \
     tablemodel.h
