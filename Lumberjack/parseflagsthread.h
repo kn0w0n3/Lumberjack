@@ -20,6 +20,25 @@ class ParseFlagsThread : public QThread{
 public:
     ParseFlagsThread(QThread *parent = 0);
     void run();
+
+signals:
+    //void archiveCreationStatus(QString);
+    void liveBkupStatsDoneToQml(QString);
+    void addLogFileToComboBox(QString);
+    void flagCount(QString);
+    void updateRefreshInProgress(bool);
+
+public slots:
+      //void setBackupType();
+    void setData(QString, QString, bool);
+
+private:
+    QStringList flagParseList;
+    QStringList logsToCompareToFlags;
+    QString bType = "";
+    QString fileName = "";
+    int flagCounter = 0;
+    bool refreshInProgress = false;
 };
 
 #endif // PARSEFLAGSTHREAD_H

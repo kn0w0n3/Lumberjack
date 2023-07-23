@@ -27,6 +27,7 @@
 #include <QCoreApplication>
 #include "seceventcounterthread.h"
 #include "archivecreatorthread.h"
+#include "parseflagsthread.h"
 
 class MainController:  public QWidget{
     Q_OBJECT
@@ -65,6 +66,7 @@ signals:
     void flagCount(QString _FlagCount);
     void settingsWinStatMesg(QString sw_StatMsg);
     void savedRefreshDataToQml(QString refreshData_);
+
 
 public slots:
     void getSystemLogs();
@@ -132,6 +134,10 @@ public slots:
     void setNumberOfSecEvents(QString);
     void createArchiveStatus(QString);
 
+    void mc_UpdateRefreshInProgress(bool);
+    void updateLiveBackupStatus();
+    void terminateThread();
+
 private:
     //QProcess getWinLogs;
     QProcess *getSystemLogsProcess;
@@ -190,6 +196,7 @@ private:
 
     SecEventCounterThread *secEventCounterThread;
     ArchiveCreatorThread *archiveCreatorThread;
+    ParseFlagsThread *parseFlagsThread;
 
     int numOfSecEvents = 0;
     int numbOfAppEvents = 0;

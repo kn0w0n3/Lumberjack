@@ -955,7 +955,6 @@ Window {
                 palette.buttonText: "#ffffff"
                 onClicked: {
                     mainController.ce_SelectFile()
-
                 }
             }
 
