@@ -16,11 +16,8 @@ int main(int argc, char *argv[]){
 
     MainController mainController;
     TableModel tableModelz;
-    //tableModelz = new TableModel();
     engine.rootContext()->setContextProperty("mainController", &mainController);
     engine.rootContext()->setContextProperty("tableModelz",&tableModelz);
-
-    //qmlRegisterType<TableModel>("TableModel", 0, 1, "TableModel");
 
     const QUrl url(u"qrc:/Lumberjack/main.qml"_qs);
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
@@ -30,9 +27,6 @@ int main(int argc, char *argv[]){
         }, Qt::QueuedConnection);
     engine.load(url);
     app.setWindowIcon(QIcon("C:/Lumberjack/images/appicon.png"));
-    //app.setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
-    //setWindowFlag(Qt::MaximizeUsingFullscreenGeometryHint,true) ;
-     //QQuickView::setResizeMode(QQuickView::SizeRootObjectToView)
 
     return app.exec();
 }

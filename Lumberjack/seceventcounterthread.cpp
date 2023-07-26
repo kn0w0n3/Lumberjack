@@ -17,13 +17,6 @@ void SecEventCounterThread::run(){
     file.close();
     foreach(const QString &logEntry, secJsonObjects){
         numOfSecEvents++;
-        //QString numToString = QString::number(numOfSecEvents);
-        //QByteArray tArray = logEntry.trimmed().toLocal8Bit();
-        // QJsonDocument json_doc = QJsonDocument::fromJson(tArray);
-        //QJsonObject jsonObject = json_doc.object();
-        // QJsonObject obdata = jsonObject.value("Event").toObject().value("System").toObject();
-        //QString eventId = obdata["EventID"].toString();
-        //result += "Event ID: " + eventId + "\n";
     }
     if(_saveType == "refresh"){
         emit secEventNum2MainContrler(QString::number(numOfSecEvents));

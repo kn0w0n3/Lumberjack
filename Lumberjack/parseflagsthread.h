@@ -27,6 +27,8 @@ signals:
     void addLogFileToComboBox(QString);
     void flagCount(QString);
     void updateRefreshInProgress(bool);
+    void flagParsingStatus2Qml(QString);
+    void flagParsingDone(int);
 
 public slots:
       //void setBackupType();

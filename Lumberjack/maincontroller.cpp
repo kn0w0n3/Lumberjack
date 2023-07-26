@@ -4,35 +4,36 @@ MainController::MainController(QWidget *parent) : QWidget(parent){
     checkDirectories();
     getSecurityLogs("refresh", "updateFlags");
     refreshInProgress = true;
-    //qDebug() << "Refresh in progress = true";
 }
 
 //Save system logs to evtx file
 void MainController::getSystemLogs(){
     if(saveType == "refresh"){
-        emit processingStatus2Qml("Processing data, please wait...");
+        emit processingStatus2Qml("Retrieving system log data, please wait...");
         qDebug() << "The refresh time being saved is: " + QDateTime::currentDateTime().toString("h:mm:ss ap");
         saveRefreshedTime(QDateTime::currentDateTime().toString("h:mm:ss ap"));
         saveRefreshedTimeWd(QDateTime::currentDateTime().toString("h:mm:ss ap dd.MM.yyyy"));
     }
     getSystemLogsProcess = new QProcess();
     QStringList args;
-    args  << "Set-Location -Path " + docsFolder + "/Lumberjack/evtx/system/;" << "Remove-Item " + docsFolder + "/Lumberjack/evtx/system/system.evtx;" << "$log = Get-WmiObject -Class Win32_NTEventlogFile | Where-Object LogfileName -EQ 'system';"
+    args  << "Set-Location -Path " + docsFolder + "/Lumberjack/evtx/system/;" << "Remove-Item " +
+             docsFolder + "/Lumberjack/evtx/system/system.evtx;" << "$log = Get-WmiObject -Class Win32_NTEventlogFile | Where-Object LogfileName -EQ 'system';"
           << "$log.BackupEventlog('" + docsFolder + "/Lumberjack/evtx/system/system.evtx')";
-    connect(getSystemLogsProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{convertSysEvtxToJson(); });
+    connect(getSystemLogsProcess, &QProcess::finished, this, &MainController::convertSysEvtxToJson);
     getSystemLogsProcess->start("powershell", args);
 }
 
 //Save application logs to evtx file
 void MainController::getApplicationLogs(){
     if(saveType == "refresh"){
-        emit processingStatus2Qml("Processing data, please wait...");
+        emit processingStatus2Qml("Retrieving application log data, please wait...");
     }
     getApplicationLogsProcess = new QProcess();
     QStringList args;
-    args  << "Set-Location -Path " + docsFolder + "/Lumberjack/evtx/application/;" << "Remove-Item " + docsFolder + "/Lumberjack/evtx/application/application.evtx;" << "$log = Get-WmiObject -Class Win32_NTEventlogFile | Where-Object LogfileName -EQ 'application';"
+    args  << "Set-Location -Path " + docsFolder + "/Lumberjack/evtx/application/;" << "Remove-Item " +
+             docsFolder + "/Lumberjack/evtx/application/application.evtx;" << "$log = Get-WmiObject -Class Win32_NTEventlogFile | Where-Object LogfileName -EQ 'application';"
           << "$log.BackupEventlog('" + docsFolder + "/Lumberjack/evtx/application/application.evtx')";
-    connect(getApplicationLogsProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{convertAppEvtxToJson();});
+    connect(getApplicationLogsProcess, &QProcess::finished, this, &MainController::convertAppEvtxToJson);
     getApplicationLogsProcess->start("powershell", args);
 }
 
@@ -42,13 +43,13 @@ void MainController::getSecurityLogs(QString sType, QString bType){
     saveType = sType;
     _backupType = bType;
     if(saveType == "refresh"){
-        emit processingStatus2Qml("Processing data, please wait...");
+        emit processingStatus2Qml("Retrieving security log data, please wait...");
     }
     getSecurityLogsProcess = new QProcess();
     QStringList args;
     args  << "Set-Location -Path " + docsFolder + "/Lumberjack/evtx/security/;" << "Remove-Item " + docsFolder + "/Lumberjack/evtx/security/security.evtx;" << "$log = Get-WmiObject -Class Win32_NTEventlogFile | Where-Object LogfileName -EQ 'security';"
           << "$log.BackupEventlog('" + docsFolder + "/Lumberjack/evtx/security/security.evtx')";
-    connect(getSecurityLogsProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{convertSecEvtxToJson();});
+    connect(getSecurityLogsProcess, &QProcess::finished, this, &MainController::convertSecEvtxToJson);
     getSecurityLogsProcess->start("powershell", args);
 }
 
@@ -57,13 +58,14 @@ void MainController::convertSecEvtxToJson(){
     //qDebug() << "IN CONVERT SEC EVTX TO JSON........";
     getSecurityLogsProcess->terminate();
     if(saveType == "refresh"){
-        emit processingStatus2Qml("Processing data, please wait...");
+        emit processingStatus2Qml("Processing security data, please wait...");
     }
     convertSecEvtxToJsonProcess = new QProcess();
     QStringList args;
     args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
-         << "./EvtxECmd.exe -f "  + docsFolder + "/Lumberjack/evtx/security/security.evtx --fj --json " + docsFolder + "/Lumberjack/json/security/ --jsonf security.json";
-    connect(convertSecEvtxToJsonProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{getSecDataFromJson();});
+         << "./EvtxECmd.exe -f "  + docsFolder + "/Lumberjack/evtx/security/security.evtx --fj --json " +
+            docsFolder + "/Lumberjack/json/security/ --jsonf security.json";
+    connect(convertSecEvtxToJsonProcess, &QProcess::finished, this, &MainController::getSecDataFromJson);
     convertSecEvtxToJsonProcess->start("powershell", args);
 }
 
@@ -72,13 +74,14 @@ void MainController::convertAppEvtxToJson(){
     //qDebug() << "IN CONVERT App EVTX TO JSON........";
     getApplicationLogsProcess->terminate();
     if(saveType == "refresh"){
-        emit processingStatus2Qml("Processing data, please wait...");
+        emit processingStatus2Qml("Processing application data, please wait...");
     }
     convertAppEvtxToJsonProcess = new QProcess();
     QStringList args;
     args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
-         << "./EvtxECmd.exe -f "  + docsFolder + "/Lumberjack/evtx/application/application.evtx --json " + docsFolder+ "/Lumberjack/json/application/ --fj --jsonf application.json";
-    connect(convertAppEvtxToJsonProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{getAppDataFromJson();});
+         << "./EvtxECmd.exe -f "  + docsFolder + "/Lumberjack/evtx/application/application.evtx --json " +
+            docsFolder+ "/Lumberjack/json/application/ --fj --jsonf application.json";
+    connect(convertAppEvtxToJsonProcess, &QProcess::finished, this, &MainController::getAppDataFromJson);
     convertAppEvtxToJsonProcess->start("powershell", args);
 }
 
@@ -86,7 +89,7 @@ void MainController::convertAppEvtxToJson(){
 void MainController::convertSysEvtxToJson(){
     getSystemLogsProcess->terminate();
     if(saveType == "refresh"){
-        emit processingStatus2Qml("Processing data, please wait...");
+        emit processingStatus2Qml("Processing system data, please wait...");
     }
     convertSysEvtxToJsonProcess = new QProcess();
     QStringList args;
@@ -99,7 +102,7 @@ void MainController::convertSysEvtxToJson(){
 //Parse JSON security data and retrieve desired values
 void MainController::getSecDataFromJson(){
     if(saveType == "refresh"){
-        emit processingStatus2Qml("Processing data, please wait...");
+        emit processingStatus2Qml("Parsing security data, please wait...");
     }
     secEventCounterThread = new SecEventCounterThread();
     connect(secEventCounterThread, &SecEventCounterThread::finished, this, &MainController::getSecDataJsonStatus);
@@ -122,7 +125,7 @@ void MainController::getSecDataJsonStatus(){
 //Parse JSON application data and retrieve desired values
 void MainController::getAppDataFromJson(){
     if(saveType == "refresh"){
-        emit processingStatus2Qml("Processing data, please wait...");
+        emit processingStatus2Qml("Parsing application data, please wait...");
     }
     QFile file(docsFolder + "/Lumberjack/json/application/application.json");
     if(!file.open(QIODevice::ReadOnly)) {
@@ -134,14 +137,7 @@ void MainController::getAppDataFromJson(){
         appJsonObjects << in.readLine();
     }
     file.close();
-    //foreach(const QString &logEntry, appJsonObjects){
-        //numbOfAppEvents++;
-        //QByteArray tArray = logEntry.trimmed().toLocal8Bit();
-        //QJsonDocument json_doc = QJsonDocument::fromJson(tArray);
-        //QJsonObject jsonObject = json_doc.object();
-        //QJsonObject obdata = jsonObject.value("Event").toObject().value("System").toObject();
-        //QString eventId = obdata["EventID"].toString();
-   // }
+
     if(saveType == "refresh"){
         emit appEventCount2Qml(QString::number(numbOfAppEvents));
     }
@@ -155,7 +151,7 @@ void MainController::getAppDataFromJson(){
 //Parse JSON system data and retrieve desired values
 void MainController::getSysDataFromJson(){
     if(saveType == "refresh"){
-        emit processingStatus2Qml("Processing data, please wait...");
+        emit processingStatus2Qml("Parsing system data, please wait...");
     }
     QFile file(docsFolder + "/Lumberjack/json/system/system.json");
     if(!file.open(QIODevice::ReadOnly)){
@@ -167,14 +163,7 @@ void MainController::getSysDataFromJson(){
         numbOfSysEvents++;
     }
     file.close();
-    //foreach(const QString &logEntry, sysJsonObjects){
-       // numbOfSysEvents++;
-        //QByteArray tArray = logEntry.trimmed().toLocal8Bit();
-       // QJsonDocument json_doc = QJsonDocument::fromJson(tArray);
-        //QJsonObject jsonObject = json_doc.object();
-       //QJsonObject obdata = jsonObject.value("Event").toObject().value("System").toObject();
-        //QString eventId = obdata["EventID"].toString();
-    //}
+
     if(saveType == "refresh"){
         emit sysEventCount2Qml(QString::number(numbOfSysEvents));
     }
@@ -189,7 +178,6 @@ void MainController::getSysDataFromJson(){
     else if(saveType == "refresh"){
         createArchive("updateFlags");
     }
-    //qDebug() << "THIS SHOULD BE THEN END OF UPDATE REFRESH";
 }
 
 //Get saved flag data to populate the current flag list in QML
@@ -232,7 +220,8 @@ void MainController::ce_SelectFile(){
 
 //Get directory path for evtx files
 void MainController::ce_SelectDir(){
-    QString dir = QFileDialog::getExistingDirectory(Q_NULLPTR, tr("Select Directory"), "/home", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    QString dir = QFileDialog::getExistingDirectory(Q_NULLPTR, tr("Select Directory"),
+                                                    "/home", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     emit dirPathToQml(dir);
     emit filePathToQml("");
     emit dirPathSepToQml("");
@@ -240,30 +229,33 @@ void MainController::ce_SelectDir(){
 
 //Get path where converted files will be stored
 void MainController::ce_SaveToPath(){
-    QString dir = QFileDialog::getExistingDirectory(Q_NULLPTR, tr("Select Directory"), "/home", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    QString dir = QFileDialog::getExistingDirectory(Q_NULLPTR, tr("Select Directory"),
+                                                    "/home", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
     emit saveToPathToQml(dir);
 }
 
 //Convert a single EVTX file to a single JSON, CSV, or XML file
 void MainController::fileConvertEvtx(QString convertType, QString fPah, QString savePath, QString iFileName ){
     if(convertType == "JSON"){
-        emit fileConvertEvtxStatus("EVTX to JSON conversion process starting " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
+        emit fileConvertEvtxStatus("EVTX to JSON conversion process starting " +
+                                   QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
         emit fileConvertEvtxStatus("Please Wait....");
         convertEvtxToFullJsonProcess = new QProcess();
         QStringList args;
         args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
              << "./EvtxECmd.exe -f " + fPah.trimmed() +  " --json " +  savePath.trimmed() + " --jsonf " + iFileName.trimmed() + ".json";
-        connect(convertEvtxToJsonProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
+        connect(convertEvtxToJsonProcess, &QProcess::finished, this, &MainController::updateEvtxConvertStatus);
         convertEvtxToJsonProcess->start("powershell", args);
     }
     else if(convertType == " Full JSON"){
-        emit fileConvertEvtxStatus("EVTX to FUll JSON conversion process starting " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
+        emit fileConvertEvtxStatus("EVTX to FUll JSON conversion process starting " +
+                                   QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
         emit fileConvertEvtxStatus("Please Wait....");
         convertEvtxToFullJsonProcess = new QProcess();
         QStringList args;
         args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
              << "./EvtxECmd.exe -f " + fPah.trimmed() +  " --fj --json " +  savePath.trimmed() + " --jsonf " + iFileName.trimmed() + ".json";
-        connect(convertEvtxToFullJsonProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
+        connect(convertEvtxToFullJsonProcess, &QProcess::finished, this, &MainController::updateEvtxConvertStatus);
         convertEvtxToFullJsonProcess->start("powershell", args);
     }
     else if(convertType == "XML"){
@@ -273,7 +265,7 @@ void MainController::fileConvertEvtx(QString convertType, QString fPah, QString 
         QStringList args;
         args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
              << "./EvtxECmd.exe -f " + fPah.trimmed() +  " --xml " +  savePath.trimmed() + " --xmlf " + iFileName.trimmed() + ".xml";
-        connect(convertEvtxToXmlProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
+        connect(convertEvtxToXmlProcess, &QProcess::finished, this, &MainController::updateEvtxConvertStatus);
         convertEvtxToXmlProcess->start("powershell", args);
     }
     else if(convertType == "CSV"){
@@ -283,7 +275,7 @@ void MainController::fileConvertEvtx(QString convertType, QString fPah, QString 
         QStringList args;
         args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
              << "./EvtxECmd.exe -f " + fPah.trimmed() +  " --csv " +  savePath.trimmed() + " --csvf " + iFileName.trimmed() + ".csv";
-        connect(convertEvtxToCsvProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
+        connect(convertEvtxToCsvProcess, &QProcess::finished, this, &MainController::updateEvtxConvertStatus);
         convertEvtxToCsvProcess->start("powershell", args);
     }
     else{
@@ -294,7 +286,8 @@ void MainController::fileConvertEvtx(QString convertType, QString fPah, QString 
 //Convert a directory of evtx files to a single json, xml, or csv. Note: Without using pointer for dynamic memory allocation, duplicate messages of conversion complete were being transmitted
 void MainController::dirConvertEvtx(QString convertType, QString fPah, QString savePath){
     if(convertType == "JSON"){
-        emit fileConvertEvtxStatus("EVTX to JSON conversion process starting " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
+        emit fileConvertEvtxStatus("EVTX to JSON conversion process starting " +
+                                   QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
         emit fileConvertEvtxStatus("Please Wait....");
         qDebug() << "SAVE PATH IS: " + savePath;
         convertEvtxToJsonProcess = new QProcess();
@@ -302,38 +295,41 @@ void MainController::dirConvertEvtx(QString convertType, QString fPah, QString s
         //Set a permanent location for deployment
         args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
              << "./EvtxECmd.exe -d " + fPah.trimmed() +  " --json " +  savePath.trimmed();
-        connect(convertEvtxToJsonProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
+        connect(convertEvtxToJsonProcess, &QProcess::finished, this, &MainController::updateEvtxConvertStatus);
         convertEvtxToJsonProcess->start("powershell", args);
     }
     else if(convertType == "Full JSON"){
-        emit fileConvertEvtxStatus("EVTX to FUll JSON conversion process starting " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
+        emit fileConvertEvtxStatus("EVTX to FUll JSON conversion process starting " +
+                                   QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
         emit fileConvertEvtxStatus("Please Wait....");
         convertEvtxToFullJsonProcess = new QProcess();
         QStringList args;
         //Set a permanent location for deployment
         args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
              << "./EvtxECmd.exe -d " + fPah.trimmed() +  " --fj --json " +  savePath.trimmed() + " --jsonf ";
-        connect(convertEvtxToFullJsonProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
+        connect(convertEvtxToFullJsonProcess, &QProcess::finished, this, &MainController::updateEvtxConvertStatus);
         convertEvtxToFullJsonProcess->start("powershell", args);
     }
     else if(convertType == "XML"){
-        emit fileConvertEvtxStatus("EVTX to XML conversion process starting " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
+        emit fileConvertEvtxStatus("EVTX to XML conversion process starting " +
+                                   QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
         emit fileConvertEvtxStatus("Please Wait....");
         convertEvtxToXmlProcess = new QProcess();
         QStringList args;
         args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
              << "./EvtxECmd.exe -d " + fPah.trimmed() +  " --xml " + savePath.trimmed();
-        connect(convertEvtxToXmlProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
+        connect(convertEvtxToXmlProcess, &QProcess::finished, this, &MainController::updateEvtxConvertStatus);
         convertEvtxToXmlProcess->start("powershell", args);
     }
     else if(convertType == "CSV"){
-        emit fileConvertEvtxStatus("EVTX to CSV conversion process starting " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
+        emit fileConvertEvtxStatus("EVTX to CSV conversion process starting " +
+                                   QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
         emit fileConvertEvtxStatus("Please Wait....");
         convertEvtxToCsvProcess = new QProcess();
         QStringList args;
         args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
-             << "./EvtxECmd.exe -d " + fPah.trimmed() +  " --csv " +  savePath.trimmed();
-        connect(convertEvtxToCsvProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
+             << "./EvtxECmd.exe -d " + fPah.trimmed() +  " --csv " +  savePath.trimmed();       
+        connect(convertEvtxToCsvProcess, &QProcess::finished, this, &MainController::updateEvtxConvertStatus);
         convertEvtxToCsvProcess->start("powershell", args);
     }
     else{
@@ -343,7 +339,8 @@ void MainController::dirConvertEvtx(QString convertType, QString fPah, QString s
 
 //Convert a directory of Evtx files to individual JSON, XML, or CSV files
 void MainController::dirConvertEachEvtx(QString convertType, QString savePath){
-    emit fileConvertEvtxStatus("EVTX file conversion process starting " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
+    emit fileConvertEvtxStatus("EVTX file conversion process starting " +
+                               QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
     emit fileConvertEvtxStatus("Please Wait....");
 
     foreach(const QString &evtxFile, listOfFilesToConvert){
@@ -356,7 +353,7 @@ void MainController::dirConvertEachEvtx(QString convertType, QString savePath){
             QStringList args;
             args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
                  << "./EvtxECmd.exe -f " + evtxFile.trimmed() +  " --json " +  savePath.trimmed() + " --jsonf " + curFileName + ".json";
-            connect(convertEachEvtxFileProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
+            connect(convertEachEvtxFileProcess, &QProcess::finished, this, &MainController::updateEvtxConvertStatus);
             convertEachEvtxFileProcess->start("powershell", args);
         }
         else if(convertType == "Full JSON"){
@@ -364,7 +361,7 @@ void MainController::dirConvertEachEvtx(QString convertType, QString savePath){
             QStringList args;
             args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
                  << "./EvtxECmd.exe -f " + evtxFile.trimmed() +  " --fj --json " +  savePath.trimmed() + " --jsonf " + curFileName + ".json";
-            connect(convertEachEvtxFileProcess2, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
+            connect(convertEachEvtxFileProcess2, &QProcess::finished, this, &MainController::updateEvtxConvertStatus);
             convertEachEvtxFileProcess2->start("powershell", args);
         }
         else if(convertType == "XML"){
@@ -372,7 +369,7 @@ void MainController::dirConvertEachEvtx(QString convertType, QString savePath){
             QStringList args;
             args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
                  << "./EvtxECmd.exe -f " + evtxFile.trimmed() +  " --xml " +  savePath.trimmed() + " --xmlf " + curFileName + ".xml";
-            connect(convertEachEvtxFileProcess3, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
+            connect(convertEachEvtxFileProcess3, &QProcess::finished, this, &MainController::updateEvtxConvertStatus);
             convertEachEvtxFileProcess3->start("powershell", args);
         }
         else if(convertType == "CSV"){
@@ -380,7 +377,7 @@ void MainController::dirConvertEachEvtx(QString convertType, QString savePath){
             QStringList args;
             args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
                  << "./EvtxECmd.exe -f " + evtxFile.trimmed() +  " --csv " +  savePath.trimmed() + " --csvf " + curFileName + ".csv";
-            connect(convertEachEvtxFileProcess4, (void(QProcess::*)(int))&QProcess::finished, [=]{updateEvtxConvertStatus();});
+            connect(convertEachEvtxFileProcess4, &QProcess::finished, this, &MainController::updateEvtxConvertStatus);
             convertEachEvtxFileProcess4->start("powershell", args);
         }
         else{
@@ -459,7 +456,7 @@ void MainController::checkDirectories(){
 void MainController::evtxProcessingDoneRelay(int n){
     processingCount += n;
     qDebug() << "Processing Count is: " +QString::number(processingCount);
-    if(processingCount == 3){
+    if(processingCount == 4){
         emit processingStatus2Qml("Summary " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
         processingCount = 0;
     }
@@ -487,7 +484,8 @@ void MainController::saveSchedulerTimeData(QString t_Hour, QString t_Minute, QSt
     if (ampm_File.open(QIODevice::ReadWrite)) {
         QTextStream stream(&ampm_File);
         stream << t_Ampm;
-        emit saveScheduleDataSaveStatus("Save completed @ " +  QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
+        emit saveScheduleDataSaveStatus("Save completed @ " +
+                                        QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
     }
     ampm_File.close();
 }
@@ -539,7 +537,8 @@ void MainController::saveSchedulerDayData(QStringList daysOfTheWeekList){
         }
     }
     dtr_File.close();
-    emit saveScheduleDataSaveStatus("Shedule Days Save completed @ " +  QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
+    emit saveScheduleDataSaveStatus("Shedule Days Save completed @ " +
+                                    QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
 }
 
 //Get the saved data from file and send to the QML GUI to be displayed
@@ -563,7 +562,8 @@ void MainController::saveSchdlerClrLogData(QString switchState){
         stream << switchState;
      }
      clearLogsChoice_File.close();
-     emit saveScheduleDataSaveStatus("Clear logs choice Save completed @ " +  QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
+     emit saveScheduleDataSaveStatus("Clear logs choice Save completed @ " +
+                                     QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
 }
 
 //Get the saved "clear log after backup" choice data from file and send to QML
@@ -587,7 +587,8 @@ void MainController::saveSchdlerBkupData(QString bUpChoice){
             stream << bUpChoice;
     }
     backupChoice_File.close();
-    emit saveScheduleDataSaveStatus("Auto backup choice Save completed @ " +  QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
+    emit saveScheduleDataSaveStatus("Auto backup choice Save completed @ " +
+                                     QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
 }
 
 //Get the saved autobackup choice data from file and send to QML
@@ -652,7 +653,9 @@ void MainController::moveAuditLogToReviewedFolder(QString fileName){
     QString fileToMove = "C:/Lumberjack/audit/archived_reports/" + fileName;
     QStringList args;
     args << "Move-Item -Path "  + fileToMove +  " -Destination C:/Lumberjack/audit/archived_reports/reviewed/" + fileName;
-    connect(moveAuditLogToReviewedProcesss,(void(QProcess::*)(int))&QProcess::finished, [=]{updateMovedLogsStatus();});
+    //connect(moveAuditLogToReviewedProcesss,(void(QProcess::*)(int))&QProcess::finished, [=]{updateMovedLogsStatus();});
+    connect(moveAuditLogToReviewedProcesss, &QProcess::finished, this, &MainController::updateMovedLogsStatus);
+
     moveAuditLogToReviewedProcesss->start("powershell", args);
 }
 
@@ -753,6 +756,9 @@ void MainController::parseFlags(QString fileName, QString bType){
     connect(parseFlagsThread, &ParseFlagsThread::addLogFileToComboBox, this, &MainController::addLogFileToComboBox);
     connect(parseFlagsThread, &ParseFlagsThread::updateRefreshInProgress, this, &MainController::mc_UpdateRefreshInProgress);
     connect(parseFlagsThread, &ParseFlagsThread::liveBkupStatsDoneToQml, this, &MainController::updateLiveBackupStatus);
+    connect(parseFlagsThread, &ParseFlagsThread::flagParsingStatus2Qml, this, &MainController::processingStatus2Qml);
+    connect(parseFlagsThread, &ParseFlagsThread::flagParsingDone, this, &MainController::evtxProcessingDoneRelay);
+
     connect(parseFlagsThread, &ParseFlagsThread::finished, this, &MainController::terminateThread);
     parseFlagsThread->start();
 }
@@ -827,63 +833,99 @@ void MainController::compareRefreshedTime(QString currentTime){
 
     }
     // 1 hour
-    else if(refrshIntervalX == "2" && timeDiff.toInt() >= 3600 && timeDiff.toInt() < 3720 && refreshInProgress == false){
+    else if(refrshIntervalX == "2"
+                && timeDiff.toInt() >= 3600
+                && timeDiff.toInt() < 3720
+                && refreshInProgress == false){
                 qDebug() << "Strating refreshed from selected interval - every hour";
                 refreshInProgress = true;
                 updateCurrentLogSummary();
     }
     // 2 hours
-    else if(refrshIntervalX == "3" && timeDiff.toInt() >= 7200 && timeDiff.toInt() < 7320 && refreshInProgress == false){
-               refreshInProgress = true;
+    else if(refrshIntervalX == "3"
+                && timeDiff.toInt() >= 7200
+                && timeDiff.toInt() < 7320
+                && refreshInProgress == false){
+                refreshInProgress = true;
                 updateCurrentLogSummary();
     }
     // 3 hours
-    else if(refrshIntervalX == "4" && timeDiff.toInt() >= 10800 && timeDiff.toInt() < 10920 && refreshInProgress == false){
+    else if(refrshIntervalX == "4"
+                && timeDiff.toInt() >= 10800
+                && timeDiff.toInt() < 10920
+                && refreshInProgress == false){
                 refreshInProgress = true;
                 updateCurrentLogSummary();
     }
     // 4 hours
-    else if(refrshIntervalX == "5" && timeDiff.toInt() >= 1440 && timeDiff.toInt() < 1560 && refreshInProgress == false){
+    else if(refrshIntervalX == "5"
+                && timeDiff.toInt() >= 1440
+                && timeDiff.toInt() < 1560
+                && refreshInProgress == false){
                 refreshInProgress = true;
                 updateCurrentLogSummary();
     }
     // 5 hours
-    else if(refrshIntervalX == "6" && timeDiff.toInt() >= 18000 && timeDiff.toInt() < 18120 && refreshInProgress == false){
+    else if(refrshIntervalX == "6"
+                && timeDiff.toInt() >= 18000
+                && timeDiff.toInt() < 18120
+                && refreshInProgress == false){
                 refreshInProgress = true;
                 updateCurrentLogSummary();
     }
     // 6 hours
-    else if(refrshIntervalX == "7" && timeDiff.toInt() >= 21600 && timeDiff.toInt() < 21720 && refreshInProgress == false){
+    else if(refrshIntervalX == "7"
+                && timeDiff.toInt() >= 21600
+                && timeDiff.toInt() < 21720
+                && refreshInProgress == false){
                 refreshInProgress = true;
                 updateCurrentLogSummary();
     }
     // 7 hours
-    else if(refrshIntervalX == "8" && timeDiff.toInt() >= 25200 && timeDiff.toInt() < 25320 && refreshInProgress == false){
+    else if(refrshIntervalX == "8"
+                && timeDiff.toInt() >= 25200
+                && timeDiff.toInt() < 25320
+                && refreshInProgress == false){
                 refreshInProgress = true;
                 updateCurrentLogSummary();
     }
     // 8 hours
-    else if(refrshIntervalX == "9" && timeDiff.toInt() >= 28800 && timeDiff.toInt() < 28920 && refreshInProgress == false){
+    else if(refrshIntervalX == "9"
+                && timeDiff.toInt() >= 28800
+                && timeDiff.toInt() < 28920
+                && refreshInProgress == false){
                 refreshInProgress = true;
                 updateCurrentLogSummary();
     }
     // 9 hours
-    else if(refrshIntervalX == "10" && timeDiff.toInt() >= 32400 && timeDiff.toInt() < 32520 && refreshInProgress == false){
+    else if(refrshIntervalX == "10"
+                && timeDiff.toInt() >= 32400
+                && timeDiff.toInt() < 32520
+                && refreshInProgress == false){
                 refreshInProgress = true;
                 updateCurrentLogSummary();
     }
     // 10 hours
-    else if(refrshIntervalX == "11" && timeDiff.toInt() >= 36000 && timeDiff.toInt() < 36120 && refreshInProgress == false){
+    else if(refrshIntervalX == "11"
+                && timeDiff.toInt() >= 36000
+                && timeDiff.toInt() < 36120
+                && refreshInProgress == false){
                 refreshInProgress = true;
                 updateCurrentLogSummary();
     }
     // 11 hours
-    else if(refrshIntervalX == "12" && timeDiff.toInt() >= 39600 && timeDiff.toInt() < 39720 && refreshInProgress == false){
+    else if(refrshIntervalX == "12"
+                && timeDiff.toInt() >= 39600
+                && timeDiff.toInt() < 39720
+                && refreshInProgress == false){
                 refreshInProgress = true;
                 updateCurrentLogSummary();
     }
     // 12 hours
-    else if(refrshIntervalX == "13" && timeDiff.toInt() >= 43200 && timeDiff.toInt() < 43320 && refreshInProgress == false){
+    else if(refrshIntervalX == "13"
+                && timeDiff.toInt() >= 43200
+                && timeDiff.toInt() < 43320
+                && refreshInProgress == false){
                 refreshInProgress = true;
                 updateCurrentLogSummary();
     }
@@ -893,7 +935,8 @@ void MainController::clearEventLogs(){
     clearLogsProcess = new QProcess();
     QStringList args;
     args  << "Clear-EventLog -LogName application, system, security";
-    connect(clearLogsProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{clearLogsStatus();});
+    //connect(clearLogsProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{clearLogsStatus();});
+    connect(clearLogsProcess, &QProcess::finished, this, &MainController::clearLogsStatus);
     clearLogsProcess->start("powershell", args);
 }
 

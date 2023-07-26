@@ -6,6 +6,7 @@ ParseFlagsThread::ParseFlagsThread(QThread *parent) : QThread(parent){
 
 void ParseFlagsThread::run(){
     qDebug() << "In parse flags thread............................";
+    emit flagParsingStatus2Qml("Parsing flag data, please wait...");
     QFile currentFlagsFile("C:/Lumberjack/flags/flags.txt");
     QFile archiveFile("C:/Lumberjack/audit/archived_reports/audit_" + fileName + ".json");
 
@@ -76,6 +77,7 @@ void ParseFlagsThread::run(){
         emit liveBkupStatsDoneToQml("Live backup completed @ " +  QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
     }
     flagCounter = 0;
+    emit flagParsingDone(1);
 }
 
 void ParseFlagsThread::setData(QString fName, QString backupType, bool _refreshStatus){
