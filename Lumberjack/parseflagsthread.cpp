@@ -44,7 +44,6 @@ void ParseFlagsThread::run(){
         foreach (const QString &flag, flagParseList) {
             if(flag == eventId_G){
                 if(bType == "updateFlags"){
-                    //qDebug() << "Save type is: " + saveType;
                     flagCounter++;
                     emit flagCount(QString::number(flagCounter));
 
@@ -71,7 +70,8 @@ void ParseFlagsThread::run(){
     if(bType == "updateFlags"){
         refreshInProgress = false;
         emit updateRefreshInProgress(refreshInProgress);
-        qDebug() << "Refresh in progress = false";
+        qDebug() << "Refresh in progress = false | Deleting file after calculations";
+        archiveFile.remove();
     }
     if(bType == "live"){
         emit liveBkupStatsDoneToQml("Live backup completed @ " +  QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));

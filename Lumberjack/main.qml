@@ -2360,9 +2360,11 @@ Window {
                 sw_TxtArea.text += "Saving Settings...\n"
                 if(rosSwitch.checked){
                     mainController.saveRunAtStartData("true")
+                    maincontroller.runOnStartRegEdit("true")
                 }
                 else if(!rosSwitch.checked){
                     mainController.saveRunAtStartData("false")
+                    mainController.runOnStartRegEdit("false")
                 }
                 var comboboxText = control5.currentIndex
                 mainController.saveRefreshSummaryData(comboboxText)
@@ -2388,7 +2390,7 @@ Window {
             onToggled: {
                 if(checked){
                     rosSwitch.text= qsTr("<font color=\"white\">On</font>")
-                    mainController.runOnStartRegEdit()
+                    //mainController.runOnStartRegEdit()
                     //https://stackoverflow.com/questions/9534415/run-application-on-startup
 
                 }
@@ -2745,9 +2747,9 @@ Window {
 
 
     Text {
-        id: logViewerTitleText
+        id: secretCityLabsLabel
         x: 1152
-        y: 689
+        y: 691
         width: 126
         height: 26
         visible: true
@@ -2937,9 +2939,10 @@ Window {
     Image {
         id: alienLogoImg
         x: 1106
-        y: 685
+        y: 687
         width: 40
         height: 30
+        visible: false
         source: "file:C:/Lumberjack/images/alien_logo.png"
         fillMode: Image.PreserveAspectFit
         //anchors.right: parent.right

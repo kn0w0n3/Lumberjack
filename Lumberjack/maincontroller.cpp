@@ -423,27 +423,27 @@ void MainController::checkDirectories(){
     QDir lumberjackDir(docsFolder + "/Lumberjack");
 
     //EVTX directories
-    QDir evtxDir(docsFolder + "/Lumberjack/evtx");
-    QDir evtxSysDir(docsFolder + "/Lumberjack/evtx/system");
-    QDir evtxAppDir(docsFolder + "/Lumberjack/evtx/application");
-    QDir evtxSecDir(docsFolder + "/Lumberjack/evtx/security");
+    //QDir evtxDir(docsFolder + "/Lumberjack/evtx");
+    //QDir evtxSysDir(docsFolder + "/Lumberjack/evtx/system");
+    //QDir evtxAppDir(docsFolder + "/Lumberjack/evtx/application");
+    //QDir evtxSecDir(docsFolder + "/Lumberjack/evtx/security");
 
     //JSON directories
-    QDir jsonDir(docsFolder + "/Lumberjack/json");
-    QDir jsonSysDir(docsFolder + "/Lumberjack/json/system");
-    QDir jsonAppDir(docsFolder + "/Lumberjack/json/application");
-    QDir jsonSecDir(docsFolder + "/Lumberjack/json/security");
+    //QDir jsonDir(docsFolder + "/Lumberjack/json");
+    //QDir jsonSysDir(docsFolder + "/Lumberjack/json/system");
+   // QDir jsonAppDir(docsFolder + "/Lumberjack/json/application");
+    //QDir jsonSecDir(docsFolder + "/Lumberjack/json/security");
 
     //Check if directories exist. If not, create them
     if(!lumberjackDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack");}
-    if(!evtxDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/evtx");}
-    if(!evtxSysDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/evtx/system");}
-    if(!evtxAppDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/evtx/application");}
-    if(!evtxSecDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/evtx/security");}
-    if(!jsonDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/json");}
-    if(!jsonSysDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/json/system");}
-    if(!jsonAppDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/json/application");}
-    if(!jsonSecDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/json/security");}
+    //if(!evtxDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/evtx");}
+    //if(!evtxSysDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/evtx/system");}
+    //if(!evtxAppDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/evtx/application");}
+    //if(!evtxSecDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/evtx/security");}
+    //if(!jsonDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/json");}
+    //if(!jsonSysDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/json/system");}
+    //if(!jsonAppDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/json/application");}
+    //if(!jsonSecDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/json/security");}
 
     //Check if the EvtxeCmd folder exists in the Documents\EvtxConverter folder
     QStringList args;
@@ -455,7 +455,7 @@ void MainController::checkDirectories(){
 //Send message to QML when EVTX files have been saved, converted, and parsed
 void MainController::evtxProcessingDoneRelay(int n){
     processingCount += n;
-    qDebug() << "Processing Count is: " +QString::number(processingCount);
+    qDebug() << "Processing Count is: " + QString::number(processingCount);
     if(processingCount == 4){
         emit processingStatus2Qml("Summary " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
         processingCount = 0;
@@ -647,7 +647,7 @@ void MainController::createArchive(QString backupType){
 }
 
 //BUG:Spaces in file names causes file to not be moved
-//Move the selected audid log to the reviewed foler
+//Move the selected audit log to the reviewed foler
 void MainController::moveAuditLogToReviewedFolder(QString fileName){
     moveAuditLogToReviewedProcesss = new QProcess();
     QString fileToMove = "C:/Lumberjack/audit/archived_reports/" + fileName;
@@ -655,7 +655,6 @@ void MainController::moveAuditLogToReviewedFolder(QString fileName){
     args << "Move-Item -Path "  + fileToMove +  " -Destination C:/Lumberjack/audit/archived_reports/reviewed/" + fileName;
     //connect(moveAuditLogToReviewedProcesss,(void(QProcess::*)(int))&QProcess::finished, [=]{updateMovedLogsStatus();});
     connect(moveAuditLogToReviewedProcesss, &QProcess::finished, this, &MainController::updateMovedLogsStatus);
-
     moveAuditLogToReviewedProcesss->start("powershell", args);
 }
 
@@ -758,19 +757,26 @@ void MainController::parseFlags(QString fileName, QString bType){
     connect(parseFlagsThread, &ParseFlagsThread::liveBkupStatsDoneToQml, this, &MainController::updateLiveBackupStatus);
     connect(parseFlagsThread, &ParseFlagsThread::flagParsingStatus2Qml, this, &MainController::processingStatus2Qml);
     connect(parseFlagsThread, &ParseFlagsThread::flagParsingDone, this, &MainController::evtxProcessingDoneRelay);
-
     connect(parseFlagsThread, &ParseFlagsThread::finished, this, &MainController::terminateThread);
     parseFlagsThread->start();
 }
 
-//Add program to startup
-void MainController::runOnStartRegEdit(){
+//Add or remove program from run at start
+void MainController::runOnStartRegEdit(QString switchState){
     qDebug() << "In regedit";
-    QSettings settings("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
-    settings.setValue("Lumberjack.exe", QCoreApplication::applicationFilePath().replace('/', '\\'));
-    settings.sync();
-    qDebug() << settings.status();
-    //or settings.remove("name");
+
+    if(switchState == "true"){
+            QSettings settings("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
+            settings.setValue("Lumberjack.exe", QCoreApplication::applicationFilePath().replace('/', '\\'));
+            settings.sync();
+            qDebug() << settings.status();
+    }
+    else if(switchState == "false"){
+            QSettings settings("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
+            settings.remove("Lumberjack.exe");
+            settings.sync();
+            qDebug() << settings.status();
+    }
 }
 
 //Save the time of refresh

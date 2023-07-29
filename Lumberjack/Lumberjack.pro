@@ -4,11 +4,13 @@ QT += xml
 QT += core
 
 SOURCES += \
+        appeventcounterthread.cpp \
         archivecreatorthread.cpp \
         main.cpp \
         maincontroller.cpp \
         parseflagsthread.cpp \
         seceventcounterthread.cpp \
+        syseventcounterthread.cpp \
         tablemodel.cpp
 
 resources.files = main.qml 
@@ -33,8 +35,10 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    appeventcounterthread.h \
     archivecreatorthread.h \
     maincontroller.h \
     parseflagsthread.h \
     seceventcounterthread.h \
+    syseventcounterthread.h \
     tablemodel.h
