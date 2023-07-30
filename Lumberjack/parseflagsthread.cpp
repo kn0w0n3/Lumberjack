@@ -5,7 +5,6 @@ ParseFlagsThread::ParseFlagsThread(QThread *parent) : QThread(parent){
 }
 
 void ParseFlagsThread::run(){
-    qDebug() << "In parse flags thread............................";
     emit flagParsingStatus2Qml("Parsing flag data, please wait...");
     QFile currentFlagsFile("C:/Lumberjack/flags/flags.txt");
     QFile archiveFile("C:/Lumberjack/audit/archived_reports/audit_" + fileName + ".json");
@@ -19,19 +18,18 @@ void ParseFlagsThread::run(){
         currentFlagsFile.close();
     }
     else{
-        qDebug() << "Flag file not open...";
+        //qDebug() << "Flag file not open...";
     }
 
     //Get JSON archive logs
     if (archiveFile.open(QIODevice::ReadOnly)) {
-        qDebug() << "Getting logs to compare.....";
         QTextStream in(&archiveFile);
         while (!in.atEnd()){
             logsToCompareToFlags << in.readLine().trimmed();
         }
         archiveFile.close();
     }else{
-        qDebug() << "Archive file not open...";
+        //qDebug() << "Archive file not open...";
     }
 
     //compare the flags to event IDs from the archive logs
@@ -59,7 +57,6 @@ void ParseFlagsThread::run(){
         }
     }
     if(bType != "updateFlags"){
-        qDebug() << "Emitting addLogFileToComboBox";
         emit addLogFileToComboBox("audit_" + fileName + ".json");
     }
     if(bType != "updateFlags" && bType != "live"){
@@ -70,7 +67,6 @@ void ParseFlagsThread::run(){
     if(bType == "updateFlags"){
         refreshInProgress = false;
         emit updateRefreshInProgress(refreshInProgress);
-        qDebug() << "Refresh in progress = false | Deleting file after calculations";
         archiveFile.remove();
     }
     if(bType == "live"){

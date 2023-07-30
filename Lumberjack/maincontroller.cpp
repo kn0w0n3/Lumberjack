@@ -10,7 +10,6 @@ MainController::MainController(QWidget *parent) : QWidget(parent){
 void MainController::getSystemLogs(){
     if(saveType == "refresh"){
         emit processingStatus2Qml("Retrieving system log data, please wait...");
-        qDebug() << "The refresh time being saved is: " + QDateTime::currentDateTime().toString("h:mm:ss ap");
         saveRefreshedTime(QDateTime::currentDateTime().toString("h:mm:ss ap"));
         saveRefreshedTimeWd(QDateTime::currentDateTime().toString("h:mm:ss ap dd.MM.yyyy"));
     }
@@ -39,7 +38,6 @@ void MainController::getApplicationLogs(){
 
 //Save secuity logs to evtx file
 void MainController::getSecurityLogs(QString sType, QString bType){
-    qDebug() << "IN GET SECURITY LOGS";
     saveType = sType;
     _backupType = bType;
     if(saveType == "refresh"){
@@ -55,7 +53,6 @@ void MainController::getSecurityLogs(QString sType, QString bType){
 
 //Convert security evtx to JSON
 void MainController::convertSecEvtxToJson(){
-    //qDebug() << "IN CONVERT SEC EVTX TO JSON........";
     getSecurityLogsProcess->terminate();
     if(saveType == "refresh"){
         emit processingStatus2Qml("Processing security data, please wait...");
@@ -71,7 +68,6 @@ void MainController::convertSecEvtxToJson(){
 
 //Convert application EVTX to JSON
 void MainController::convertAppEvtxToJson(){
-    //qDebug() << "IN CONVERT App EVTX TO JSON........";
     getApplicationLogsProcess->terminate();
     if(saveType == "refresh"){
         emit processingStatus2Qml("Processing application data, please wait...");
@@ -112,10 +108,8 @@ void MainController::getSecDataFromJson(){
 }
 
 void MainController::getSecDataJsonStatus(){
-    qDebug() << "In get SEC data JSON Status..........";
-    qDebug() << "Terminating evtx to json conversion process......";
-    qDebug() << "Terminating file ops thread since it ahould be finished......";
-    qDebug() << "Calling Get Application Logs......";
+    //qDebug() << "In get sec data jason status:";
+    QThread::msleep(300);
     convertSecEvtxToJsonProcess->terminate();
     evtxProcessingDoneRelay(1);
     secEventCounterThread->terminate();
@@ -127,50 +121,39 @@ void MainController::getAppDataFromJson(){
     if(saveType == "refresh"){
         emit processingStatus2Qml("Parsing application data, please wait...");
     }
-    QFile file(docsFolder + "/Lumberjack/json/application/application.json");
-    if(!file.open(QIODevice::ReadOnly)) {
-        //Error
-    }
-    QTextStream in(&file);
-    while (!in.atEnd()){
-        numbOfAppEvents++;
-        appJsonObjects << in.readLine();
-    }
-    file.close();
+    appEventCounterThread = new AppEventCounterThread();
+    connect(appEventCounterThread, &AppEventCounterThread::finished, this, &MainController::getAppDataJsonStatus);
+    connect(appEventCounterThread, &AppEventCounterThread::appEventNum2MainContrler, this, &MainController::setNumberOfAppEvents);
+    appEventCounterThread->setSaveType(saveType);
+    appEventCounterThread->start();
+}
 
-    if(saveType == "refresh"){
-        emit appEventCount2Qml(QString::number(numbOfAppEvents));
-    }
-    numbOfAppEvents = 0;
-    evtxProcessingDoneRelay(1);
+void MainController::getAppDataJsonStatus(){
+    QThread::msleep(300);
     convertAppEvtxToJsonProcess->terminate();
-    appJsonObjects.clear();
+    evtxProcessingDoneRelay(1);
+    appEventCounterThread->terminate();
     getSystemLogs();
 }
 
 //Parse JSON system data and retrieve desired values
 void MainController::getSysDataFromJson(){
     if(saveType == "refresh"){
-        emit processingStatus2Qml("Parsing system data, please wait...");
+        emit processingStatus2Qml("Parsing System data, please wait...");
     }
-    QFile file(docsFolder + "/Lumberjack/json/system/system.json");
-    if(!file.open(QIODevice::ReadOnly)){
-        //error
-    }
-    QTextStream in(&file);
-    while (!in.atEnd()){
-        sysJsonObjects << in.readLine();
-        numbOfSysEvents++;
-    }
-    file.close();
 
-    if(saveType == "refresh"){
-        emit sysEventCount2Qml(QString::number(numbOfSysEvents));
-    }
-    numbOfSysEvents = 0;
-    evtxProcessingDoneRelay(1);
+    sysEventCounterThread = new SysEventCounterThread();
+    connect(sysEventCounterThread, &SysEventCounterThread::finished, this, &MainController::getSysDataJsonStatus);
+    connect(sysEventCounterThread, &SysEventCounterThread::sysEventNum2MainContrler, this, &MainController::setNumberOfSysEvents);
+    sysEventCounterThread->setSaveType(saveType);
+    sysEventCounterThread->start();
+}
+
+void MainController::getSysDataJsonStatus(){
+    QThread::msleep(300);
     convertSysEvtxToJsonProcess->terminate();
-    sysJsonObjects.clear();
+    evtxProcessingDoneRelay(1);
+    sysEventCounterThread->terminate();
 
     if(saveType == "backup"){
         createArchive("live");
@@ -289,7 +272,6 @@ void MainController::dirConvertEvtx(QString convertType, QString fPah, QString s
         emit fileConvertEvtxStatus("EVTX to JSON conversion process starting " +
                                    QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
         emit fileConvertEvtxStatus("Please Wait....");
-        qDebug() << "SAVE PATH IS: " + savePath;
         convertEvtxToJsonProcess = new QProcess();
         QStringList args;
         //Set a permanent location for deployment
@@ -422,28 +404,9 @@ void MainController::checkDirectories(){
     //Main Dir
     QDir lumberjackDir(docsFolder + "/Lumberjack");
 
-    //EVTX directories
-    //QDir evtxDir(docsFolder + "/Lumberjack/evtx");
-    //QDir evtxSysDir(docsFolder + "/Lumberjack/evtx/system");
-    //QDir evtxAppDir(docsFolder + "/Lumberjack/evtx/application");
-    //QDir evtxSecDir(docsFolder + "/Lumberjack/evtx/security");
-
-    //JSON directories
-    //QDir jsonDir(docsFolder + "/Lumberjack/json");
-    //QDir jsonSysDir(docsFolder + "/Lumberjack/json/system");
-   // QDir jsonAppDir(docsFolder + "/Lumberjack/json/application");
-    //QDir jsonSecDir(docsFolder + "/Lumberjack/json/security");
-
-    //Check if directories exist. If not, create them
-    if(!lumberjackDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack");}
-    //if(!evtxDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/evtx");}
-    //if(!evtxSysDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/evtx/system");}
-    //if(!evtxAppDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/evtx/application");}
-    //if(!evtxSecDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/evtx/security");}
-    //if(!jsonDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/json");}
-    //if(!jsonSysDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/json/system");}
-    //if(!jsonAppDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/json/application");}
-    //if(!jsonSecDir.exists()){QDir().mkdir(docsFolder + "/Lumberjack/json/security");}
+    if(!lumberjackDir.exists()){
+        QDir().mkdir(docsFolder + "/Lumberjack");
+    }
 
     //Check if the EvtxeCmd folder exists in the Documents\EvtxConverter folder
     QStringList args;
@@ -455,7 +418,6 @@ void MainController::checkDirectories(){
 //Send message to QML when EVTX files have been saved, converted, and parsed
 void MainController::evtxProcessingDoneRelay(int n){
     processingCount += n;
-    qDebug() << "Processing Count is: " + QString::number(processingCount);
     if(processingCount == 4){
         emit processingStatus2Qml("Summary " + QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
         processingCount = 0;
@@ -626,18 +588,16 @@ void MainController::evtxCmdFolderExistsResponse(){
             return;
     }
     else if(response == "False"){
-            qDebug() << "The folder does not exist. It needs to be copied and moved with powershell......";
             QString targetDir = "C:/Lumberjack/EvtxeCmd/";
             QStringList args;
             args << "Copy-Item -Path "  + targetDir +  " -Destination " + docsFolder + "/Lumberjack/EvtxeCmd/ -Recurse";
             moveEvtxeCmdToDocsProcess.start("powershell", args);
     }
     else{
-            qDebug() << "The evtxecmd folder exist response was neither true nor false......";
+
     }
 }
 
-//Put on thread? This causes the GUI to lock
 //Create an archive file containing the the date and time in the file name. Combine system, security, application, json files into one file.
 void MainController::createArchive(QString backupType){
     _backupType = backupType;
@@ -701,7 +661,6 @@ void MainController::saveRunAtStartData(QString rasChoice){
 
 //Populate run at start choices in QML
 void MainController::populateRunAtStartData(){
-    qDebug() << "In populate run at start data";
     QFile runAtStartFile("C:/Lumberjack/settings/runonstart/runonstart.txt");
     if(runAtStartFile.open(QIODevice::ReadOnly)) {
             QTextStream in(&runAtStartFile);
@@ -727,21 +686,17 @@ void MainController::saveRefreshSummaryData(QString rsChoice){
 
 //Populate the refresh summary data in QML
 void MainController::populateRefreshSummaryData(){
-    qDebug() << "In populate resfresh data";
     QFile refreshSummaryFile("C:/Lumberjack/settings/refreshsummary/refreshsummary.txt"); 
     if(refreshSummaryFile.open(QIODevice::ReadOnly)) {
-            qDebug() << "In populate resfresh data file open";
             QTextStream in(&refreshSummaryFile);
             while (!in.atEnd()){
 
             QString temp = in.readAll().trimmed();
-            qDebug() << "The save refrsh data is: " + temp;
-            qDebug() << "Emitting populate resfresh data";
             emit savedRefreshDataToQml(temp);
             }
     }
     else{
-            qDebug() << "The file is not open";
+
     }
     refreshSummaryFile.close();
 }
@@ -750,7 +705,6 @@ void MainController::populateRefreshSummaryData(){
 void MainController::parseFlags(QString fileName, QString bType){
     parseFlagsThread = new ParseFlagsThread();
     parseFlagsThread->setData(fileName, bType, refreshInProgress);
-
     connect(parseFlagsThread, &ParseFlagsThread::flagCount, this, &MainController::flagCount);
     connect(parseFlagsThread, &ParseFlagsThread::addLogFileToComboBox, this, &MainController::addLogFileToComboBox);
     connect(parseFlagsThread, &ParseFlagsThread::updateRefreshInProgress, this, &MainController::mc_UpdateRefreshInProgress);
@@ -763,19 +717,17 @@ void MainController::parseFlags(QString fileName, QString bType){
 
 //Add or remove program from run at start
 void MainController::runOnStartRegEdit(QString switchState){
-    qDebug() << "In regedit";
-
     if(switchState == "true"){
             QSettings settings("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
             settings.setValue("Lumberjack.exe", QCoreApplication::applicationFilePath().replace('/', '\\'));
             settings.sync();
-            qDebug() << settings.status();
+            //qDebug() << settings.status();
     }
     else if(switchState == "false"){
             QSettings settings("HKEY_CURRENT_USER\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
             settings.remove("Lumberjack.exe");
             settings.sync();
-            qDebug() << settings.status();
+            //qDebug() << settings.status();
     }
 }
 
@@ -787,10 +739,9 @@ void MainController::saveRefreshedTime(QString curTime){
             stream << curTime;
     }
     lastRefreshTimeFile.close();
-    //QString currentDateTime = QDateTime::currentDateTime().toString("MM-dd-yyyy_h-mm-ss-ap");
-    //emit settingsWinStatMesg("Refresh data saved @ " + currentDateTime);
 }
 
+//Save the time and date of the current refresh in progress
 void MainController::saveRefreshedTimeWd(QString curTimeWd){
     QFile lastRefreshTimeFileWd("C:/Lumberjack/settings/refreshsummary/lastrefreshtimewd.txt");
     if (lastRefreshTimeFileWd.open(QIODevice::WriteOnly)) {
@@ -802,29 +753,23 @@ void MainController::saveRefreshedTimeWd(QString curTimeWd){
 
 //compare refresh time
 void MainController::compareRefreshedTime(QString currentTime){
-    qDebug() << "In COMPARE refreshed time.........";
     QFile lastRefreshSummaryFile("C:/Lumberjack/settings/refreshsummary/lastrefreshtimewd.txt");
     if(lastRefreshSummaryFile.open(QIODevice::ReadOnly)) {
             QTextStream in(&lastRefreshSummaryFile);
             while (!in.atEnd()){
                 lastRefreshedTime_WD = in.readAll().trimmed();
-                qDebug() << "Last refresh WD: " + lastRefreshedTime_WD;
             }            
     }
     lastRefreshSummaryFile.close();
-    //return lastRefreshTime;
     QString start = lastRefreshedTime_WD;
     QString end = currentTime;
     timeDiff = QString("%1").arg(QDateTime().fromString(start, "h:m:s ap dd.MM.yyyy").secsTo(QDateTime().fromString(end, "h:m:s ap dd.MM.yyyy")));
-    qDebug() << "The time difference is: " + timeDiff;
-
 
     QFile refreshIntervalFile("C:/Lumberjack/settings/refreshsummary/refreshsummary.txt");
     if(refreshIntervalFile.open(QIODevice::ReadOnly)) {
             QTextStream in(&refreshIntervalFile);
             while (!in.atEnd()){
                 refrshIntervalX = in.readAll().trimmed();
-                qDebug() << "Refresh Interval is: " + refrshIntervalX;
             }
     }
     refreshIntervalFile.close();
@@ -843,7 +788,6 @@ void MainController::compareRefreshedTime(QString currentTime){
                 && timeDiff.toInt() >= 3600
                 && timeDiff.toInt() < 3720
                 && refreshInProgress == false){
-                qDebug() << "Strating refreshed from selected interval - every hour";
                 refreshInProgress = true;
                 updateCurrentLogSummary();
     }
@@ -941,23 +885,32 @@ void MainController::clearEventLogs(){
     clearLogsProcess = new QProcess();
     QStringList args;
     args  << "Clear-EventLog -LogName application, system, security";
-    //connect(clearLogsProcess, (void(QProcess::*)(int))&QProcess::finished, [=]{clearLogsStatus();});
     connect(clearLogsProcess, &QProcess::finished, this, &MainController::clearLogsStatus);
     clearLogsProcess->start("powershell", args);
 }
 
 void MainController::clearLogsStatus(){
+    //TO DO: Send message to QML
     qDebug() << "Clear logs finished........";
 }
 
-//Send the number of sec events to QML
+//Send the number of security events to QML
 void MainController::setNumberOfSecEvents(QString NOSE){
     emit securityEventCount2Qml(NOSE);
 }
 
+//Send the number of application events to QML
+void MainController::setNumberOfAppEvents(QString NOAE){
+    emit appEventCount2Qml(NOAE);
+}
+
+//Send the number of system events to QML
+void MainController::setNumberOfSysEvents(QString NSE){
+    emit sysEventCount2Qml(NSE);
+}
+
 //Parse flags after archive thread is done processing
 void MainController::createArchiveStatus(QString timeFromArchive){
-    qDebug() << "IN CREATE ARCHIVE STATUS";
     parseFlags(timeFromArchive, _backupType);
     archiveCreatorThread->quit();
 }
@@ -970,6 +923,7 @@ void MainController::updateLiveBackupStatus(){
     emit liveBkupStatsDoneToQml("Live backup completed @ " +  QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
 }
 
+//Stop parse flags thread
 void MainController::terminateThread(){
     parseFlagsThread->quit();
 }

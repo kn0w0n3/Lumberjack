@@ -5,7 +5,6 @@ SecEventCounterThread::SecEventCounterThread(QThread *parent) : QThread(parent){
 }
 
 void SecEventCounterThread::run(){
-    qDebug() << "In file ops thread run()........";
     QFile file(docsFolder + "/Lumberjack/json/security/security.json");
     if(!file.open(QIODevice::ReadOnly)){
         //qDebug() << "Sec file not open.......";

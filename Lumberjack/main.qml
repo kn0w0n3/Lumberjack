@@ -42,7 +42,7 @@ Window {
                 width: 119
                 height: 28
                 visible: false
-                source: "file:C:/Lumberjack/images/logo2.png"
+                source: "file:C:/Lumberjack/images/alien_logo.png"
                 fillMode: Image.PreserveAspectFit
             }
 
@@ -795,7 +795,7 @@ Window {
             palette.buttonText: "#ffffff"
             onClicked: {
 
-                console.log("The row count is: " + tableModelz.rowCount());
+                //console.log("The row count is: " + tableModelz.rowCount());
                 var numRows = tableModelz.rowCount();
                 var counter = 0;
                 var rowCounter = numRows -1;
@@ -852,7 +852,7 @@ Window {
                 //Move the selected log file to the reviewed folder
                 //var fileName = control.currentText
                 mainController.moveAuditLogToReviewedFolder(control.currentText)
-                console.log("Current text is: " + control.currentText)
+                //console.log("Current text is: " + control.currentText)
             }
         }
 
@@ -2938,12 +2938,12 @@ Window {
 
     Image {
         id: alienLogoImg
-        x: 1106
-        y: 687
-        width: 40
+        x: 1152
+        y: 662
+        width: 114
         height: 30
         visible: false
-        source: "file:C:/Lumberjack/images/alien_logo.png"
+        source: "file:C:/Lumberjack/images/interference.png"
         fillMode: Image.PreserveAspectFit
         //anchors.right: parent.right
         //anchors.bottom: parent.bottom

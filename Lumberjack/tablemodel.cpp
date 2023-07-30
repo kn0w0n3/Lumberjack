@@ -16,7 +16,6 @@ QVariant TableModel::data(const QModelIndex &index, int role) const{
      qDebug() << "In data() tableModel.cpp: ";
      switch (role){
      case Qt::DisplayRole:
-         //return QString().arg(index.column()).arg(index.row());
          return table.at(index.row()).at(index.column());
      default:
          break;
@@ -72,11 +71,6 @@ bool TableModel::insertRows(int position, int rows, const QModelIndex &parent){
       QString channel_ = obdata["Channel"].toString();
       QString timeCreated = obdata2["@SystemTime"].toString();
 
-      //if(channel_.isEmpty() && computerName.isEmpty() && timeCreated.isEmpty() && eventId.isEmpty()){
-          //break;
-          //qDebug() << "EMPTY CHANNEL<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
-     //}
-
       if(rowCounter == 1 && mainHeaderSet == false){
             mainHeaderSet = true;
             table.append({"Event ID", "Computer Name", "Channel", "Time Created"});
@@ -100,21 +94,8 @@ bool TableModel::insertRows(int position, int rows, const QModelIndex &parent){
             table.append({"", "", "", ""});
             table.append({eventId, computerName, channel_, timeCreated});
       }
-/*
-      else if(appHeaderSet == true  && flagsHeaderSet == false){
-            qDebug() << "In set Flags header.....";
-            flagsHeaderSet  = true;
-            table.append({"", "", "", ""});
-            table.append({eventId, computerName, channel_, timeCreated});
-      }
-*/
       else{
-            //if(!channel_.isEmpty()){
-            table.append({eventId, computerName, channel_, timeCreated});
-           // }
-           // else{
-                //Do nothing
-           //}
+            table.append({eventId, computerName, channel_, timeCreated}); 
         }
     }
     secHeaderSet = false;

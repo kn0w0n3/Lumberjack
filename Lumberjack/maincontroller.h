@@ -28,6 +28,8 @@
 #include "seceventcounterthread.h"
 #include "archivecreatorthread.h"
 #include "parseflagsthread.h"
+#include "appeventcounterthread.h"
+#include "syseventcounterthread.h"
 
 class MainController:  public QWidget{
     Q_OBJECT
@@ -72,17 +74,15 @@ public slots:
     void getSystemLogs();
     void getApplicationLogs();
     void getSecurityLogs(QString, QString);
-
     void convertSecEvtxToJson();
     void convertAppEvtxToJson();
     void convertSysEvtxToJson();
-
     void getSecDataFromJson();
     void getSecDataJsonStatus();
-
     void getAppDataFromJson();
+    void getAppDataJsonStatus();
     void getSysDataFromJson();
-
+    void getSysDataJsonStatus();
     void populateFlagData();
     void saveFlagData(QString);
     void ce_SelectFile();
@@ -96,19 +96,14 @@ public slots:
     void checkDirectories();
     void evtxProcessingDoneRelay(int);
     void updateCurrentLogSummary();
-
     void saveSchedulerTimeData(QString, QString, QString);
     void populateSchedulerTimeData();
-
     void saveSchedulerDayData(QStringList);
     void populateShedulerDaysData();
-
     void saveSchdlerClrLogData(QString);
     void popSchdlerClrLogData();
-
     void saveSchdlerBkupData(QString);
     void popSchdlerBkupData();
-
     void getArchivedLogsList();
     void evtxCmdFolderExistsResponse();
     void createArchive(QString);
@@ -116,15 +111,11 @@ public slots:
     void updateMovedLogsStatus();
     void updateFlagList(QStringList, QStringList);
     void createBackup(QString);
-
     void saveRunAtStartData(QString);
     void populateRunAtStartData();
-
     void saveRefreshSummaryData(QString);
     void populateRefreshSummaryData();
-
     void parseFlags(QString, QString);
-
     void runOnStartRegEdit(QString);
     void saveRefreshedTime(QString);
     void saveRefreshedTimeWd(QString);
@@ -132,8 +123,9 @@ public slots:
     void clearEventLogs();
     void clearLogsStatus();
     void setNumberOfSecEvents(QString);
+    void setNumberOfAppEvents(QString);
+    void setNumberOfSysEvents(QString);
     void createArchiveStatus(QString);
-
     void mc_UpdateRefreshInProgress(bool);
     void updateLiveBackupStatus();
     void terminateThread();
@@ -179,15 +171,13 @@ private:
     QStringList flagParseList;
     QStringList logsToCompareToFlags;
 
-    QByteArray tArray_G;
-    QJsonDocument json_doc_G;
-    QJsonObject jsonObject_G;
-    QJsonObject obdata_G;
-    QJsonObject obdata2_G;
-    QString eventId_G = obdata_G["EventID"].toString();
-    //QString computerName = obdata["Computer"].toString();
-    QString channel_G = obdata_G["Channel"].toString();
-    //QString timeCreated = obdata2["@SystemTime"].toString();
+    //QByteArray tArray_G;
+    //QJsonDocument json_doc_G;
+    //QJsonObject jsonObject_G;
+    //QJsonObject obdata_G;
+    //QJsonObject obdata2_G;
+    //QString eventId_G = obdata_G["EventID"].toString();
+    //QString channel_G = obdata_G["Channel"].toString();
     QString lastRefreshTime = "";
     QString lastRefreshedTime_WD = "";
     QString refrshIntervalX = "";
@@ -195,6 +185,8 @@ private:
     bool refreshInProgress = false;
 
     SecEventCounterThread *secEventCounterThread;
+    AppEventCounterThread *appEventCounterThread;
+    SysEventCounterThread *sysEventCounterThread;
     ArchiveCreatorThread *archiveCreatorThread;
     ParseFlagsThread *parseFlagsThread;
 
