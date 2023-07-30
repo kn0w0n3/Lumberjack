@@ -29,6 +29,7 @@ signals:
     void updateRefreshInProgress(bool);
     void flagParsingStatus2Qml(QString);
     void flagParsingDone(int);
+    void clearEventLogs();
 
 public slots:
       //void setBackupType();
@@ -39,6 +40,7 @@ private:
     QStringList logsToCompareToFlags;
     QString bType = "";
     QString fileName = "";
+    QString clearLogsSwitchStatus = "";
     int flagCounter = 0;
     bool refreshInProgress = false;
 };

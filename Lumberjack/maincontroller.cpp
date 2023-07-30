@@ -15,9 +15,8 @@ void MainController::getSystemLogs(){
     }
     getSystemLogsProcess = new QProcess();
     QStringList args;
-    args  << "Set-Location -Path " + docsFolder + "/Lumberjack/evtx/system/;" << "Remove-Item " +
-             docsFolder + "/Lumberjack/evtx/system/system.evtx;" << "$log = Get-WmiObject -Class Win32_NTEventlogFile | Where-Object LogfileName -EQ 'system';"
-          << "$log.BackupEventlog('" + docsFolder + "/Lumberjack/evtx/system/system.evtx')";
+    args  << "Set-Location -Path C:/Lumberjack/evtx/system/;" << "Remove-Item C:/Lumberjack/evtx/system/system.evtx;" << "$log = Get-WmiObject -Class Win32_NTEventlogFile | Where-Object LogfileName -EQ 'system';"
+          << "$log.BackupEventlog('""C:/Lumberjack/evtx/system/system.evtx')";
     connect(getSystemLogsProcess, &QProcess::finished, this, &MainController::convertSysEvtxToJson);
     getSystemLogsProcess->start("powershell", args);
 }
@@ -29,9 +28,8 @@ void MainController::getApplicationLogs(){
     }
     getApplicationLogsProcess = new QProcess();
     QStringList args;
-    args  << "Set-Location -Path " + docsFolder + "/Lumberjack/evtx/application/;" << "Remove-Item " +
-             docsFolder + "/Lumberjack/evtx/application/application.evtx;" << "$log = Get-WmiObject -Class Win32_NTEventlogFile | Where-Object LogfileName -EQ 'application';"
-          << "$log.BackupEventlog('" + docsFolder + "/Lumberjack/evtx/application/application.evtx')";
+    args  << "Set-Location -Path C:/Lumberjack/evtx/application/;" << "Remove-Item C:/Lumberjack/evtx/application/application.evtx;" << "$log = Get-WmiObject -Class Win32_NTEventlogFile | Where-Object LogfileName -EQ 'application';"
+          << "$log.BackupEventlog('""C:/Lumberjack/evtx/application/application.evtx')";
     connect(getApplicationLogsProcess, &QProcess::finished, this, &MainController::convertAppEvtxToJson);
     getApplicationLogsProcess->start("powershell", args);
 }
@@ -45,8 +43,8 @@ void MainController::getSecurityLogs(QString sType, QString bType){
     }
     getSecurityLogsProcess = new QProcess();
     QStringList args;
-    args  << "Set-Location -Path " + docsFolder + "/Lumberjack/evtx/security/;" << "Remove-Item " + docsFolder + "/Lumberjack/evtx/security/security.evtx;" << "$log = Get-WmiObject -Class Win32_NTEventlogFile | Where-Object LogfileName -EQ 'security';"
-          << "$log.BackupEventlog('" + docsFolder + "/Lumberjack/evtx/security/security.evtx')";
+    args  << "Set-Location -Path C:/Lumberjack/evtx/security/;" << "Remove-Item C:/Lumberjack/evtx/security/security.evtx;" << "$log = Get-WmiObject -Class Win32_NTEventlogFile | Where-Object LogfileName -EQ 'security';"
+          << "$log.BackupEventlog('""C:/Lumberjack/evtx/security/security.evtx')";
     connect(getSecurityLogsProcess, &QProcess::finished, this, &MainController::convertSecEvtxToJson);
     getSecurityLogsProcess->start("powershell", args);
 }
@@ -60,8 +58,7 @@ void MainController::convertSecEvtxToJson(){
     convertSecEvtxToJsonProcess = new QProcess();
     QStringList args;
     args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
-         << "./EvtxECmd.exe -f "  + docsFolder + "/Lumberjack/evtx/security/security.evtx --fj --json " +
-            docsFolder + "/Lumberjack/json/security/ --jsonf security.json";
+         << "./EvtxECmd.exe -f C:/Lumberjack/evtx/security/security.evtx --fj --json C:/Lumberjack/json/security/ --jsonf security.json";
     connect(convertSecEvtxToJsonProcess, &QProcess::finished, this, &MainController::getSecDataFromJson);
     convertSecEvtxToJsonProcess->start("powershell", args);
 }
@@ -75,8 +72,7 @@ void MainController::convertAppEvtxToJson(){
     convertAppEvtxToJsonProcess = new QProcess();
     QStringList args;
     args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
-         << "./EvtxECmd.exe -f "  + docsFolder + "/Lumberjack/evtx/application/application.evtx --json " +
-            docsFolder+ "/Lumberjack/json/application/ --fj --jsonf application.json";
+         << "./EvtxECmd.exe -f C:/Lumberjack/evtx/application/application.evtx --json C:/Lumberjack/json/application/ --fj --jsonf application.json";
     connect(convertAppEvtxToJsonProcess, &QProcess::finished, this, &MainController::getAppDataFromJson);
     convertAppEvtxToJsonProcess->start("powershell", args);
 }
@@ -90,7 +86,7 @@ void MainController::convertSysEvtxToJson(){
     convertSysEvtxToJsonProcess = new QProcess();
     QStringList args;
     args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
-         << "./EvtxECmd.exe -f "  + docsFolder + "/Lumberjack/evtx/system/system.evtx --json " + docsFolder + "/Lumberjack/json/system/ --fj --jsonf system.json";
+         << "./EvtxECmd.exe -f C:/Lumberjack/evtx/system/system.evtx --json C:/Lumberjack/json/system/ --fj --jsonf system.json";
     connect(convertSysEvtxToJsonProcess, (void(QProcess::*)(int))&QProcess::finished, this, &MainController::getSysDataFromJson);
     convertSysEvtxToJsonProcess->start("powershell", args);
 }
@@ -141,7 +137,6 @@ void MainController::getSysDataFromJson(){
     if(saveType == "refresh"){
         emit processingStatus2Qml("Parsing System data, please wait...");
     }
-
     sysEventCounterThread = new SysEventCounterThread();
     connect(sysEventCounterThread, &SysEventCounterThread::finished, this, &MainController::getSysDataJsonStatus);
     connect(sysEventCounterThread, &SysEventCounterThread::sysEventNum2MainContrler, this, &MainController::setNumberOfSysEvents);
@@ -711,6 +706,7 @@ void MainController::parseFlags(QString fileName, QString bType){
     connect(parseFlagsThread, &ParseFlagsThread::liveBkupStatsDoneToQml, this, &MainController::updateLiveBackupStatus);
     connect(parseFlagsThread, &ParseFlagsThread::flagParsingStatus2Qml, this, &MainController::processingStatus2Qml);
     connect(parseFlagsThread, &ParseFlagsThread::flagParsingDone, this, &MainController::evtxProcessingDoneRelay);
+    connect(parseFlagsThread, &ParseFlagsThread::clearEventLogs, this, &MainController::clearEventLogs);
     connect(parseFlagsThread, &ParseFlagsThread::finished, this, &MainController::terminateThread);
     parseFlagsThread->start();
 }

@@ -7,6 +7,7 @@ ParseFlagsThread::ParseFlagsThread(QThread *parent) : QThread(parent){
 void ParseFlagsThread::run(){
     emit flagParsingStatus2Qml("Parsing flag data, please wait...");
     QFile currentFlagsFile("C:/Lumberjack/flags/flags.txt");
+    QFile clearLogsStatusFile("C:/Lumberjack/settings/clearlogs/clearlogs.txt");
     QFile archiveFile("C:/Lumberjack/audit/archived_reports/audit_" + fileName + ".json");
 
     //Get the list of flags
@@ -60,9 +61,23 @@ void ParseFlagsThread::run(){
         emit addLogFileToComboBox("audit_" + fileName + ".json");
     }
     if(bType != "updateFlags" && bType != "live"){
-        qDebug() << "Clearing logs after scheduled backup.......";
-        //TODO: Check clear backup logs switch status before clearing
-        //clearEventLogs();
+
+        //Get the clear logs switch saved status
+        if (clearLogsStatusFile.open(QIODevice::ReadOnly)) {
+            QTextStream in(&currentFlagsFile);
+            while(!in.atEnd()){
+                clearLogsSwitchStatus = in.readLine().trimmed();
+            }
+            currentFlagsFile.close();
+        }
+        else{
+            //error
+        }
+
+        //If clear logs switch is on: clear the event logs
+        if(clearLogsSwitchStatus == "true"){
+            emit clearEventLogs();
+        }
     }
     if(bType == "updateFlags"){
         refreshInProgress = false;
