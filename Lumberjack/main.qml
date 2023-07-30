@@ -3,9 +3,11 @@ import QtQuick
 import QtQuick.Controls 2.15
 import Qt5Compat.GraphicalEffects
 import QtQml.Models 2.12
-//import TableModel 0.1
+import Qt.labs.platform
+
 
 Window {
+    id: mainShell
     width: 1280
     height: 720
     visible: true
@@ -15,6 +17,26 @@ Window {
     maximumHeight: 720
     minimumWidth: 1280
     minimumHeight: 720
+
+    SystemTrayIcon {
+        visible: true
+        icon.source: "file:C:/Lumberjack/images/appicon.png"
+
+        onActivated: {
+            menu.open()
+        }
+
+        menu: Menu {
+                MenuItem {
+                    text: qsTr("Quit")
+                    onTriggered: Qt.quit()
+                }
+                MenuItem {
+                    text: qsTr("Open GUI")
+                    onTriggered: mainShell.show()
+                }
+            }
+    }
 
     Rectangle {
         id: mainWin
@@ -2748,14 +2770,14 @@ Window {
 
     Text {
         id: secretCityLabsLabel
-        x: 1152
-        y: 691
-        width: 126
-        height: 26
+        x: 1169
+        y: 687
+        width: 107
+        height: 22
         visible: true
         color: "#ffffff"
         text: qsTr("Secret City Labs")
-        font.pixelSize: 18
+        font.pixelSize: 15
         //anchors.right: parent.right
         //anchors.bottom: parent.bottom
     }
@@ -2938,12 +2960,14 @@ Window {
 
     Image {
         id: alienLogoImg
-        x: 1152
-        y: 662
-        width: 114
-        height: 30
-        visible: false
-        source: "file:C:/Lumberjack/images/interference.png"
+        x: 1151
+        y: 706
+        width: 144
+        height: 11
+        visible: true
+        //view in designer with following code
+        //source: "images/ipattern.png"
+        source: "file:C:/Lumberjack/images/ipattern.png"
         fillMode: Image.PreserveAspectFit
         //anchors.right: parent.right
         //anchors.bottom: parent.bottom

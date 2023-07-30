@@ -5,5 +5,6 @@
         <file>images/evtx-converter-text.png</file>
         <file>images/scheduler-text.png</file>
         <file>images/flags-text.png</file>
+        <file>images/ipattern.png</file>
     </qresource>
 </RCC>
