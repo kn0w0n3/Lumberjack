@@ -20,12 +20,16 @@ int main(int argc, char *argv[]){
     engine.rootContext()->setContextProperty("tableModelz",&tableModelz);
 
     const QUrl url(u"qrc:/Lumberjack/main.qml"_qs);
+
     QObject::connect(&engine, &QQmlApplicationEngine::objectCreated,
         &app, [url](QObject *obj, const QUrl &objUrl) {
             if (!obj && url == objUrl)
                 QCoreApplication::exit(-1);
+            //obj->setProperty("flags", Qt::SubWindow);
         }, Qt::QueuedConnection);
+     //obj->setProperty("flags", Qt::SubWindow);
     engine.load(url);
+
     app.setWindowIcon(QIcon("C:/Lumberjack/images/appicon.png"));
 
     return app.exec();

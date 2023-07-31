@@ -18,6 +18,14 @@ Window {
     minimumWidth: 1280
     minimumHeight: 720
 
+    onVisibilityChanged: {
+        console.log("Window State changed: " + mainShell.visibility)
+        var windowState_ = mainShell.visibility
+        if(windowState_ === 3){
+            mainShell.hide()
+        }
+    }
+
     SystemTrayIcon {
         visible: true
         icon.source: "file:C:/Lumberjack/images/appicon.png"

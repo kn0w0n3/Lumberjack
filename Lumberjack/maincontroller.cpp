@@ -923,3 +923,5 @@ void MainController::updateLiveBackupStatus(){
 void MainController::terminateThread(){
     parseFlagsThread->quit();
 }
+
+

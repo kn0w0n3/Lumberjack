@@ -25,6 +25,8 @@
 #include <QStandardPaths>
 #include <QSettings>
 #include <QCoreApplication>
+#include <QSystemTrayIcon>
+#include <QTimer>
 #include "seceventcounterthread.h"
 #include "archivecreatorthread.h"
 #include "parseflagsthread.h"
@@ -68,7 +70,6 @@ signals:
     void flagCount(QString _FlagCount);
     void settingsWinStatMesg(QString sw_StatMsg);
     void savedRefreshDataToQml(QString refreshData_);
-
 
 public slots:
     void getSystemLogs();
