@@ -1813,6 +1813,7 @@ Window {
                 y: 79
                 width: 95
                 height: 16
+                visible: false
                 color: "#ffffff"
                 text: qsTr("Current Schedule")
                 font.pixelSize: 12
