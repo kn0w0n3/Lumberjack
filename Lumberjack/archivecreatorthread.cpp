@@ -6,9 +6,9 @@ ArchiveCreatorThread::ArchiveCreatorThread(QThread *parent) : QThread(parent){
 
 void ArchiveCreatorThread::run(){
     QString currentDateTime = QDateTime::currentDateTime().toString("MM-dd-yyyy_h-mm-ss-ap");
-    QFile secJsonFile(docsFolder + "/Lumberjack/json/security/security.json");
-    QFile sysJsonFile(docsFolder + "/Lumberjack/json/system/system.json");
-    QFile appJsonFile(docsFolder + "/Lumberjack/json/application/application.json");
+    QFile secJsonFile("C:/Lumberjack/json/security/security.json");
+    QFile sysJsonFile("C:/Lumberjack/json/system/system.json");
+    QFile appJsonFile("C:/Lumberjack/json/application/application.json");
     QFile archiveFile("C:/Lumberjack/audit/archived_reports/audit_" + currentDateTime + ".json");
 
     if(secJsonFile.open(QIODevice::ReadOnly)){

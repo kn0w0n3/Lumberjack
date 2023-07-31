@@ -5,7 +5,7 @@ SysEventCounterThread::SysEventCounterThread(QThread *parent) : QThread(parent){
 }
 
 void SysEventCounterThread::run(){
-    QFile file(docsFolder + "/Lumberjack/json/system/system.json");
+    QFile file("C:/Lumberjack/json/system/system.json");
     if(!file.open(QIODevice::ReadOnly)){
         //qDebug() << "Sys file not open.......";
     }

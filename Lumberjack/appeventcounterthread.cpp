@@ -5,7 +5,7 @@ AppEventCounterThread::AppEventCounterThread(QThread *parent) : QThread(parent){
 }
 
 void AppEventCounterThread::run(){
-    QFile file(docsFolder + "/Lumberjack/json/application/application.json");
+    QFile file("C:/Lumberjack/json/application/application.json");
     if(!file.open(QIODevice::ReadOnly)){
         //qDebug() << "App file not open.......";
     }
