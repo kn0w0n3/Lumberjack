@@ -19,7 +19,9 @@ From revision a86356ce8a
 Kit 6.5.2 MinGW 64-bit        
 https://www.qt.io/    
 
-# **Requirements:**   
+# **Requirements:**
+**The following component must be installed for the evtx converter to work properly.**  
+
 https://aka.ms/dotnet-core-applaunch?framework=Microsoft.NETCore.App&framework_version=6.0.0&arch=x64&rid=win10-x64  
 
 https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-6.0.16-windows-x64-installer?cid=getdotnetcore    
