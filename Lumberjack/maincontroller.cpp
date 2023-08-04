@@ -218,14 +218,14 @@ void MainController::fileConvertEvtx(QString convertType, QString fPah, QString 
         emit fileConvertEvtxStatus("EVTX to JSON conversion process starting " +
                                    QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
         emit fileConvertEvtxStatus("Please Wait....");
-        convertEvtxToFullJsonProcess = new QProcess();
+        convertEvtxToJsonProcess = new QProcess();
         QStringList args;
         args << "Set-Location -Path " + docsFolder + "/Lumberjack/EvtxeCmd/;"
              << "./EvtxECmd.exe -f " + fPah.trimmed() +  " --json " +  savePath.trimmed() + " --jsonf " + iFileName.trimmed() + ".json";
         connect(convertEvtxToJsonProcess, &QProcess::finished, this, &MainController::updateEvtxConvertStatus);
         convertEvtxToJsonProcess->start("powershell", args);
     }
-    else if(convertType == " Full JSON"){
+    else if(convertType == "Full JSON"){
         emit fileConvertEvtxStatus("EVTX to FUll JSON conversion process starting " +
                                    QDateTime::currentDateTime().toString("MM/dd/yyyy h:mm:ss ap"));
         emit fileConvertEvtxStatus("Please Wait....");
