@@ -5,7 +5,7 @@ Windows Log Viewer | Automatic Backup | Audit Tool
               
  # **Usage:**  
  **Run Lumberjack as administarator. Security logs cannot be obtained otherwise.**     
- 1) Automatically backup and clear Windows event logs 
+ 1) Manual/Auto log backup + clear Windows event logs 
  2) Set flags for specific events
  3) View saved logs
  4) Convert EVTX files to JSON, XML, or CSV
