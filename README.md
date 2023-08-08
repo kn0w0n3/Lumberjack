@@ -10,7 +10,7 @@ Windows Log Viewer | Automatic Backup | Audit Tool
  3) View saved logs
  4) Convert EVTX files to JSON, XML, or CSV
 
-The QAbstractTableModel and QTableview classes currently have limited capablilites. This has limited the formatting of the table in the log viewer. An update is planned for the future. All flags will be at the end of the log file currently.    
+The QAbstractTableModel and QTableView classes currently have limited capablilites. This has limited the formatting of the table in the log viewer. An update is planned for the future. All flags will be at the end of the log file currently.    
 
 https://doc.qt.io/qt-6/qabstracttablemodel.html  
 https://doc.qt.io/qt-6/qml-qtquick-tableview.html  
