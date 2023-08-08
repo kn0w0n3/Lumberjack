@@ -8,7 +8,12 @@ Windows Log Viewer | Automatic Backup | Audit Tool
  1) Automatically backup and clear Windows event logs 
  2) Set flags for specific events
  3) View saved logs
- 4) Convert EVTX files to JSON, XML, or CSV  
+ 4) Convert EVTX files to JSON, XML, or CSV
+
+The QAbstractTableModel and QTableview classes currently have limited capablilites. This has limited the formatting of the table in the log viewer.  
+An update is planned for the future. All flags will be at the end of the log file currently.  
+https://doc.qt.io/qt-6/qabstracttablemodel.html  
+https://doc.qt.io/qt-6/qml-qtquick-tableview.html  
 
 # **Work Environment:**       
 ![QtLogo](https://user-images.githubusercontent.com/22214754/179895211-d52559ab-35df-4fcc-bf69-7377739330d4.png)  
