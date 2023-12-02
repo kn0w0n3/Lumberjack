@@ -1,5 +1,5 @@
 # Lumberjack
-Security Information Event Management Tool
+Security Information and Event Management Tool
 
 ![Lumberjack_GUI_7-30-23](https://github.com/kn0w0n3/Lumberjack/assets/22214754/dfa4507a-a734-4d20-9653-5a2166ecda25)       
               
